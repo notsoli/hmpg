@@ -4,7 +4,7 @@ const mysql = require('mysql')
 const hash = require('./hash')
 
 // create a list of invalid usernames
-const invalidUsernames = ['register']
+const invalidUsernames = []
 
 // set up sql connection
 const sql = mysql.createConnection({
@@ -20,8 +20,8 @@ function login(username, password, callback) {
   const hashedPassword = hash.password(password)
 
   // compare username and password to database
-  const compareInfo = "SELECT * FROM userinfo WHERE username = '" + username + "' AND password = '" + hashedPassword + "';"
-  sql.query(compareInfo, (err, result) => {
+  const compareInfo = "SELECT * FROM userinfo WHERE username = ? AND password = ?;"
+  sql.query(compareInfo, [username, hashedPassword](err, result) => {
     // check if result exists
     if (result.length > 0) {
       // make sure result is an actual entry identification
@@ -62,19 +62,10 @@ function register(username, password, callback) {
   // creates a new date and converts it into seconds
   const registerDate = Math.floor(Date.now()/1000)
 
-  // NO THIS IS STUPID NEVER DO THIS
-  // THIS IS JUST A SQL INJECTION WAITING TO HAPPEN
-  // const checkExisting = "INSERT IGNORE INTO userinfo" +
-  // "(username, password, registerDate) VALUES('" +
-  // username + "', '" +
-  // hashedPassword + "', '" +
-  // registerDate + "');"
-
   // add new user to database
-  const checkExisting = "INSERT IGNORE INTO userinfo(username, password, registerDate, prefix)" +
-  "VALUES(?, ?, ?, ?)"
+  const checkExisting = "INSERT IGNORE INTO userinfo(username, password, registerDate) VALUES(?, ?, ?)"
 
-  sql.query(checkExisting, [username, hashedPassword, registerDate, username], (err, result) => {
+  sql.query(checkExisting, [username, hashedPassword, registerDate], (err, result) => {
     if (err) throw err
     // checks if a new account was actually added
     if (result.affectedRows != 0) {
