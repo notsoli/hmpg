@@ -3,7 +3,6 @@ const crypto = require('crypto')
 
 // generate secret
 const secret = token(32)
-console.log(secret)
 
 // create a sha256 hash out of user's password
 function password(password) {
