@@ -6,6 +6,8 @@ const cookieParser = require('cookie-parser')
 const logger = require('morgan')
 const subdomain = require('wildcard-subdomains')
 
+const package = require('./package.json')
+
 const app = express()
 
 // ******
@@ -81,3 +83,6 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500)
   res.render('error')
 })
+
+// confirmation
+console.log("running " + package.name + " version " + package.version)
