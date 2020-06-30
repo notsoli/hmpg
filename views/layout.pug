@@ -1,6 +1,7 @@
 doctype html
 html
   head
+    meta(name="viewport" content="width=device-width, initial-scale=1")
     title= title
     link(rel='stylesheet', href='/stylesheets/reset.css')
     link(rel='stylesheet', href='/stylesheets/layout.css')
@@ -8,16 +9,25 @@ html
     block links
   body  
     ul#nav
-      li 
-        a#logo(href="http://hmpg.io") hmpg
-      li#wrapper
+      li#nav-logo
+        a(href="http://hmpg.io") hmpg
+      li#nav-wrapper
         if user
-          a#profile(href=accountUrl) #{user}
+          #nav-profile #{user}
         else
-          a#profile not logged in
-        ul#submenu.inactive
+          button
+            a(href="http://hmpg.io/") login
+          button
+            a(href="http://hmpg.io/register") register
+        ul#nav-submenu.inactive
           li
-            a#account(href="http://hmpg.io/account") account
+            a(href=accountUrl) your hmpg
           li
-            a#account(href="http://hmpg.io/settings") settings
+            a(href="http://hmpg.io/account") account
+          li
+            a(href="http://hmpg.io/settings") settings
+          li
+            a(href="http://hmpg.io/logout") logout
+        li#nav-arrow
+          div ▼
     block content
