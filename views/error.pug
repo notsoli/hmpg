@@ -1,0 +1,10 @@
+doctype html
+html
+  head
+    link(rel='stylesheet', href='/stylesheets/error.css')
+    link(rel='stylesheet', href='/stylesheets/reset.css')
+  body
+    #main
+      #code= error.status
+      #message= message
+      pre #{error.stack}

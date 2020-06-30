@@ -1,0 +1,11 @@
+#main {
+  padding: 30px;
+}
+
+#main > * {
+  margin-bottom: 10px;
+}
+
+#code {
+  font-size: 50px;
+}

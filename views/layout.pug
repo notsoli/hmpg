@@ -1,0 +1,23 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/reset.css')
+    link(rel='stylesheet', href='/stylesheets/layout.css')
+    script(src='/javascripts/layout.js')
+    block links
+  body  
+    ul#nav
+      li 
+        a#logo(href="/") hmpg
+      li#wrapper
+        if user
+          a#profile(href=accountUrl) user: #{user}
+        else
+          a#profile not logged in
+        ul#submenu.inactive
+          li
+            a#account(href="http://hmpg.io/account") account
+          li
+            a#account(href="http://hmpg.io/settings") settings
+    block content

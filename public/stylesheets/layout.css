@@ -1,0 +1,46 @@
+#nav {
+  background-color: #000000;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: stretch;
+  height: 50px;
+}
+
+#nav li {
+  align-items: stretch;
+  display: flex;
+}
+
+#nav a {
+  color: #ffffff;
+  text-decoration: none;
+  align-items: center;
+  display: flex;
+  padding: 10px;
+}
+
+#nav #logo {
+  font-size: 30px;
+  font-weight: bold;
+}
+
+#submenu {
+  position: absolute;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+#submenu {
+  background-color: #000000;
+  top: 50px;
+}
+
+#nav .active {
+  display: block;
+}
+
+#nav .inactive {
+  display: none;
+}

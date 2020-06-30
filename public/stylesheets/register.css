@@ -1,0 +1,15 @@
+#main {
+  padding: 30px;
+}
+
+#main>div {
+  margin-bottom: 10px;
+}
+
+#main>* {
+  margin-bottom: 10px;
+}
+
+#register > input {
+  margin-right: 5px;
+}
