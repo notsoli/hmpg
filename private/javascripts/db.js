@@ -21,7 +21,7 @@ function login(username, password, callback) {
 
   // compare username and password to database
   const compareInfo = "SELECT * FROM userinfo WHERE username = ? AND password = ?;"
-  sql.query(compareInfo, [username, hashedPassword](err, result) => {
+  sql.query(compareInfo, [username, hashedPassword], (err, result) => {
     // check if result exists
     if (result.length > 0) {
       // make sure result is an actual entry identification
