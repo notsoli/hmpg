@@ -5,7 +5,7 @@ const router = express.Router()
 const sql = require('../../private/javascripts/db')
 
 // register a new user
-router.post('/', (req, res) => {
+router.post('/register', (req, res) => {
   // assign form information to variables
   const {username, password, confirmpassword} = req.body
 

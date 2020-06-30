@@ -59,9 +59,22 @@ function register(username, password, callback) {
   // converts plaintext password into hashed password
   const hashedPassword = hash.password(password)
 
-  // add new username and password to database
-  const checkExisting = "INSERT IGNORE INTO userinfo (username, password) VALUES('" + username + "', '" + hashedPassword + "');"
-  sql.query(checkExisting, (err, result) => {
+  // creates a new date and converts it into seconds
+  const registerDate = Math.floor(Date.now()/1000)
+
+  // NO THIS IS STUPID NEVER DO THIS
+  // THIS IS JUST A SQL INJECTION WAITING TO HAPPEN
+  // const checkExisting = "INSERT IGNORE INTO userinfo" +
+  // "(username, password, registerDate) VALUES('" +
+  // username + "', '" +
+  // hashedPassword + "', '" +
+  // registerDate + "');"
+
+  // add new user to database
+  const checkExisting = "INSERT IGNORE INTO userinfo(username, password, registerDate, prefix)" +
+  "VALUES(?, ?, ?, ?)"
+
+  sql.query(checkExisting, [username, hashedPassword, registerDate, username], (err, result) => {
     if (err) throw err
     // checks if a new account was actually added
     if (result.affectedRows != 0) {
