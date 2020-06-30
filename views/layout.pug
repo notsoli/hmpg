@@ -9,10 +9,10 @@ html
   body  
     ul#nav
       li 
-        a#logo(href="/") hmpg
+        a#logo(href="http://hmpg.io") hmpg
       li#wrapper
         if user
-          a#profile(href=accountUrl) user: #{user}
+          a#profile(href=accountUrl) #{user}
         else
           a#profile not logged in
         ul#submenu.inactive

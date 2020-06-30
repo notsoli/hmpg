@@ -9,6 +9,7 @@ router.post('/', (req, res) => {
   // assign form information to variables
   const {username, password} = req.body
 
+  // make sure username and password fit criteria for login
   const validity = sql.validity(username, password, password)
   if (validity.result == true) {
     // attempt logging in
