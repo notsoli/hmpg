@@ -1,15 +1,83 @@
 #main {
-  padding: 30px;
+  width: 100%;
+  height: calc(100% - 50px);
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
-#main>div {
-  margin-bottom: 10px;
+#registerWrapper {
+  width: 250px;
+  padding: 40px;
 }
 
-#main>* {
-  margin-bottom: 10px;
+#register {
+  display: flex;
+  flex-direction: column;
 }
 
-#register > input {
-  margin-right: 5px;
+#register>* {
+  margin-bottom: 20px;
+}
+
+#registerStatus {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 15px;
+  margin-bottom: 20px;
+}
+
+#register>input {
+  font-size: 15px;
+  font-family: serif;
+  height: 30px;
+  outline: none;
+}
+
+#register>button {
+  height: 36px;
+  color: #ffffff;
+  background-color: #4eba5e;
+  border: 2px solid #4eba5e;
+  border-radius: 5px;
+  outline: none;
+  font-size: 15px;
+}
+
+#register>button:hover {
+  cursor: pointer;
+}
+
+#disclaimer {
+  margin-bottom: 20px;
+}
+
+#loginLabel {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+#loginButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  width: calc(100% - auto4px);
+  height: 30px;
+  background-color: #6090db;
+  color: #ffffff;
+  border: 2px solid #6090db;
+  border-radius: 5px;
+  outline: none;
+}
+
+#loginButton a {
+  display: flex;
+  text-decoration: none;
+  width: 100%;
+  height: 100%;
 }

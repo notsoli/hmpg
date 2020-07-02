@@ -5,11 +5,12 @@ block links
 
 block content
   #main
-    form#login(method="POST" action="/login")
-      input#username(type='text' name='username' placeholder="username")
-      input#password(type='password' name='password' placeholder="password")
-      button#submit(type="submit") submit
-    #register
-      #registerlabel don't have an account?
-      button#registerbutton
-        a#registerlink(href="/register") register
+    #loginWrapper
+      #loginStatus
+      form#login(method="POST" action="/login")
+        input#username(type='text' name='username' placeholder="username")
+        input#password(type='password' name='password' placeholder="password")
+        button#submit(type="submit") submit
+      #register
+        #registerLabel don't have an account?
+        a#registerButton(href="/register") register

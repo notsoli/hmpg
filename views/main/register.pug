@@ -5,11 +5,14 @@ block links
     
 block content
   #main
-    #info
-      #subtitle register a new account
-    form#register(method="POST" action="/register")
-      input#username(type='text' name='username' placeholder="username")
-      input#password(type='password' name='password' placeholder="password")
-      input#passwordconfirm(type='password' name='confirmpassword' placeholder="confirm password")
-      button#submit(type="submit") submit
-    #disclaimer although your login information is encrypted, this is simply a personal project not to be taken too seriously. i cannot guarantee that the login database is completely secure. for your safety, please use a username and password that you do NOT use on any other site.
+    #registerWrapper
+      #registerStatus
+      form#register(method="POST" action="/register")
+        input#username(type='text' name='username' placeholder="username")
+        input#password(type='password' name='password' placeholder="password")
+        input#passwordConfirm(type='password' name='confirmpassword' placeholder="confirm password")
+        button#submit(type="submit") submit
+      #disclaimer although your login information is encrypted, this is simply a personal project not to be taken too seriously. i cannot guarantee that the login database is completely secure. for your safety, please use a username and password that you do NOT use on any other site.
+      #login
+        #loginLabel already have an account?
+        a#loginButton(href="/login") login  
