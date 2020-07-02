@@ -32,6 +32,7 @@ html
             a(href="http://hmpg.io/settings") settings
           li
             a(href="http://hmpg.io/logout") logout
-        li#nav-arrow
-          div ▼
+        if user
+          li#nav-arrow
+            div ▼
     block content
