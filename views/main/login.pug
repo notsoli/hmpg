@@ -1,0 +1,15 @@
+extends ../layout
+
+block links
+  link(rel='stylesheet', href='/stylesheets/main/login.css')
+
+block content
+  #main
+    form#login(method="POST" action="/login")
+      input#username(type='text' name='username' placeholder="username")
+      input#password(type='password' name='password' placeholder="password")
+      button#submit(type="submit") submit
+    #register
+      #registerlabel don't have an account?
+      button#registerbutton
+        a#registerlink(href="/register") register

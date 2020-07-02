@@ -6,7 +6,7 @@ const router = express.Router()
 const hash = require('../private/javascripts/hash')
 
 // list of available routes
-const routes = ['register', 'upload', 'files', 'account', 'settings', 'logout', '']
+const routes = ['login', 'register', 'upload', 'files', 'account', 'settings', 'logout', '']
 
 // route static pages, thank you kingsley solomon!
 for(let i = 0; i < routes.length; i++) {
