@@ -1,5 +1,5 @@
 // waits until html data is loaded
-window.onload = init
+window.addEventListener('load', init)
 
 // dom objects
 let profile, submenu
