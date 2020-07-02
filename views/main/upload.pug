@@ -1,0 +1,11 @@
+extends ../layout
+
+block links
+  link(rel='stylesheet', href='/stylesheets/index.css')
+  script(src="/javascripts/main/upload.js")
+
+block content
+  #main
+    input#fileInput(type='file' name='sampleFile' multiple)
+    button#uploadButton upload
+    #formStatus

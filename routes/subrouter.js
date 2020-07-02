@@ -2,19 +2,16 @@
 const express = require('express')
 const router = express.Router()
 
-// const sql = require('../private/javascripts/db')
+const sql = require('../private/javascripts/db')
 const hash = require('../private/javascripts/hash')
 
-// get & render page
+// render base homepage
 const hmpg = require('./sub/hmpg')
 router.all('/s/:target/', function(req, res, next) {
   req.info = hash.payload(req, res, next)
 
   // create account url
   const user = req.info.user
-  if (user) {
-    req.info.accountUrl = 'http://' + user + '.hmpg.io'
-  }
 
   // store target
   req.info.target = req.params.target
@@ -22,5 +19,25 @@ router.all('/s/:target/', function(req, res, next) {
   // console.log(req.info)
   next()
 }, hmpg)
+
+// serve static files
+router.all('/s/:target/:link', function(req, res, next) {
+  // store parameters
+  const target = req.params.target
+  const link = req.params.link
+
+  // find directory of file
+  const directory = sql.findDirectory(target, link, (result) => {
+    // check if directory was found
+    if (result) {
+      const directory = "E:/hmpg/" + result.userid + "/" + result.directory
+      console.log("serving file at directory " + directory)
+      res.sendFile(directory)
+    } else {
+      console.log("failed to find file")
+      next()
+    }
+  })
+})
 
 module.exports = router

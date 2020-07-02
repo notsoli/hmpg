@@ -5,6 +5,8 @@ const path = require('path')
 const cookieParser = require('cookie-parser')
 const logger = require('morgan')
 const subdomain = require('wildcard-subdomains')
+const fileUpload = require('express-fileupload');
+const bodyParser = require('body-parser')
 
 const package = require('./package.json')
 
@@ -17,7 +19,6 @@ const app = express()
 // view engine setup
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'pug')
-// app.set('subdomain offset', 1)
 
 // app setup
 app.use(logger('dev'))
@@ -25,6 +26,11 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
+app.use(fileUpload({
+    useTempFiles : true,
+    tempFileDir : 'E:/hmpg/tmp'
+}))
+app.use(bodyParser.json())
 
 // export app before it gets read by other pages
 module.exports = app
@@ -36,7 +42,7 @@ module.exports = app
 // configure wildcard subdomains
 app.use(subdomain({
   namespace: 's',
-  whitelist: ['']
+  whitelist: ['www']
 }))
 
 // route subdomain pages
@@ -46,27 +52,6 @@ app.all('/s/*', subRouter)
 // route main domain pages
 const mainRouter = require('./routes/mainrouter')
 app.all('*', mainRouter)
-
-// // list of available routes
-//const routes = ['account', 'register', '']
-
-// // route static pages, thank you kingsley solomon!
-// for(let i = 0; i < routes.length; i++) {
-//   app.use('/' + routes[i], (req, res, next) => {
-//     console.log("matched regular domain")
-//     // generate main payload
-//     req.info = hash.payload(req, res, next)
-//
-//     // create account url
-//     const user = req.info.user
-//     if (user) {
-//       req.info.accountUrl = user + '.' + req.get('Host')
-//     }
-//
-//     // console.log(req.info)
-//     next()
-//   }, require('./routes/main/' + routes[i]))
-// }
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
