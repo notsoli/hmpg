@@ -34,7 +34,8 @@ function login(username, password, callback) {
 
         // create payload object
         const payload = {
-          user: username
+          user: username,
+          id: result[0].userid
         }
 
         // create a jwt
@@ -147,7 +148,27 @@ function validity(username, password, confirmpassword) {
   }
 }
 
+// finds the directory of a static file
+function findDirectory(username, link, callback) {
+  // find directory using username and link
+  const findDirectory = "SELECT userid, directory FROM fileinfo WHERE userid IN (SELECT userid FROM userinfo WHERE username = ?) AND link = ?"
+
+  sql.query(findDirectory, [username, link], (err, result) => {
+    if (err) throw err
+
+    // checks if a directory was found
+    if (result.length > 0) {
+      // return directory on success
+      callback(result[0])
+    } else {
+      // return nothing on failure
+      callback()
+    }
+  })
+}
+
 // allows other files to use database functions
 module.exports.login = login
 module.exports.register = register
 module.exports.validity = validity
+module.exports.findDirectory = findDirectory
