@@ -109,3 +109,8 @@ body {
     margin-left: 0;
   }
 }
+
+/* content */
+#main {
+  padding: 30px;
+}
