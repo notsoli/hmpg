@@ -5,7 +5,7 @@ const router = express.Router()
 const sql = require('../../private/javascripts/db')
 
 // register a new user
-router.post('/register', (req, res) => {
+router.post('/register', (req, res, next) => {
   // assign form information to variables
   const {username, password, confirmpassword} = req.body
 
@@ -31,20 +31,19 @@ router.post('/register', (req, res) => {
             // registration was successful, but login wasn't
             console.log("failed to login")
           }
-
-          // redirect back to homepage
-          res.redirect('/')
         })
       } else {
         // username is already taken
         console.log("failed to register account\nreason: username is already taken")
-        res.redirect('/register')
       }
     })
   } else {
     // username or password is invalid for registration
     console.log("failed to register account\nreason: " + validity.reason)
   }
+
+  // temporary catch-all
+  next()
 })
 
 // get & render page
