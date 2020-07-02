@@ -22,10 +22,19 @@ body {
 }
 
 #nav a, #nav-profile{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
   font-size: 15px;
   color: #ffffff;
   text-decoration: none;
   padding: 10px;
+}
+
+#nav a:hover {
+  background-color: #ffffff;
+  color: #000000;
 }
 
 #nav-logo a {
@@ -33,32 +42,9 @@ body {
   font-weight: bold;
 }
 
-/* nav buttons */
-#nav button {
-  background-color: #000000;
-  border: 2px solid #ffffff;
-  border-radius: 5px;
-  margin: 10px 10px 10px 0px;
-  width: 80px;
-  outline: none;
-  padding: 5px;
-}
-
-#nav button a {
-  display: block;
-  width: 100%;
-  height: 100%;
-  color: #ffffff;
-  padding: 0;
-}
-
-#nav button:hover {
-  background-color: #ffffff;
-  color: #000000;
-}
-
-#nav button:hover a {
-  color: #000000;
+#nav .navButton {
+  width: 60px;
+  padding: 0 10px 0 10px;
 }
 
 /* nav submenu */
@@ -113,4 +99,8 @@ body {
 /* content */
 #main {
   padding: 30px;
+}
+
+button {
+  font-family: serif;
 }

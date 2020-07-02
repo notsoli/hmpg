@@ -15,10 +15,8 @@ html
         if user
           #nav-profile #{user}
         else
-          button
-            a(href="http://hmpg.io/login") login
-          button
-            a(href="http://hmpg.io/register") register
+          a.navButton(href="http://hmpg.io/login") login
+          a.navButton(href="http://hmpg.io/register") register
         ul#nav-submenu.inactive
           li
             a(href="http://" + user + ".hmpg.io") your hmpg

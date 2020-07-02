@@ -18,8 +18,6 @@ function init() {
     wrapper.addEventListener("mouseleave", hideDropdown)
     arrow.addEventListener("mouseover", showDropdown)
     arrow.addEventListener("mouseleave", hideDropdown)
-  } else {
-    arrow.style.display = "none"
   }
 
   // this feels a bit hack-y, but it works for now
