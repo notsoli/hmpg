@@ -27,23 +27,24 @@ router.post('/register', (req, res, next) => {
 
             // send jwt to user
             res.cookie('jwtToken', attempt.jwt, {maxAge: 900000, httpOnly: true, domain: 'hmpg.io'})
+            res.send({success: true, login: true})
           } else {
             // registration was successful, but login wasn't
             console.log("failed to login")
+            res.send({success: true, login: false})
           }
         })
       } else {
         // username is already taken
         console.log("failed to register account\nreason: username is already taken")
+        res.send({success: false, error: "username is already taken"})
       }
     })
   } else {
     // username or password is invalid for registration
     console.log("failed to register account\nreason: " + validity.reason)
+    res.send({success: false, error: validity.reason})
   }
-
-  // temporary catch-all
-  next()
 })
 
 // get & render page

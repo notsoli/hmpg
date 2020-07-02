@@ -2,15 +2,16 @@ extends ../layout
 
 block links
   link(rel='stylesheet', href='/stylesheets/main/login.css')
+  script(src="/javascripts/main/login.js")
 
 block content
   #main
     #loginWrapper
       #loginStatus
-      form#login(method="POST" action="/login")
+      #login
         input#username(type='text' name='username' placeholder="username")
         input#password(type='password' name='password' placeholder="password")
-        button#submit(type="submit") submit
+        button#loginButton submit
       #register
         #registerLabel don't have an account?
         a#registerButton(href="/register") register
