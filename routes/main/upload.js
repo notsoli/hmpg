@@ -6,23 +6,29 @@ const file = require('../../private/javascripts/file')
 
 // handle file uploads and other ajax requests
 router.post('/upload', (req, res) => {
-  if (req.files) {
-    const files = req.files.file
-
-    // check if either one or multiple files are selected
-    if (files.length) {
-      // multiple files
-      for (let i = 0; i < files.length; i++) {
-        file.download(files[i], req.info)
-      }
-    } else {
-      // single file
-      file.download(files, req.info)
-    }
-  }
-
   // check if user is signed in
   if (req.info.user) {
+    // check if user uploaded any files
+    if (req.files) {
+      const files = req.files.file
+
+      // check if either one or multiple files are selected
+      if (files.length) {
+        // multiple files
+        console.log("only one file per request")
+        res.send({success: false, error: "only one file per request"})
+      } else {
+        // single file
+        file.handle(files, req.info.userid, 4, (handleAttempt) => {
+          if (handleAttempt.success == true) {
+            const completeLink = "http://" + req.info.user + ".hmpg.io/" + handleAttempt.link
+            res.send({success: true, link: completeLink})
+          } else {
+            console.log("failed to upload file")
+          }
+        })
+      }
+    }
   }
 })
 

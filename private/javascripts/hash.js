@@ -11,9 +11,25 @@ function password(password) {
   return hash
 }
 
-// create a randomized string
+// create a randomized hex string
 function token(length) {
   return crypto.randomBytes(length).toString('hex');
+}
+
+// list of possible alphanumeric characters
+const alphaString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+const alphaArray = []
+for (let i = 0; i < alphaString.length; i++) {
+  alphaArray[i] = alphaString[i]
+}
+
+// generates a random alphanumeric string
+function alphanumeric(length) {
+  const string = []
+  for (let i = 0; i < length; i++) {
+    string[i] = alphaArray[Math.floor(Math.random() * 62)]
+  }
+  return string.join("")
 }
 
 // sign jwt
@@ -133,6 +149,7 @@ function payload(req, res, next) {
 module.exports.secret = secret
 module.exports.password = password
 module.exports.token = token
+module.exports.alphanumeric = alphanumeric
 module.exports.sign = sign
 module.exports.verify = verify
 module.exports.payload = payload

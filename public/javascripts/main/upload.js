@@ -30,23 +30,31 @@ function sendFileData() {
     }
   }
 
+  // create a new ajax request
   const request = new XMLHttpRequest()
+
+  // prepare to receive response
+  request.addEventListener("readystatechange", handleResponse)
+
+  // send request
   request.open("POST", "http://hmpg.io/upload")
-
-  // monitor request progress
-  request.addEventListener('progress', (event) => {
-    monitorProgress(event)
-  })
-
   request.send(fileForm)
 }
 
-function monitorProgress(event) {
-  console.log(event.loaded)
-  console.log(event.total)
-}
+// handle request response
+function handleResponse(message) {
+  if (this.readyState == 4) {
+    // store request response
+    const response = JSON.parse(this.response)
+    console.log(response)
 
-// update form status
-function updateStatus(message) {
-  formStatus.innerHTML = message
+    // check if file upload was successful
+    if (response.success == true) {
+      // redirect to files
+      window.location.href = response.link
+    } else {
+      // set status as error message
+      registerStatus.innerHTML = response.error
+    }
+  }
 }

@@ -35,7 +35,7 @@ function login(username, password, callback) {
         // create payload object
         const payload = {
           user: username,
-          id: result[0].userid
+          userid: result[0].userid
         }
 
         // create a jwt
@@ -167,8 +167,76 @@ function findDirectory(username, link, callback) {
   })
 }
 
+// create a file link
+function link(id, directory, length, callback) {
+  // store every link created by a user
+  const links = [""]
+
+  // get a list of all links created by a user
+  const getLinks = "SELECT link FROM fileinfo WHERE userid = ?"
+
+  sql.query(getLinks, id, (err, result) => {
+    if (err) throw err
+
+    // checks if any links were found
+    if (result.length > 0) {
+      for (let r = 0; r < result.length; r++) {
+        links[r] = result[r].link
+      }
+    }
+
+    // used to determine if a unique link has been created
+    let unique = false
+
+    // store the number of repeats
+    let repeats = 1
+
+    // store created link
+    let fileLink
+
+    // repeat until a uniqle link is found
+    while (!unique) {
+      // generate a random link
+      fileLink = hash.alphanumeric(length)
+
+      // iterate through each link
+      unique = true
+      for (let l = 0; l < links.length; l++) {
+        // compare it to the newly created link
+        if (links[l] == fileLink) {
+          unique = false
+        }
+      }
+
+      // check if the repeats has exceeded 100
+      if (repeats >= 100) {
+        callback({success: false, error: "failed to generate unique link"})
+      }
+
+      // increment repeats
+      repeats++
+    }
+
+    // add the new link to the fileinfo database
+    const addLink = "INSERT IGNORE INTO fileinfo(userid, link, directory) VALUES(?, ?, ?)"
+
+    sql.query (addLink, [id, fileLink, directory], (err, result) => {
+      if (err) throw err
+
+      if (result.affectedRows != 0) {
+        // successful link creation
+        callback({success: true, link: fileLink})
+      } else {
+        // failed link creation
+        callback({success: false, error: "failed to create link"})
+      }
+    })
+  })
+}
+
 // allows other files to use database functions
 module.exports.login = login
 module.exports.register = register
 module.exports.validity = validity
 module.exports.findDirectory = findDirectory
+module.exports.link = link
