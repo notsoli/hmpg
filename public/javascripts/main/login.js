@@ -7,10 +7,10 @@ let usernameInput, passwordInput, loginButton, loginStatus
 // init function
 function init() {
   // dom objects
-  usernameInput = document.getElementById("username")
-  passwordInput = document.getElementById("password")
-  loginButton = document.getElementById("loginButton")
-  loginStatus = document.getElementById("loginStatus")
+  usernameInput = document.querySelector("#username")
+  passwordInput = document.querySelector("#password")
+  loginButton = document.querySelector("#loginButton")
+  loginStatus = document.querySelector("#loginStatus")
 
   // event listeners
   loginButton.addEventListener("click", sendLoginData)

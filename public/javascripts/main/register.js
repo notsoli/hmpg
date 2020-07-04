@@ -7,11 +7,11 @@ let usernameInput, passwordInput, confirmInput, registerButton, registerStatus
 // init function
 function init() {
   // dom objects
-  usernameInput = document.getElementById("username")
-  passwordInput = document.getElementById("password")
-  confirmInput = document.getElementById("confirmpassword")
-  registerButton = document.getElementById("registerButton")
-  registerStatus = document.getElementById("registerStatus")
+  usernameInput = document.querySelector("#username")
+  passwordInput = document.querySelector("#password")
+  confirmInput = document.querySelector("#confirmpassword")
+  registerButton = document.querySelector("#registerButton")
+  registerStatus = document.querySelector("#registerStatus")
 
   // event listeners
   registerButton.addEventListener("click", sendRegisterData)
