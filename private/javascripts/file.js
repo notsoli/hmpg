@@ -5,7 +5,6 @@ const fs= require('fs')
 
 // handle file upload
 function handle(file, id, length, callback) {
-  console.log("running")
   // create a directory for the file to go into
   const directory = file.name
   const completeDirectory = "E:/hmpg/" + id + "/" + directory

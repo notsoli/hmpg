@@ -1,10 +1,25 @@
 extends ../layout
 
 block links
+  link(rel='stylesheet', href='/stylesheets/main/upload.css')
   script(src="/javascripts/main/upload.js")
 
 block content
+  #dropZone
   #main
-    input#fileInput(type='file' name='sampleFile' multiple)
-    button#uploadButton upload
-    #formStatus
+    #fileWrapper
+      #fileDropper
+        div drag and drop files
+        p or
+        //- send me a memo when this breaks lol
+        button(onclick='document.getElementById("fileInput").click()')#fileButton choose files
+    #fileList
+      p Files
+      #fileDivide
+      #fileExample
+        #exampleIcon ▶
+        #exampleName name
+        #exampleSize size
+        #exampleLink link
+        #exampleStatus status
+  input#fileInput(type='file' name='sampleFile' style="display: none" multiple)

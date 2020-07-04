@@ -1,0 +1,167 @@
+#main {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+#dropZone {
+  display: none;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+}
+
+#fileWrapper {
+  width: 100%;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#fileDropper {
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#fileDropper>div {
+  font-size: 20px;
+}
+
+#fileDropper>p {
+  color: #a8a8a8;
+}
+
+#fileButton {
+  height: 36px;
+  color: #ffffff;
+  background-color: #4eba5e;
+  border: 2px solid #4eba5e;
+  border-radius: 5px;
+  outline: none;
+  font-size: 15px;
+}
+
+#fileButton:hover {
+  cursor: pointer;
+}
+
+#fileList {
+  margin: 25px;
+}
+
+#fileList>p {
+  font-size: 20px;
+}
+
+#fileDivide {
+  width: 100%;
+  height: 2px;
+  background-color: #a8a8a8;
+  margin: 15px 0;
+}
+
+.file, #fileExample {
+  display: flex;
+  flex-direction: row;
+  height: 30px;
+}
+
+.fileIcon, #exampleIcon {
+  width: 10%;
+  display: none;
+}
+
+.fileName, #exampleName {
+  width: 150px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  padding-right: 10px;
+  flex-grow: 1;
+}
+
+.fileDropdown {
+  display: flex;
+  flex-direction: row;
+}
+
+.attributeName {
+  display: none;
+}
+
+.fileSize, #exampleSize {
+  width: 100px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  padding-right: 10px;
+}
+
+.fileLink, #exampleLink {
+  width: 250px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  padding-right: 10px;
+}
+
+.fileStatus, #exampleStatus {
+  width: 100px;
+  text-align: right;
+}
+
+#exampleIcon, #exampleName, #exampleStatus, #exampleSize, #exampleLink {
+  color: #a8a8a8;
+}
+
+@media only screen  and (max-width : 1223px) {
+  #fileDropper>p, #fileDropper>div {
+    display: none;
+  }
+
+  #fileButton {
+    height: 40px;
+    font-size: 20px;
+  }
+
+  #fileDropper {
+    height: 40px;
+  }
+
+  .fileIcon, #exampleIcon {
+    display: block;
+  }
+
+  .fileDropdown {
+    display: none;
+    flex-direction: column;
+    justify-content: space-around;
+    width: calc(100% - 50px);
+    height: 100px;
+    position: absolute;
+    margin-top: 30px;
+    background-color: #000000;
+  }
+
+  .fileDropdown > div {
+    display: flex;
+    width: calc(100% - 60px);
+    flex-direction: row;
+    justify-content: space-between;
+    height: 20px;
+    padding: 0 30px;
+    color: #ffffff;
+  }
+
+  .attributeName {
+    display: block;
+  }
+
+  #exampleSize, #exampleLink {
+    display: none;
+  }
+}
