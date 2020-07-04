@@ -4,7 +4,7 @@ const mysql = require('mysql')
 const hash = require('./hash')
 
 // create a list of invalid usernames
-const invalidUsernames = []
+const invalidUsernames = ['test']
 
 // set up sql connection
 const sql = mysql.createConnection({
@@ -79,73 +79,40 @@ function register(username, password, callback) {
 
 // check if username and password fit criteria for account creation and login
 function validity(username, password, confirmpassword) {
-  // check if username is too long
-  if (username.length <= 16) {
-    // check if username is too short
-    if (username.length >= 3) {
-      // check if username contains special characters
-      const expression = new RegExp(/[\s~`!@#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?()\._]/)
-      if (!expression.test(username)) {
-        // check if username is in list of invalid usernames
-        let isValid = true
-        const lowerUser = username.toLowerCase()
-        for (let i = 0; i < invalidUsernames.length; i++) {
-          if (invalidUsernames[i] === lowerUser) {
-            isValid = false
-          }
-        }
-        if (isValid) {
-          // check if password is too long
-          if (password.length <= 32) {
-            // check if password is too short
-            if (password.length >= 8) {
-              // check if password matches confirmed password
-              if (password === confirmpassword) {
-                return {
-                  result: true,
-                }
-              } else {
-                return {
-                  result: false,
-                  reason: "passwords do not match"
-                }
-              }
-            } else {
-              return {
-                result: false,
-                reason: "password is shorter than 8 characters"
-              }
-            }
-          } else {
-            return {
-              result: false,
-              reason: "password is longer than 32 characters"
-            }
-          }
-        } else {
-          return {
-            result: false,
-            reason: "username is invalid"
-          }
-        }
-      } else {
-        return {
-          result: false,
-          reason: "username contains special characters"
-        }
-      }
-    } else {
-      return {
-        result: false,
-        reason: "username is shorter than 3 characters"
-      }
-    }
-  } else {
-    return {
-      result: false,
-      reason: "username is longer than 16 characters"
+  // verify username length
+  if (username.length > 16) {
+    return {result: false, reason: "username is longer than 16 characters"}
+  } else if (username.length < 3) {
+    return {result: false, reason: "username is shorter than 3 characters"}
+  }
+
+  // verify password length
+  if (password.length > 32) {
+    return {result: false, reason: "password is longer than 32 characters"}
+  } else if (password.length < 8) {
+    return {result: false, reason: "password is shorter than 8 characters"}
+  }
+
+  // verify that passwords match
+  if (password !== confirmpassword) {
+    return {result: false, reason: "passwords do not match"}
+  }
+
+  // verify that username is alphanumeric
+  const expression = new RegExp(/[\s~`!@#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?()\._]/)
+  if (expression.test(username)) {
+    return {result: false, reason: "username contains special characters"}
+  }
+
+  // verify that username is allowed
+  const lowerUser = username.toLowerCase()
+  for (let i = 0; i < invalidUsernames.length; i++) {
+    if (invalidUsernames[i] === lowerUser) {
+      return {result: false, reason: "username is invalid"}
     }
   }
+
+  return {result: true}
 }
 
 // finds the directory of a static file
