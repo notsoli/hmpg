@@ -126,9 +126,13 @@ function handleResponse(message) {
       // change file status
       document.querySelector("#fileStatus-" + this.id).innerHTML = "done"
       console.log("uploaded file")
+
+      // reset status
+      requestStatus.innerHTML = ""
     } else {
       // set status as error message
-      registerStatus.innerHTML = response.error
+      requestStatus.innerHTML = response.error
+      document.querySelector("#file-" + this.id).remove()
     }
   }
 }

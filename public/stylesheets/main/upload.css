@@ -52,6 +52,11 @@
   cursor: pointer;
 }
 
+#requestStatus {
+  padding: 0 25px;
+  height: 25px;
+}
+
 #fileList {
   margin: 25px;
 }
