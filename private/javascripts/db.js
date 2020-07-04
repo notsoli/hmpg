@@ -26,20 +26,14 @@ function login(username, password, callback) {
     if (result.length > 0) {
       // make sure result is an actual entry identification
       if (result[0].username === username && result[0].password === hashedPassword) {
-        // successful login attempt, create header object
-        const header = {
-          alg: "HS256",
-          typ: "JWT"
-        }
-
-        // create payload object
+        // successful login, create payload object
         const payload = {
           user: username,
           userid: result[0].userid
         }
 
         // create a jwt
-        const jwt = hash.sign(header, payload)
+        const jwt = hash.sign(payload)
         callback({
           success: true,
           jwt: jwt

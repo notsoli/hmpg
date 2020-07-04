@@ -33,7 +33,13 @@ function alphanumeric(length) {
 }
 
 // sign jwt
-function sign(header, payload) {
+function sign(payload) {
+  // create header object
+  const header = {
+    alg: "HS256",
+    typ: "JWT"
+  }
+
   // convert the header to base64
   const stringHeader = JSON.stringify(header)
   const baseHeader = Buffer.from(stringHeader).toString("base64")
