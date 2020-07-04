@@ -3,9 +3,11 @@
 const mysql = require('mysql')
 const hash = require('./hash')
 const e = require('../../config/errors.json')
+const usernameList = require('../../config/invalidUsernames.json')
 
-// create a list of invalid usernames
-const invalidUsernames = ['test']
+// creates references to invalid usernames and terms for easy use
+const invalidUsernames = usernameList.invalidUsernames
+const invalidTerms = usernameList.invalidTerms
 
 // set up sql connection
 const sql = mysql.createConnection({
