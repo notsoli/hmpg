@@ -46,11 +46,11 @@ app.use(subdomain({
 }))
 
 // route subdomain pages
-const subRouter = require('./routes/subrouter')
+const subRouter = require('./routes/subRouter')
 app.all('/s/*', subRouter)
 
 // route main domain pages
-const mainRouter = require('./routes/mainrouter')
+const mainRouter = require('./routes/mainRouter')
 app.all('*', mainRouter)
 
 // catch 404 and forward to error handler

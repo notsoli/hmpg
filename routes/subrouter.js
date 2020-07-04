@@ -6,7 +6,7 @@ const sql = require('../private/javascripts/db')
 const hash = require('../private/javascripts/hash')
 
 // render base homepage
-const hmpg = require('./sub/hmpg')
+const hmpgRouter = require('./sub/hmpgRouter')
 router.all('/s/:target/', function(req, res, next) {
   req.info = hash.payload(req, res, next)
 
@@ -18,7 +18,7 @@ router.all('/s/:target/', function(req, res, next) {
 
   // console.log(req.info)
   next()
-}, hmpg)
+}, hmpgRouter)
 
 // serve static files
 router.all('/s/:target/:link', function(req, res, next) {
