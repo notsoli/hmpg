@@ -1,0 +1,5 @@
+{
+  "loginEnabled": true,
+  "registerEnabled": true,
+  "uploadEnabled": true
+}

@@ -4,9 +4,16 @@ const router = express.Router()
 
 const sql = require('../../private/javascripts/db')
 const e = require('../../config/errors.json')
+const breaker = require('../../config/breaker.json')
 
 // handle login requests
 router.post('/login', (req, res) => {
+  // determine if login is enabled
+  if (!breaker.loginEnabled) {
+    res.send({success: false, error: e.breaker.loginDisabled})
+    return
+  }
+
   // create a request body reference
   const body = req.body
 

@@ -4,9 +4,16 @@ const router = express.Router()
 
 const sql = require('../../private/javascripts/db')
 const e = require('../../config/errors.json')
+const breaker = require('../../config/breaker.json')
 
 // register a new user
 router.post('/register', (req, res, next) => {
+  // determine if registration is enabled
+  if (!breaker.registerEnabled) {
+    res.send({success: false, error: e.breaker.registerDisabled})
+    return
+  }
+
   // create a request body reference
   const body = req.body
 

@@ -23,5 +23,10 @@
     "noFiles": "no files selected",
     "multipleFiles": "only one file per request",
     "failedUpload": "failed to upload file"
+  },
+  "breaker": {
+    "loginDisabled": "sorry, login is disabled at this time",
+    "registerDisabled": "sorry, registration is disabled at this time",
+    "uploadDisabled": "sorry, file upload is disabled at this time"
   }
 }

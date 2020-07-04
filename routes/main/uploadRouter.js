@@ -5,9 +5,16 @@ const router = express.Router()
 const file = require('../../private/javascripts/file')
 const hash = require('../../private/javascripts/hash')
 const e = require('../../config/errors.json')
+const breaker = require('../../config/breaker.json')
 
 // handle file uploads and other ajax requests
 router.post('/upload', (req, res) => {
+  // determine if upload is enabled
+  if (!breaker.uploadEnabled) {
+    res.send({success: false, error: e.breaker.uploadDisabled})
+    return
+  }
+
   // check if user is signed in and has uploaded files
   if (!req.info.user) {
     res.send({success: false, error: e.request.noSession})
