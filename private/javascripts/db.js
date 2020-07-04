@@ -2,6 +2,7 @@
 
 const mysql = require('mysql')
 const hash = require('./hash')
+const e = require('../../config/errors.json')
 
 // create a list of invalid usernames
 const invalidUsernames = ['test']
@@ -75,34 +76,34 @@ function register(username, password, callback) {
 function validity(username, password, confirmpassword) {
   // verify username length
   if (username.length > 16) {
-    return {result: false, reason: "username is longer than 16 characters"}
+    return {result: false, reason: e.validity.longUsername}
   } else if (username.length < 3) {
-    return {result: false, reason: "username is shorter than 3 characters"}
+    return {result: false, reason: e.validity.shortUsername}
   }
 
   // verify password length
   if (password.length > 32) {
-    return {result: false, reason: "password is longer than 32 characters"}
+    return {result: false, reason: e.validity.longPassword}
   } else if (password.length < 8) {
-    return {result: false, reason: "password is shorter than 8 characters"}
+    return {result: false, reason: e.validity.shortPassword}
   }
 
   // verify that passwords match
   if (password !== confirmpassword) {
-    return {result: false, reason: "passwords do not match"}
+    return {result: false, reason: e.validity.differentPassword}
   }
 
   // verify that username is alphanumeric
   const expression = new RegExp(/[\s~`!@#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?()\._]/)
   if (expression.test(username)) {
-    return {result: false, reason: "username contains special characters"}
+    return {result: false, reason: e.validity.specialUsername}
   }
 
   // verify that username is allowed
   const lowerUser = username.toLowerCase()
   for (let i = 0; i < invalidUsernames.length; i++) {
     if (invalidUsernames[i] === lowerUser) {
-      return {result: false, reason: "username is invalid"}
+      return {result: false, reason: e.validity.invalidUsername}
     }
   }
 
@@ -171,7 +172,7 @@ function link(id, directory, length, callback) {
 
       // check if the repeats has exceeded 100
       if (repeats >= 100) {
-        callback({success: false, error: "failed to generate unique link"})
+        callback({success: false, error: e.link.overlapLink})
       }
 
       // increment repeats
@@ -189,7 +190,7 @@ function link(id, directory, length, callback) {
         callback({success: true, link: fileLink})
       } else {
         // failed link creation
-        callback({success: false, error: "failed to create link"})
+        callback({success: false, error: e.link.failedLink})
       }
     })
   })

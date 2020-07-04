@@ -1,0 +1,27 @@
+{
+  "validity": {
+    "longUsername": "username is longer than 16 characters",
+    "shortUsername": "username is shorter than 3 characters",
+    "specialUsername": "username contains special characters",
+    "invalidUsername": "username is invalid",
+    "takenUsername": "username is already taken",
+    "longPassword": "password is longer than 32 characters",
+    "shortPassword": "password is shorter than 8 characters",
+    "differentPassword": "passwords do not match",
+    "invalidLogin": "username or password is incorrect"
+  },
+  "link": {
+    "overlapLink": "failed to generate unique link",
+    "failedLink": "failed to create link",
+    "failedMove": "error moving file"
+  },
+  "request": {
+    "badRequest": "bad request",
+    "noSession": "not logged in"
+  },
+  "upload": {
+    "noFiles": "no files selected",
+    "multipleFiles": "only one file per request",
+    "failedUpload": "failed to upload file"
+  }
+}

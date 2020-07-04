@@ -3,6 +3,7 @@ const express = require('express')
 const router = express.Router()
 
 const sql = require('../../private/javascripts/db')
+const e = require('../../config/errors.json')
 
 // handle login requests
 router.post('/login', (req, res) => {
@@ -11,19 +12,19 @@ router.post('/login', (req, res) => {
 
   // verify post request length
   if (Object.keys(body).length !== 2) {
-    res.send({success: false, error: "bad request"})
+    res.send({success: false, error: e.request.badRequest})
     return
   }
 
   // verify existence and type of username
   if (!body.username || typeof(body.username) !== "string") {
-    res.send({success: false, error: "bad request"})
+    res.send({success: false, error: e.request.badRequest})
     return
   }
 
   // verify existence and type of password
   if (!body.password || typeof(body.password) !== "string") {
-    res.send({success: false, error: "bad request"})
+    res.send({success: false, error: e.request.badRequest})
     return
   }
 
@@ -45,13 +46,13 @@ router.post('/login', (req, res) => {
       } else {
         // username or password didn't match any database entries
         console.log("username or password is incorrect")
-        res.send({success: false, error: "username or password is incorrect"})
+        res.send({success: false, error: e.validity.invalidLogin})
       }
     })
   } else {
     // username or password isn't valid for login
     console.log("username or password is incorrect")
-    res.send({success: false, error: "username or password is incorrect"})
+    res.send({success: false, error: e.validity.invalidLogin})
   }
 })
 

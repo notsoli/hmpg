@@ -4,18 +4,19 @@ const router = express.Router()
 
 const file = require('../../private/javascripts/file')
 const hash = require('../../private/javascripts/hash')
+const e = require('../../config/errors.json')
 
 // handle file uploads and other ajax requests
 router.post('/upload', (req, res) => {
   // check if user is signed in and has uploaded files
   if (!req.info.user) {
-    res.send({success: false, error: "not logged in"})
+    res.send({success: false, error: e.request.noSession})
     return
   }
 
   // check if user has uploaded files
   if (!req.files) {
-    res.send({success: false, error: "no files selected"})
+    res.send({success: false, error: e.upload.noFiles})
     return
   }
 
@@ -26,7 +27,7 @@ router.post('/upload', (req, res) => {
   if (files.length) {
     // multiple files
     console.log("only one file per request")
-    res.send({success: false, error: "only one file per request"})
+    res.send({success: false, error: e.upload.multipleFiles})
   } else {
     // single file
     file.handle(files, req.info.userid, 4, (handleAttempt) => {
@@ -36,6 +37,7 @@ router.post('/upload', (req, res) => {
         res.send({success: true, link: completeLink, uploads: req.info.uploads})
       } else {
         console.log("failed to upload file")
+        res.send({success: false, error: e.upload.failedUpload})
       }
     })
   }

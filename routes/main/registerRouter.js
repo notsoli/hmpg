@@ -3,6 +3,7 @@ const express = require('express')
 const router = express.Router()
 
 const sql = require('../../private/javascripts/db')
+const e = require('../../config/errors.json')
 
 // register a new user
 router.post('/register', (req, res, next) => {
@@ -11,25 +12,25 @@ router.post('/register', (req, res, next) => {
 
   // verify post request length
   if (Object.keys(body).length !== 3) {
-    res.send({success: false, error: "bad request"})
+    res.send({success: false, error: e.request.badRequest})
     return
   }
 
   // verify existence and type of username
   if (!body.username || typeof(body.username) !== "string") {
-    res.send({success: false, error: "bad request"})
+    res.send({success: false, error: e.request.badRequest})
     return
   }
 
   // verify existence and type of password
   if (!body.password || typeof(body.password) !== "string") {
-    res.send({success: false, error: "bad request"})
+    res.send({success: false, error: e.request.badRequest})
     return
   }
 
   // verify existence and type of confirmpassword
   if (!body.confirmpassword || typeof(body.confirmpassword) !== "string") {
-    res.send({success: false, error: "bad request"})
+    res.send({success: false, error: e.request.badRequest})
     return
   }
 
@@ -64,7 +65,7 @@ router.post('/register', (req, res, next) => {
       } else {
         // username is already taken
         console.log("failed to register account\nreason: username is already taken")
-        res.send({success: false, error: "username is already taken"})
+        res.send({success: false, error: e.validity.takenUsername})
       }
     })
   } else {

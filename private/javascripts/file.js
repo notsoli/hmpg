@@ -1,7 +1,8 @@
 // filesystem manipulation functions
 
 const db = require('./db')
-const fs= require('fs')
+const fs = require('fs')
+const e = require('../../config/errors.json')
 
 // handle file upload
 function handle(file, id, length, callback) {
@@ -37,7 +38,7 @@ function move(file, directory, callback) {
     if (err) {
       // failed moving file
       console.log(err)
-      callback({success: false, error: "error moving file"})
+      callback({success: false, error: e.link.failedMove})
     } else {
       // moved file
       callback({success: true})
