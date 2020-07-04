@@ -6,6 +6,33 @@ const sql = require('../../private/javascripts/db')
 
 // register a new user
 router.post('/register', (req, res, next) => {
+  // create a request body reference
+  const body = req.body
+
+  // verify post request length
+  if (Object.keys(body).length !== 3) {
+    res.send({success: false, error: "bad request"})
+    return
+  }
+
+  // verify existence and type of username
+  if (!body.username || typeof(body.username) !== "string") {
+    res.send({success: false, error: "bad request"})
+    return
+  }
+
+  // verify existence and type of password
+  if (!body.password || typeof(body.password) !== "string") {
+    res.send({success: false, error: "bad request"})
+    return
+  }
+
+  // verify existence and type of confirmpassword
+  if (!body.confirmpassword || typeof(body.confirmpassword) !== "string") {
+    res.send({success: false, error: "bad request"})
+    return
+  }
+
   // assign form information to variables
   const {username, password, confirmpassword} = req.body
 

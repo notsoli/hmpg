@@ -6,6 +6,27 @@ const sql = require('../../private/javascripts/db')
 
 // handle login requests
 router.post('/login', (req, res) => {
+  // create a request body reference
+  const body = req.body
+
+  // verify post request length
+  if (Object.keys(body).length !== 2) {
+    res.send({success: false, error: "bad request"})
+    return
+  }
+
+  // verify existence and type of username
+  if (!body.username || typeof(body.username) !== "string") {
+    res.send({success: false, error: "bad request"})
+    return
+  }
+
+  // verify existence and type of password
+  if (!body.password || typeof(body.password) !== "string") {
+    res.send({success: false, error: "bad request"})
+    return
+  }
+
   // assign form information to variables
   const {username, password} = req.body
 
