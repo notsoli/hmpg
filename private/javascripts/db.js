@@ -184,7 +184,7 @@ function link(id, directory, length, callback) {
     // add the new link to the fileinfo database
     const addLink = "INSERT IGNORE INTO fileinfo(userid, link, directory) VALUES(?, ?, ?)"
 
-    sql.query (addLink, [id, fileLink, directory], (err, result) => {
+    sql.query(addLink, [id, fileLink, directory], (err, result) => {
       if (err) throw err
 
       if (result.affectedRows != 0) {
