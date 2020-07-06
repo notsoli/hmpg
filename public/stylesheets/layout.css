@@ -40,6 +40,12 @@ body {
 #nav-logo a {
   font-size: 30px;
   font-weight: bold;
+  padding: 0 10px;
+}
+
+#nav-logo a:hover {
+  background-color: #000000;
+  color: #ffffff;
 }
 
 #nav .navButton {
