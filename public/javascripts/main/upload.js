@@ -146,7 +146,7 @@ function buildFile(targetFileName, targetFileSize, id) {
 
   // fileIcon
   const fileIcon = document.createElement("div")
-  fileIcon.innerHTML = "▶"
+  fileIcon.innerHTML = "▼"
   fileIcon.className = "fileIcon"
   fileIcon.id = "fileIcon-" + id
   fileIcon.addEventListener("click", toggleDropdown)
@@ -221,7 +221,7 @@ function toggleDropdown() {
   // determine if dropdown is toggled
   if (file.className.includes("toggled")) {
     // change visual atributes
-    this.innerHTML = "▶"
+    this.innerHTML = "▼"
 
     // hide dropdown
     document.querySelector("#fileDropdown-" + id).style.display = "none"
@@ -233,7 +233,7 @@ function toggleDropdown() {
     file.className = "file"
   } else {
     // change visual atributes
-    this.innerHTML = "▼"
+    this.innerHTML = "▲"
 
     // show dropdown
     document.querySelector("#fileDropdown-" + id).style.display = "flex"
@@ -252,7 +252,7 @@ function formatDesktop() {
   if (window.innerWidth >= 1224 && !desktop) {
     for (let i = 0; i < requests.length; i++) {
       // imitate a toggle for each dropdown
-      document.querySelector("#fileIcon-" + i).innerHTML = "▶"
+      document.querySelector("#fileIcon-" + i).innerHTML = "▼"
       document.querySelector("#fileDropdown-" + i).style.display = "flex"
       document.querySelector("#file-" + i).style.height = "30px"
       document.querySelector("#file-" + i).className = "file"
