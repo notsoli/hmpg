@@ -15,7 +15,7 @@ router.post('/upload', (req, res) => {
     return
   }
 
-  // check if user is signed in and has uploaded files
+  // check if user is signed in
   if (!req.info.user) {
     res.send({success: false, error: e.request.noSession})
     return
@@ -35,19 +35,20 @@ router.post('/upload', (req, res) => {
     // multiple files
     console.log("only one file per request")
     res.send({success: false, error: e.upload.multipleFiles})
-  } else {
-    // single file
-    file.handle(files, req.info.userid, 4, (handleAttempt) => {
-      if (handleAttempt.success == true) {
-        // respond with the new link
-        const completeLink = "http://" + req.info.user + ".hmpg.io/" + handleAttempt.link
-        res.send({success: true, link: completeLink, uploads: req.info.uploads})
-      } else {
-        console.log("failed to upload file")
-        res.send({success: false, error: e.upload.failedUpload})
-      }
-    })
+    return
   }
+
+  // single file
+  file.handle(files, req.info.userid, 4, (handleAttempt) => {
+    if (handleAttempt.success == true) {
+      // respond with the new link
+      const completeLink = "http://" + req.info.user + ".hmpg.io/" + handleAttempt.link
+      res.send({success: true, link: completeLink, uploads: req.info.uploads})
+    } else {
+      console.log("failed to upload file")
+      res.send({success: false, error: e.upload.failedUpload})
+    }
+  })
 })
 
 // get & render page

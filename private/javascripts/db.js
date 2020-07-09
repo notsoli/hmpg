@@ -2,6 +2,7 @@
 
 const mysql = require('mysql')
 const hash = require('./hash')
+const file = require('./file')
 const e = require('../../config/errors.json')
 const usernameList = require('../../config/invalidUsernames.json')
 
@@ -25,30 +26,18 @@ function login(username, password, callback) {
   // compare username and password to database
   const compareInfo = "SELECT * FROM userinfo WHERE username = ? AND password = ?;"
   sql.query(compareInfo, [username, hashedPassword], (err, result) => {
-    // check if result exists
-    if (result.length > 0) {
-      // make sure result is an actual entry identification
-      if (result[0].username === username && result[0].password === hashedPassword) {
-        // successful login, create payload object
-        const payload = {
-          user: username,
-          userid: result[0].userid
-        }
-
-        // create a jwt
-        const jwt = hash.sign(payload)
-        callback({
-          success: true,
-          jwt: jwt
-        })
-      } else {
-        // failed login attempt
-        callback(false)
-      }
-    } else {
-      // failed login attempt
-      callback(false)
+    // make sure result is an actual entry identification
+    if (result.length < 0 && result[0].username === username && result[0].password === hashedPassword) {
+      callback({success: false, error: e.validity.invalidLogin})
+      return
     }
+
+    // create payload object
+    const payload = {user: username, userid: result[0].userid}
+
+    // create a jwt
+    const jwt = hash.sign(payload)
+    callback({success: true, jwt: jwt})
   })
 }
 
@@ -64,12 +53,11 @@ function register(username, password, callback) {
   const checkExisting = "INSERT IGNORE INTO userinfo(username, password, registerDate) VALUES(?, ?, ?)"
 
   sql.query(checkExisting, [username, hashedPassword, registerDate], (err, result) => {
-    if (err) throw err
     // checks if a new account was actually added
     if (result.affectedRows != 0) {
-      callback(true)
+      callback({success: true})
     } else {
-      callback(false)
+      callback({success: false, error: e.validity.takenUsername})
     }
   })
 }
@@ -118,15 +106,12 @@ function findDirectory(username, link, callback) {
   const findDirectory = "SELECT userid, directory FROM fileinfo WHERE userid IN (SELECT userid FROM userinfo WHERE username = ?) AND link = ?"
 
   sql.query(findDirectory, [username, link], (err, result) => {
-    if (err) throw err
-
     // checks if a directory was found
     if (result.length > 0) {
       // return directory on success
-      callback(result[0])
+      callback({success: true, result: result[0]})
     } else {
-      // return nothing on failure
-      callback()
+      callback({success: false, error: ""})
     }
   })
 }
@@ -150,13 +135,7 @@ function link(id, directory, length, callback) {
     }
 
     // used to determine if a unique link has been created
-    let unique = false
-
-    // store the number of repeats
-    let repeats = 1
-
-    // store created link
-    let fileLink
+    let unique = false, repeats = 1, fileLink
 
     // repeat until a uniqle link is found
     while (!unique) {
@@ -177,7 +156,6 @@ function link(id, directory, length, callback) {
         callback({success: false, error: e.link.overlapLink})
       }
 
-      // increment repeats
       repeats++
     }
 
@@ -185,8 +163,6 @@ function link(id, directory, length, callback) {
     const addLink = "INSERT IGNORE INTO fileinfo(userid, link, directory) VALUES(?, ?, ?)"
 
     sql.query(addLink, [id, fileLink, directory], (err, result) => {
-      if (err) throw err
-
       if (result.affectedRows != 0) {
         // successful link creation
         callback({success: true, link: fileLink})

@@ -57,9 +57,6 @@ function sign(payload) {
 
 // verify jwt
 function verify(jwt) {
-  // keep track of the jwt's validity
-  let validity = false
-
   // keep track of header and payload objects
   let headerResult, payloadResult
 
@@ -67,41 +64,35 @@ function verify(jwt) {
   const parsedString = jwt.split(".")
 
   // make sure there are 3 parts
-  if (parsedString.length == 3) {
-    // verify header object
-    const decodedHeader = Buffer.from(parsedString[0], 'base64').toString("ascii")
-    headerResult = validateJSON(decodedHeader)
-
-    if (headerResult.validity) {
-      // verify payload object
-      const decodedPayload = Buffer.from(parsedString[1], 'base64').toString("ascii")
-      payloadResult = validateJSON(decodedPayload)
-
-      if (payloadResult.validity) {
-        //verify the signature
-        const stringSignature = parsedString[0] + "." + parsedString[1]
-        const baseSignature = crypto.createHmac("sha256", secret).update(stringSignature).digest("hex")
-
-        if (baseSignature === parsedString[2]) {
-          validity = true
-        }
-      }
-    }
+  if (parsedString.length !== 3) {
+    return {validity: false}
   }
 
-  // returns jwt validity
-  if (validity) {
-    // valid jwt
-    return {
-      validity: true,
-      header: headerResult.object,
-      payload: payloadResult.object
-    }
-  } else {
-    // invalid jwt
-    return {
-      validity: false
-    }
+  // verify header object
+  const decodedHeader = Buffer.from(parsedString[0], 'base64').toString("ascii")
+  headerResult = validateJSON(decodedHeader)
+
+  // verify payload object
+  const decodedPayload = Buffer.from(parsedString[1], 'base64').toString("ascii")
+  payloadResult = validateJSON(decodedPayload)
+
+  if (!headerResult.validity || !payloadResult.validity) {
+    return {validity: false}
+  }
+
+  //verify the signature
+  const stringSignature = parsedString[0] + "." + parsedString[1]
+  const baseSignature = crypto.createHmac("sha256", secret).update(stringSignature).digest("hex")
+
+  if (baseSignature !== parsedString[2]) {
+    return {validity: false}
+  }
+
+  // valid jwt
+  return {
+    validity: true,
+    header: headerResult.object,
+    payload: payloadResult.object
   }
 }
 
@@ -112,10 +103,9 @@ function validateJSON(string) {
   try {
     object = JSON.parse(string)
   } catch (e) {
-    return {
-      validity: false
-    }
+    return {validity: false}
   }
+
   return {
     validity: true,
     object: object
@@ -132,22 +122,18 @@ function payload(req, res, next) {
     // verify jwt
     const jwt = verify(cookies.jwtToken, secret)
 
-    if (jwt.validity == true) {
-      // valid jwt
-      console.log("valid jwt")
-
-      // return the data contained in the jwt payload
-      return jwt.payload
-    } else {
+    if (!jwt.validity) {
       // invalid jwt
       console.log("invalid jwt")
-
-      // destroy the jwtToken cookie
       res.clearCookie("jwtToken")
+      return {}
     }
+
+    // valid jwt
+    console.log("valid jwt")
+    return jwt.payload
   }
 
-  // return empty object
   return {}
 }
 

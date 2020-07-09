@@ -26,17 +26,22 @@ router.all('/s/:target/:link', function(req, res, next) {
   const target = req.params.target
   const link = req.params.link
 
+  // make sure the request isn't for favicon.ico
+  if (link === "favicon.ico") {
+    return
+  }
+
   // find directory of file
-  const directory = sql.findDirectory(target, link, (result) => {
+  sql.findDirectory(target, link, (attempt) => {
     // check if directory was found
-    if (result) {
-      const directory = "E:/hmpg/" + result.userid + "/" + result.directory
-      console.log("serving file at directory " + directory)
-      res.sendFile(directory)
-    } else {
+    if (!attempt.success) {
       console.log("failed to find file")
-      next()
+      return
     }
+
+    const directory = "E:/hmpg/" + attempt.result.userid + "/" + attempt.result.directory
+    console.log("serving file at directory " + directory)
+    res.sendFile(directory)
   })
 })
 
