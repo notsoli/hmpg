@@ -24,6 +24,12 @@
     "multipleFiles": "only one file per request",
     "failedUpload": "failed to upload file"
   },
+  "fs": {
+    "directoryExists": "directory already exists",
+    "failedDirectory": "failed to create directory",
+    "fileExists": "file already exists",
+    "failedInfoWrite": "failed to create info file"
+  },
   "breaker": {
     "loginDisabled": "sorry, login is disabled at this time",
     "registerDisabled": "sorry, registration is disabled at this time",
