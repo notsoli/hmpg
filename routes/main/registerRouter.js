@@ -3,6 +3,7 @@ const express = require('express')
 const router = express.Router()
 
 const sql = require('../../private/javascripts/db')
+const file = require('../../private/javascripts/file')
 const e = require('../../config/errors.json')
 const breaker = require('../../config/breaker.json')
 
@@ -41,24 +42,54 @@ router.post('/register', (req, res, next) => {
     }
 
     console.log("successfully registered account '" + username + "'")
-
-    // log the new user in
-    sql.login(username, password, (loginAttempt) => {
-      // check if login was successful
-      if (!loginAttempt.success) {
-        console.log("failed to login")
+    completeRegister(username, password, (completeAttempt) => {
+      if(!completeAttempt.success) {
         res.send({success: true, login: false})
         return
       }
 
-      console.log("successfully logged in to account '" + username + "'")
+      console.log("successfully set up account'" + username + "'")
 
       // send jwt to user
-      res.cookie('jwtToken', attempt.jwt, {maxAge: 900000, httpOnly: true, domain: 'hmpg.io'})
+      res.cookie('jwtToken', completeAttempt.jwt, {maxAge: 900000, httpOnly: true, domain: 'hmpg.io'})
       res.send({success: true, login: true})
     })
   })
 })
+
+// sets the new user up following a successful register
+function completeRegister(username, password, callback) {
+  // get userid
+  sql.userid(username, (idAttempt) => {
+    // check if userid grab was successful
+    if(!idAttempt.success) {
+      callback({success: false, error: idAttempt.error})
+      return
+    }
+
+    // create an upload directory
+    file.createRoot(idAttempt.userid, (rootAttempt) => {
+      if(!rootAttempt.success) {
+        callback({success: false, error: rootAttempt.error})
+        return
+      }
+
+      // log the new user in
+      sql.login(username, password, (loginAttempt) => {
+        // check if login was successful
+        if (!loginAttempt.success) {
+          console.log("failed to login")
+          callback({success: false, error: loginAttempt.error})
+          console.log("oops3")
+          return
+        }
+
+        console.log("successfully logged in to account '" + username + "'")
+        callback({success: true, jwt: loginAttempt.jwt})
+      })
+    })
+  })
+}
 
 function verifyBody(body) {
   // verify post request length

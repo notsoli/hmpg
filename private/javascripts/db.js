@@ -18,50 +18,6 @@ const sql = mysql.createConnection({
   database: "hmpg"
 })
 
-// use the sql database to check login information & create a jwt if valid
-function login(username, password, callback) {
-  // converts plaintext password into hashed password
-  const hashedPassword = hash.password(password)
-
-  // compare username and password to database
-  const compareInfo = "SELECT * FROM userinfo WHERE username = ? AND password = ?;"
-  sql.query(compareInfo, [username, hashedPassword], (err, result) => {
-    // make sure result is an actual entry identification
-    if (result.length < 0 && result[0].username === username && result[0].password === hashedPassword) {
-      callback({success: false, error: e.validity.invalidLogin})
-      return
-    }
-
-    // create payload object
-    const payload = {user: username, userid: result[0].userid}
-
-    // create a jwt
-    const jwt = hash.sign(payload)
-    callback({success: true, jwt: jwt})
-  })
-}
-
-// use the sql database to register a new user
-function register(username, password, callback) {
-  // converts plaintext password into hashed password
-  const hashedPassword = hash.password(password)
-
-  // creates a new date and converts it into seconds
-  const registerDate = Math.floor(Date.now()/1000)
-
-  // add new user to database
-  const checkExisting = "INSERT IGNORE INTO userinfo(username, password, registerDate) VALUES(?, ?, ?)"
-
-  sql.query(checkExisting, [username, hashedPassword, registerDate], (err, result) => {
-    // checks if a new account was actually added
-    if (result.affectedRows != 0) {
-      callback({success: true})
-    } else {
-      callback({success: false, error: e.validity.takenUsername})
-    }
-  })
-}
-
 // check if username and password fit criteria for account creation and login
 function validity(username, password, confirmpassword) {
   // verify username length
@@ -98,6 +54,64 @@ function validity(username, password, confirmpassword) {
   }
 
   return {result: true}
+}
+
+// gets userid from username
+function userid(username, callback) {
+  const selectid = "SELECT userid FROM userinfo WHERE username = ?;"
+  sql.query(selectid, [username], (err, result) => {
+    // make sure result is an actual entry identification
+    if (result.length == 0) {
+      callback({success: false, error: e.validity.invalidUsername})
+      return
+    }
+
+    callback({success: true, userid: result[0].userid})
+  })
+}
+
+// use the sql database to check login information & create a jwt if valid
+function login(username, password, callback) {
+  // converts plaintext password into hashed password
+  const hashedPassword = hash.password(password)
+
+  // compare username and password to database
+  const compareInfo = "SELECT * FROM userinfo WHERE username = ? AND password = ?;"
+  sql.query(compareInfo, [username, hashedPassword], (err, result) => {
+    // make sure result is an actual entry identification
+    if (result.length < 0 || result[0].username !== username || result[0].password !== hashedPassword) {
+      callback({success: false, error: e.validity.invalidLogin})
+      return
+    }
+
+    // create payload object
+    const payload = {user: username, userid: result[0].userid}
+
+    // create a jwt
+    const jwt = hash.sign(payload)
+    callback({success: true, jwt: jwt})
+  })
+}
+
+// use the sql database to register a new user
+function register(username, password, callback) {
+  // converts plaintext password into hashed password
+  const hashedPassword = hash.password(password)
+
+  // creates a new date and converts it into seconds
+  const registerDate = Math.floor(Date.now()/1000)
+
+  // add new user to database
+  const checkExisting = "INSERT IGNORE INTO userinfo(username, password, registerDate) VALUES(?, ?, ?)"
+
+  sql.query(checkExisting, [username, hashedPassword, registerDate], (err, result) => {
+    // checks if a new account was actually added
+    if (result.affectedRows != 0) {
+      callback({success: true})
+    } else {
+      callback({success: false, error: e.validity.takenUsername})
+    }
+  })
 }
 
 // finds the directory of a static file
@@ -175,8 +189,9 @@ function link(id, directory, length, callback) {
 }
 
 // allows other files to use database functions
+module.exports.validity = validity
 module.exports.login = login
 module.exports.register = register
-module.exports.validity = validity
+module.exports.userid = userid
 module.exports.findDirectory = findDirectory
 module.exports.link = link

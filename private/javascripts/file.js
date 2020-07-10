@@ -42,6 +42,32 @@ function Info(totalFiles, totalSize) {
   this.totalSize = totalSize
 }
 
+// sets up an upload directory for user
+function createRoot(id, callback) {
+  // concatenate full path
+  const fullPath = "E:/hmpg/" + id
+
+  // create directory
+  fs.mkdir(fullPath, (mkdirError) => {
+    // check if directory creation was unsuccessful
+    if(mkdirError) {
+      callback({success: false, error: e.fs.failedDirectory})
+      return
+    }
+
+    // create info file
+    fs.writeFile("E:/hmpg/" + id + "/hmpgInfo.json", "{}", (err) => {
+      if (err) {
+        console.log("error creating info file")
+        callback({success: false, error: e.fs.failedInfoWrite})
+        return
+      }
+
+      callback({success: true})
+    })
+  })
+}
+
 // creates a directory if it doesn't already exist
 function createDirectory(path, callback) {
   // concatenate full path
@@ -69,18 +95,9 @@ function createDirectory(path, callback) {
   })
 }
 
-// creates a file containing general attributes
-function createInfo(id) {
-  fs.writeFile("E:/hmpg/" + id + "/info.json", "{}", (err) => {
-    if (err) {
-      console.log("error creating info file")
-      callback({success: false, error: e.fs.failedInfoWrite})
-      return
-    }
+// adds a directory to the user's hmpgInfo.json
+function addDirectory(path, id) {
 
-    console.log("created info file for user " + id)
-    callback({success: true})
-  })
 }
 
 // handle file upload
@@ -126,5 +143,6 @@ function move(file, directory, callback) {
   })
 }
 
+module.exports.createRoot = createRoot
 module.exports.createDirectory = createDirectory
 module.exports.handle = handle
