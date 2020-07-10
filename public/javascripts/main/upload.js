@@ -121,7 +121,8 @@ function handleResponse(message) {
     // check if file upload was successful
     if (response.success == true) {
       // change file link
-      document.querySelector("#linkAttribute-" + this.id).innerHTML = response.link
+      const linkString = '<a href="' + response.link + '">' + response.link + '</a>'
+      document.querySelector("#linkAttribute-" + this.id).innerHTML = linkString
 
       // change file status
       document.querySelector("#fileStatus-" + this.id).innerHTML = "done"
@@ -139,75 +140,15 @@ function handleResponse(message) {
 
 // build file html
 function buildFile(targetFileName, targetFileSize, id) {
-  // file
-  const file = document.createElement("div")
-  file.className = "file"
-  file.id = "file-" + id
-
-  // fileIcon
-  const fileIcon = document.createElement("div")
-  fileIcon.innerHTML = "▼"
-  fileIcon.className = "fileIcon"
-  fileIcon.id = "fileIcon-" + id
-  fileIcon.addEventListener("click", toggleDropdown)
-  file.appendChild(fileIcon)
-
-  // fileName
-  const fileName = document.createElement("div")
-  fileName.innerHTML = targetFileName
-  fileName.className = "fileName"
-  file.appendChild(fileName)
-
-  // fileDropdown
-  const fileDropdown = document.createElement("div")
-  fileDropdown.className = "fileDropdown"
-  fileDropdown.id = "fileDropdown-" + id
-  file.appendChild(fileDropdown)
-
-  // fileSize
-  const fileSize = document.createElement("div")
-  fileSize.className = "fileSize"
-  fileDropdown.appendChild(fileSize)
-
-  // fileSize attributeName
-  const sizeAttributeName = document.createElement("div")
-  sizeAttributeName.innerHTML = "size:"
-  sizeAttributeName.className = "attributeName"
-  fileSize.appendChild(sizeAttributeName)
-
-  // fileSize attributeValue
-  const sizeAttributeValue = document.createElement("div")
-  sizeAttributeValue.innerHTML = targetFileSize
-  sizeAttributeValue.className = "attributeValue"
-  fileSize.appendChild(sizeAttributeValue)
-
-  // fileLink
-  const fileLink = document.createElement("div")
-  fileLink.className = "fileLink"
-  fileDropdown.appendChild(fileLink)
-
-  // fileLink attributeName
-  const linkAttributeName = document.createElement("div")
-  linkAttributeName.innerHTML = "link:"
-  linkAttributeName.className = "attributeName"
-  fileLink.appendChild(linkAttributeName)
-
-  // fileLink attributeValue
-  const linkAttributeValue = document.createElement("div")
-  linkAttributeValue.innerHTML = "..."
-  linkAttributeValue.className = "attributeValue"
-  linkAttributeValue.id = "linkAttribute-" + id
-  fileLink.appendChild(linkAttributeValue)
-
-  // fileStatus
-  const fileStatus = document.createElement("div")
-  fileStatus.innerHTML = "uploading"
-  fileStatus.className = "fileStatus"
-  fileStatus.id = "fileStatus-" + id
-  file.appendChild(fileStatus)
+  // build dom
+  const domString = '<div class="file" id="file-' + id + '"><div class="fileIcon" id="fileIcon-' + id + '">▼</div><div class="fileName">' + targetFileName + '</div><div class="fileDropdown" id="fileDropdown-' + id + '"><div class="fileSize"><div class="attributeName">size:</div><div class="attributeValue">' + targetFileSize + '</div></div><div class="fileLink"><div class="attributeName">link:</div><div class="attributeValue" id="linkAttribute-' + id + '">...</div></div></div><div class="fileStatus" id="fileStatus-' + id + '">uploading</div></div>'
+  const file = new DOMParser().parseFromString(domString, 'text/html')
 
   // append to fileList
-  fileList.appendChild(file)
+  fileList.appendChild(file.body.firstChild)
+
+  // add event listener
+  document.querySelector("#fileIcon-" + id).addEventListener("click", toggleDropdown)
 }
 
 // toggle the information dropdown

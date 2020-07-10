@@ -114,6 +114,10 @@
   padding-right: 10px;
 }
 
+.fileLink a {
+  color: #000000;
+}
+
 .fileStatus, #exampleStatus {
   width: 100px;
   text-align: right;
@@ -164,6 +168,10 @@
 
   .attributeName {
     display: block;
+  }
+
+  .fileLink a {
+    color: #ffffff;
   }
 
   #exampleSize, #exampleLink {
