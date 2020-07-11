@@ -1,8 +1,16 @@
 extends ../layout
 
 block links
+  link(rel='stylesheet', href='/stylesheets/main/files.css')
+  script(src="/javascripts/main/files.js")
+  script(src="/javascripts/main/fs.js")
 
 block content
   #main
-    #info
-      #subtitle your files
+    #directoryWrapper
+      #createDirectory
+        input#directory(type='text' name='directory' placeholder="directory")
+        button#directoryButton create directory
+    #fileWrapper
+      div your files
+      #currentItem item info

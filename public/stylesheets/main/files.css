@@ -1,0 +1,32 @@
+.file, .directory {
+  margin: 10px 0;
+}
+
+.file {
+  margin-left: 20px;
+}
+
+.container {
+  display: none;
+  margin-left: 30px;
+  border-left: 2px dotted #000000;
+}
+
+.hideIcon {
+  width: 20px;
+  text-align: center;
+}
+
+.dirType, .fileType {
+  padding: 0 5px;
+  text-align: center;
+}
+
+.dirInfo, .fileInfo {
+  display: flex;
+  flex-direction: row;
+}
+
+.hideIcon:hover, .dirName:hover, .fileName:hover {
+  cursor: pointer;
+}

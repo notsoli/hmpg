@@ -1,46 +1,9 @@
 // filesystem manipulation functions
 
 const db = require('./db')
+const info = require('./info')
 const fs = require('fs')
 const e = require('../../config/errors.json')
-
-// file constructor function
-function File(path, name, size, type, link) {
-  this.path = path
-  this.name = name
-  this.size = size
-  this.displaySize = function() {
-    // from Hristo on StackOverflow
-    let tempSize = this.size
-
-    let i = -1
-    const byteUnits = [' KB', ' MB', ' GB']
-
-    // determine what suffix should be used
-    do {
-        tempSize = tempSize / 1024
-        i++;
-    } while (fileSizeInBytes > 1024)
-
-    return Math.max(tempSize, 0.1).toFixed(1) + byteUnits[i]
-  }
-  this.type = type
-  this.link = link
-}
-
-// directory constuctor function
-function Directory(path, name, link, children) {
-  this.path = path
-  this.name = name
-  this.link = link
-  this.children = children
-}
-
-// info constructor function
-function Info(totalFiles, totalSize) {
-  this.totalFiles = totalFiles
-  this.totalSize = totalSize
-}
 
 // sets up an upload directory for user
 function createRoot(id, callback) {
@@ -50,13 +13,16 @@ function createRoot(id, callback) {
   // create directory
   fs.mkdir(fullPath, (mkdirError) => {
     // check if directory creation was unsuccessful
-    if(mkdirError) {
+    if (mkdirError) {
       callback({success: false, error: e.fs.failedDirectory})
       return
     }
 
+    // create base json
+    const hmpgInfo = new info.Info()
+
     // create info file
-    fs.writeFile("E:/hmpg/" + id + "/hmpgInfo.json", "{}", (err) => {
+    fs.writeFile("E:/hmpg/" + id + "/hmpgInfo.json", JSON.stringify(hmpgInfo), (err) => {
       if (err) {
         console.log("error creating info file")
         callback({success: false, error: e.fs.failedInfoWrite})
@@ -68,49 +34,95 @@ function createRoot(id, callback) {
   })
 }
 
+// handle directory creation
+function handleDirectory(id, directory, length, callback) {
+  // concatenate a path for the directory to go into
+  const completeDirectory = "E:/hmpg/" + id + "/" + directory
+
+  // figure out directory name
+  let name, directorySplit
+  if (!directory.includes("/")) {
+    name = directory
+  } else {
+    const directorySplit = directory.split("/")
+    name = directorySplit[directorySplit.length - 1]
+  }
+
+  // create a directory in user's filesystem
+  createDirectory(completeDirectory, (createAttempt) => {
+    if (!createAttempt.success) {
+      callback({success: false, error: createAttempt.error})
+      return
+    }
+
+    // create a link for the directory
+    db.link(id, directory, length, (linkAttempt) => {
+      if (!linkAttempt.success) {
+        callback({success: false, error: linkAttempt.error})
+        return
+      }
+
+      console.log("successfully created link")
+
+      // add the directory to the user's hmpgInfo
+      const newDirectory = new info.Directory(name, linkAttempt.link)
+
+      // remove last part of directory
+      let baseDirectory
+      if (!directory.includes("/")) {
+        baseDirectory = ""
+      } else {
+        directorySplit.pop()
+        baseDirectory = directorySplit.join("/")
+      }
+
+      info.addItem(id, baseDirectory, newDirectory, (addAttempt) => {
+        if (!addAttempt.success) {
+          callback({success: false, error: addAttempt.error})
+          return
+        }
+
+        console.log("successfully added item")
+
+        callback(linkAttempt)
+      })
+    })
+  })
+}
+
 // creates a directory if it doesn't already exist
 function createDirectory(path, callback) {
-  // concatenate full path
-  const fullPath = "E:/hmpg" + path
-  console.log(fullPath)
-
-  fs.access(fullPath, fs.constants.F_OK, (accessError) => {
+  fs.access(path, fs.constants.F_OK, (accessError) => {
     // check if directory already exists
-    if(!accessError || accessError.code !== "ENOENT") {
+    if (!accessError || accessError.code !== "ENOENT") {
       callback({success: false, error: e.fs.directoryExists})
       return
     }
 
     // create directory
-    fs.mkdir(fullPath, (mkdirError) => {
+    fs.mkdir(path, (mkdirError) => {
       // check if directory creation was unsuccessful
-      if(mkdirError) {
+      if (mkdirError) {
         callback({success: false, error: e.fs.failedDirectory})
         return
       }
 
-      console.log("created directory " + fullPath)
+      console.log("successfully created directory " + path)
       callback({success: true})
     })
   })
 }
 
-// adds a directory to the user's hmpgInfo.json
-function addDirectory(path, id) {
-
-}
-
 // handle file upload
-function handle(file, id, length, callback) {
-  // create a directory for the file to go into
+function handleFile(file, id, length, callback) {
+  // concatenate a path for the file to go into
   const directory = file.name
   const completeDirectory = "E:/hmpg/" + id + "/" + directory
 
   // move file into desired directory
   move(file, completeDirectory, (moveAttempt) => {
-    if (moveAttempt.success == false) {
-      console.log(moveAttempt.error)
-      callback(moveAttempt)
+    if (!moveAttempt.success) {
+      callback({success: false, error: moveAttempt.error})
       return
     }
 
@@ -118,14 +130,26 @@ function handle(file, id, length, callback) {
 
     // create a link for the file
     db.link(id, directory, length, (linkAttempt) => {
-      if (linkAttempt.success == false) {
-        console.log(linkAttempt.error)
-        callback(linkAttempt)
+      if (!linkAttempt.success) {
+        callback({success: false, error: linkAttempt.error})
         return
       }
 
       console.log("successfully created link")
-      callback(linkAttempt)
+
+      // add the file to the user's hmpgInfo
+      const newFile = new info.File(file.name, file.size, file.mimetype, linkAttempt.link)
+
+      info.addItem(id, "", newFile, (addAttempt) => {
+        if (!addAttempt.success) {
+          callback({success: false, error: addAttempt.error})
+          return
+        }
+
+        console.log("successfully added item")
+
+        callback(linkAttempt)
+      })
     })
   })
 }
@@ -143,6 +167,12 @@ function move(file, directory, callback) {
   })
 }
 
+// const testFile = new File("test.png", 10000, "image/png", "xZ3Z")
+// addItem(3, "", testFile, (attempt) => {
+//   console.log(attempt)
+// })
+
 module.exports.createRoot = createRoot
+module.exports.handleDirectory = handleDirectory
 module.exports.createDirectory = createDirectory
-module.exports.handle = handle
+module.exports.handleFile = handleFile

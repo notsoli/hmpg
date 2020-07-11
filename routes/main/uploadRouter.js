@@ -39,15 +39,16 @@ router.post('/upload', (req, res) => {
   }
 
   // single file
-  file.handle(files, req.info.userid, 4, (handleAttempt) => {
-    if (handleAttempt.success == true) {
-      // respond with the new link
-      const completeLink = "http://" + req.info.user + ".hmpg.io/" + handleAttempt.link
-      res.send({success: true, link: completeLink, uploads: req.info.uploads})
-    } else {
+  file.handleFile(files, req.info.userid, 4, (handleAttempt) => {
+    if (!handleAttempt.success) {
       console.log("failed to upload file")
-      res.send({success: false, error: e.upload.failedUpload})
+      res.send({success: false, error: handleAttempt.error})
+      return
     }
+
+    // respond with the new link
+    const completeLink = "http://" + req.info.user + ".hmpg.io/" + handleAttempt.link
+    res.send({success: true, link: completeLink, uploads: req.info.uploads})
   })
 })
 

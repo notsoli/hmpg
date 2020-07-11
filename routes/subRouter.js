@@ -26,11 +26,6 @@ router.all('/s/:target/:link', function(req, res, next) {
   const target = req.params.target
   const link = req.params.link
 
-  // make sure the request isn't for favicon.ico
-  if (link === "favicon.ico") {
-    return
-  }
-
   // find directory of file
   sql.findDirectory(target, link, (attempt) => {
     // check if directory was found
