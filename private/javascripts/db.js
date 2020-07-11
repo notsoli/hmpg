@@ -79,7 +79,7 @@ function login(username, password, callback) {
   const compareInfo = "SELECT * FROM userinfo WHERE username = ? AND password = ?;"
   sql.query(compareInfo, [username, hashedPassword], (err, result) => {
     // make sure result is an actual entry identification
-    if (result.length < 0 || result[0].username !== username || result[0].password !== hashedPassword) {
+    if (result.length !== 1 || result[0].username !== username || result[0].password !== hashedPassword) {
       callback({success: false, error: e.validity.invalidLogin})
       return
     }

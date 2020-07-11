@@ -19,6 +19,7 @@ router.post('/register', (req, res, next) => {
   const verifyResult = verifyBody(req.body)
   if (!verifyResult.success) {
     res.send ({success: false, error: verifyResult.error})
+    return
   }
 
   // assign form information to variables
