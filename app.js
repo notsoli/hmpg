@@ -7,8 +7,10 @@ const logger = require('morgan')
 const subdomain = require('wildcard-subdomains')
 const fileUpload = require('express-fileupload');
 const bodyParser = require('body-parser')
+const favicon = require('serve-favicon')
 
 const package = require('./package.json')
+const hash = require('./private/javascripts/hash.js')
 
 const app = express()
 
@@ -38,6 +40,20 @@ module.exports = app
 // ******
 // ROUTES
 // ******
+
+// serve favicon
+app.use(favicon('./public/images/favicon.ico'))
+
+// route api pages, thank you kingsley solomon!
+const routes = ['getFiles']
+for(let i = 0; i < routes.length; i++) {
+  app.use('/' + routes[i], (req, res, next) => {
+    // generate main payload
+    req.info = hash.payload(req, res, next)
+
+    next()
+  }, require('./routes/api/' + routes[i]))
+}
 
 // configure wildcard subdomains
 app.use(subdomain({
