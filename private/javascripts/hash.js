@@ -125,7 +125,7 @@ function payload(req, res, next) {
     if (!jwt.validity) {
       // invalid jwt
       console.log("invalid jwt")
-      res.clearCookie("jwtToken")
+      res.clearCookie("jwtToken", {domain: 'hmpg.io'})
       return {}
     }
 
