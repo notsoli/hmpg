@@ -187,6 +187,32 @@ function addPath(info, path, item) {
   return {success: true, newInfo: newInfo}
 }
 
+// searches for an item from user's hmpgInfo.json
+function searchItem(id, link, callback) {
+  // concatenate full hmpgInfo.json path
+  const infoPath = "E:/hmpg/" + id + "/hmpgInfo.json"
+
+  // read hmpgInfo.json
+  fs.readFile(infoPath, (err, data) => {
+    if (err) {
+      console.log(err)
+      callback({success: false, error: err})
+      return
+    }
+    const hmpgInfo = JSON.parse(data)
+
+    // search and modify hmpgInfo
+    const itemInfo = searchDirectory({action: "search"}, link, hmpgInfo.root, 0, [])
+
+    if (!itemInfo.selectedItem) {
+      callback({success: false, error: "item wasn't found"})
+      return
+    }
+
+    callback({success: true, itemInfo: itemInfo, hmpgInfo: hmpgInfo})
+  })
+}
+
 // modifies a file from user's hmpgInfo.json
 function modifyItem(id, request, link, callback) {
   // concatenate full hmpgInfo.json path
@@ -207,6 +233,16 @@ function modifyItem(id, request, link, callback) {
     if (!itemInfo.selectedItem) {
       callback({success: false, error: "item wasn't found"})
       return
+    }
+
+    // remove item from total
+    if (request.action === "delete") {
+      if (itemInfo.selectedItem.fileName) {
+        hmpgInfo.totalFiles--
+        hmpgInfo.totalSize -= itemInfo.selectedItem.fileSize
+      } else {
+        hmpgInfo.totalDirectories--
+      }
     }
 
     // reassemble hmpgInfo.json
@@ -274,6 +310,7 @@ function searchDirectory(request, link, items, id, _path, _selectedItem) {
   return {path: path, selectedItem: selectedItem}
 }
 
+// read user's hmpgInfo.json
 function read(id, callback) {
   fs.readFile("E:/hmpg/" + id + "/hmpgInfo.json", "utf8", (err, data) => {
     if (err) {
@@ -286,9 +323,27 @@ function read(id, callback) {
   })
 }
 
+// send hmpgInfo with target directory's children as root
+function handleView(id, link, callback) {
+  searchItem(id, link, (searchAttempt) => {
+    if (!searchAttempt.success) {
+      callback({success: false, error: searchAttempt.error})
+      return
+    }
+
+    // create dummy hmpgInfo object
+    const hmpgInfo = searchAttempt.hmpgInfo
+    hmpgInfo.root = searchAttempt.itemInfo.selectedItem.children
+
+    callback({success: true, info: JSON.stringify(hmpgInfo)})
+  })
+}
+
 module.exports.File = File
 module.exports.Directory = Directory
 module.exports.Info = Info
 module.exports.addItem = addItem
+module.exports.searchItem = searchItem
 module.exports.modifyItem = modifyItem
 module.exports.read = read
+module.exports.handleView = handleView

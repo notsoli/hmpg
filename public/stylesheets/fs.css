@@ -1,0 +1,76 @@
+#filePreview {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  margin: 10px 0;
+}
+
+#previewImage {
+  margin-right: 10px;
+}
+
+#previewInfo {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  overflow-wrap: break-word;
+  overflow: hidden;
+}
+
+#itemLink {
+  display: flex;
+  flex-direction: row;
+}
+
+#linkLabel {
+  margin-right: 5px;
+}
+
+#linkValue {
+  color: #000000;
+}
+
+.file, .directory {
+  margin: 10px 0;
+}
+
+.file {
+  margin-left: 20px;
+}
+
+.container {
+  display: none;
+  margin-left: 30px;
+  border-left: 2px dotted #000000;
+}
+
+.container > div {
+  padding-left: 5px;
+}
+
+.hideIcon {
+  width: 20px;
+  text-align: center;
+}
+
+.dirType, .fileType {
+  padding: 0 5px;
+  text-align: center;
+}
+
+.dirName, .fileName {
+  flex-grow: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dirInfo, .fileInfo {
+  display: flex;
+  flex-direction: row;
+}
+
+.hideIcon:hover, .dirName:hover, .fileName:hover {
+  cursor: pointer;
+}

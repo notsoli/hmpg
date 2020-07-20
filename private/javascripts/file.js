@@ -169,14 +169,14 @@ function move(file, directory, callback) {
 
 // handles file deletion
 function handleDelete(id, link, callback) {
-  // delete item from hmpgInfo.json
-  info.modifyItem(id, {action: "delete"}, link, (modifyAttempt) => {
-    if (!modifyAttempt.success) {
-      callback({success: false, error: modifyAttempt.error})
+  // search item in hmpgInfo.json
+  info.searchItem(id, link, (searchAttempt) => {
+    if (!searchAttempt.success) {
+      callback({success: false, error: searchAttempt.error})
       return
     }
 
-    const itemInfo = modifyAttempt.itemInfo
+    const itemInfo = searchAttempt.itemInfo
 
     // concatenate path
     let basePath = itemInfo.path.join("/") + "/"
@@ -203,11 +203,10 @@ function handleDelete(id, link, callback) {
             return
           }
 
-          // remove link from database
-          db.unlink(id, link, (unlinkAttempt) => {
-            if (!unlinkAttempt.success) {
-              console.log("unlink failed")
-              callback({success: false, error: unlinkAttempt.error})
+          completeDelete(id, link, (completeAttempt) => {
+            if (!completeAttempt.success) {
+              console.log(err)
+              callback({success: false, error: completeAttempt.error})
               return
             }
 
@@ -217,14 +216,15 @@ function handleDelete(id, link, callback) {
       } else {
         fs.rmdir(fullPath, (err) => {
           if (err) {
+            console.log(err)
             callback({success: false, error: err})
             return
           }
 
-          // remove link from database
-          db.unlink(id, link, (unlinkAttempt) => {
-            if (!unlinkAttempt.success) {
-              callback({success: false, error: unlinkAttempt.error})
+          completeDelete(id, link, (completeAttempt) => {
+            if (!completeAttempt.success) {
+              console.log(err)
+              callback({success: false, error: completeAttempt.error})
               return
             }
 
@@ -232,6 +232,27 @@ function handleDelete(id, link, callback) {
           })
         })
       }
+    })
+  })
+}
+
+// remove item from link database and hmpgInfo.json
+function completeDelete(id, link, callback) {
+  // remove link from database
+  db.unlink(id, link, (unlinkAttempt) => {
+    if (!unlinkAttempt.success) {
+      callback({success: false, error: unlinkAttempt.error})
+      return
+    }
+
+    // delete item from hmpgInfo.json
+    info.modifyItem(id, {action: "delete"}, link, (modifyAttempt) => {
+      if (!modifyAttempt.success) {
+        callback({success: false, error: modifyAttempt.error})
+        return
+      }
+
+      callback({success: true})
     })
   })
 }

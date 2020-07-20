@@ -64,53 +64,6 @@ function renderFileList(list) {
   document.querySelector("#fileWrapper").appendChild(list)
 }
 
-function handleItemSelect() {
-  // get the object's item id
-  const id = this.parentNode.id.split("-")[1]
-  const item = items[id]
-
-  // set item as focused
-  focused = item
-
-  // store username (this is a stupid way to do it)
-  const username = document.querySelector("#nav-profile").innerHTML
-
-  // determine if item is a file or directory
-  if (item.hasOwnProperty("fileName")) {
-    // file name, size, and type
-    document.querySelector("#itemName").innerHTML = "name: " + item.fileName
-    document.querySelector("#itemSize").innerHTML = "size: " + item.displaySize
-    document.querySelector("#itemType").innerHTML = "type: " + item.fileType
-
-    // file link
-    document.querySelector("#linkLabel").innerHTML = "link:"
-    const completeLink = "https://" + username + ".hmpg.io/" + item.fileLink
-    document.querySelector("#linkValue").innerHTML = item.fileLink
-    document.querySelector("#linkValue").href = completeLink
-  } else {
-    // directory name
-    document.querySelector("#itemName").innerHTML = "name: " + item.dirName
-
-    // directory size
-    let suffix
-    if (item.children.length === 1) {
-      suffix = " item"
-    } else {
-      suffix = " items"
-    }
-    document.querySelector("#itemSize").innerHTML = "size: " + item.children.length + suffix
-
-    // directory type
-    document.querySelector("#itemType").innerHTML = "type: directory"
-
-    // directory link
-    document.querySelector("#linkLabel").innerHTML = "link:"
-    const completeLink = "https://" + username + ".hmpg.io/" + item.dirLink
-    document.querySelector("#linkValue").innerHTML = item.dirLink
-    document.querySelector("#linkValue").href = completeLink
-  }
-}
-
 function handleDelete() {
   // determine if any files are selected
   if (selected.length > 0) {
@@ -186,10 +139,10 @@ function handleRename() {
           handleRename()
           return
         }
-
-        // send rename request
-        sendRenameRequest(link, result)
       }
+
+      // send rename request
+      sendRenameRequest(link, result)
     }
   }
 }

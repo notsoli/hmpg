@@ -7,16 +7,24 @@ let selected = []
 // store currently focused item
 let focused
 
-function sendFileRequest() {
+function sendFileRequest(userid, link) {
   // create a new ajax request
   const request = new XMLHttpRequest()
 
   // prepare to receive response
   request.addEventListener("readystatechange", handleFileResponse)
 
-  // send request
-  request.open("GET", "https://hmpg.io/getFiles")
-  request.send()
+  // send different request based on parameters
+  if (userid !== undefined && link !== undefined) {
+    // send request
+    request.open("POST", "getFiles")
+    request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8')
+    request.send(JSON.stringify({userid: userid, link: link}))
+  } else {
+    // send request
+    request.open("GET", "getFiles")
+    request.send()
+  }
 }
 
 function handleFileResponse() {
@@ -164,5 +172,59 @@ function handleItemCheck() {
         selected.splice(i, 1)
       }
     }
+  }
+}
+
+function handleItemSelect() {
+  // get the object's item id
+  const id = this.parentNode.id.split("-")[1]
+  const item = items[id]
+
+  // set item as focused
+  focused = item
+
+  // get username
+  const subdomain = window.location.host.split(".")[0]
+  let username
+  if (subdomain == "hmpg" || subdomain == "www") {
+    // this is a stupid way to do it
+    username = document.querySelector("#nav-profile").innerHTML
+  } else {
+    username = subdomain
+  }
+
+  // determine if item is a file or directory
+  if (item.hasOwnProperty("fileName")) {
+    // file name, size, and type
+    document.querySelector("#itemName").innerHTML = "name: " + item.fileName
+    document.querySelector("#itemSize").innerHTML = "size: " + item.displaySize
+    document.querySelector("#itemType").innerHTML = "type: " + item.fileType
+
+    // file link
+    document.querySelector("#linkLabel").innerHTML = "link:"
+    const completeLink = "https://" + username + ".hmpg.io/" + item.fileLink
+    document.querySelector("#linkValue").innerHTML = item.fileLink
+    document.querySelector("#linkValue").href = completeLink
+  } else {
+    // directory name
+    document.querySelector("#itemName").innerHTML = "name: " + item.dirName
+
+    // directory size
+    let suffix
+    if (item.children.length === 1) {
+      suffix = " item"
+    } else {
+      suffix = " items"
+    }
+    document.querySelector("#itemSize").innerHTML = "size: " + item.children.length + suffix
+
+    // directory type
+    document.querySelector("#itemType").innerHTML = "type: directory"
+
+    // directory link
+    document.querySelector("#linkLabel").innerHTML = "link:"
+    const completeLink = "https://" + username + ".hmpg.io/" + item.dirLink
+    document.querySelector("#linkValue").innerHTML = item.dirLink
+    document.querySelector("#linkValue").href = completeLink
   }
 }

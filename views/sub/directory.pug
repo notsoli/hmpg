@@ -2,16 +2,12 @@ extends ../layout
 
 block links
   link(rel='stylesheet', href='/stylesheets/fs.css')
-  link(rel='stylesheet', href='/stylesheets/main/files.css')
+  link(rel='stylesheet', href='/stylesheets/sub/directory.css')
   script(src="/javascripts/fs.js")
-  script(src="/javascripts/main/files.js")
+  script(src="/javascripts/sub/directory.js")
 
 block content
   #main
-    #directoryWrapper
-      #createDirectory
-        input#directoryLabel(type='text' name='directory' placeholder="directory")
-        button#directoryButton create directory
     #filePreview
       img#previewImage(src="https://via.placeholder.com/150/" width="150" height="150")
       #previewInfo
@@ -21,7 +17,4 @@ block content
         #itemLink
           #linkLabel link: ...
           a#linkValue(href="")
-    #fileActions
-      #renameButton rename
-      #deleteButton delete
     #fileWrapper

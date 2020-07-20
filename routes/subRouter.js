@@ -46,7 +46,20 @@ router.all('/s/:target/:link', function(req, res, next) {
         console.log("serving file at directory " + directory)
         res.sendFile(directory)
       } else if (stats.isDirectory()) {
-        res.send("directory sharing support is coming soon!")
+        console.log("serving directory " + directory)
+
+        // set login information
+        req.info = hash.payload(req, res, next)
+
+        // set response cookies
+        res.cookie("targetid", attempt.result.userid, {maxAge: 900000, domain: 'hmpg.io'})
+        res.cookie("targetLink", req.params.link, {maxAge: 900000, domain: 'hmpg.io'})
+
+        // set response title
+        req.info.title = "hmpg:directory"
+
+        // render page
+        res.render('./sub/directory', req.info)
       }
     })
   })
