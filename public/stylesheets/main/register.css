@@ -38,7 +38,7 @@
   outline: none;
 }
 
-#register>button {
+#registerButton {
   height: 36px;
   color: #ffffff;
   background-color: #4eba5e;
@@ -48,12 +48,13 @@
   font-size: 15px;
 }
 
-#register>button:hover {
+#registerButton:hover {
   cursor: pointer;
 }
 
 #disclaimer {
   margin-bottom: 20px;
+  text-align: justify;
 }
 
 #loginLabel {
