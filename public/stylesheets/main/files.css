@@ -78,6 +78,10 @@
   border-left: 2px dotted #000000;
 }
 
+.container > div {
+  padding-left: 5px;
+}
+
 .hideIcon {
   width: 20px;
   text-align: center;
