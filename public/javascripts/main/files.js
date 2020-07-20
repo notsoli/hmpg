@@ -88,9 +88,19 @@ function handleItemSelect() {
     document.querySelector("#linkValue").innerHTML = item.fileLink
     document.querySelector("#linkValue").href = completeLink
   } else {
-    // directory name, size, and type
+    // directory name
     document.querySelector("#itemName").innerHTML = "name: " + item.dirName
-    document.querySelector("#itemSize").innerHTML = "size: " + item.children.length + " items"
+
+    // directory size
+    let suffix
+    if (item.children.length === 1) {
+      suffix = " item"
+    } else {
+      suffix = " items"
+    }
+    document.querySelector("#itemSize").innerHTML = "size: " + item.children.length + suffix
+
+    // directory type
     document.querySelector("#itemType").innerHTML = "type: directory"
 
     // directory link
