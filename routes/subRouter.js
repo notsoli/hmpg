@@ -4,6 +4,7 @@ const router = express.Router()
 
 const sql = require('../private/javascripts/db')
 const hash = require('../private/javascripts/hash')
+const fs = require('fs')
 
 // render base homepage
 const hmpgRouter = require('./sub/hmpgRouter')
@@ -35,8 +36,19 @@ router.all('/s/:target/:link', function(req, res, next) {
     }
 
     const directory = "E:/hmpg/" + attempt.result.userid + "/" + attempt.result.directory
-    console.log("serving file at directory " + directory)
-    res.sendFile(directory)
+
+    fs.stat(directory, (err, stats) => {
+      if (err) {
+        return
+      }
+
+      if (stats.isFile()) {
+        console.log("serving file at directory " + directory)
+        res.sendFile(directory)
+      } else if (stats.isDirectory()) {
+        res.send("directory sharing support is coming soon!")
+      }
+    })
   })
 })
 
