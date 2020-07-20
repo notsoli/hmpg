@@ -32,6 +32,7 @@ router.all('/s/:target/:link', function(req, res, next) {
     // check if directory was found
     if (!attempt.success) {
       console.log("failed to find file")
+      next()
       return
     }
 

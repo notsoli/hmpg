@@ -31,7 +31,7 @@
     "failedDirectory": "failed to create directory",
     "fileExists": "file already exists",
     "failedInfoWrite": "failed to create info file",
-    "invalidName": "filename is invalid"
+    "invalidName": "name is invalid"
   },
   "breaker": {
     "loginDisabled": "sorry, login is disabled at this time",

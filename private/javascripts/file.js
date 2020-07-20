@@ -36,6 +36,16 @@ function createRoot(id, callback) {
 
 // handle directory creation
 function handleDirectory(id, directory, length, callback) {
+  // replace backslashes with forwardslashes
+  directory = directory.replace(/\\/g, "/")
+
+  // determine if name is illegal
+  const expression = new RegExp(/[?%*:|"<>]/)
+  if (expression.test(directory)) {
+    callback({success: false, error: e.fs.invalidName})
+    return
+  }
+
   // concatenate a path for the directory to go into
   const completeDirectory = "E:/hmpg/" + id + "/" + directory
 
@@ -115,6 +125,13 @@ function createDirectory(path, callback) {
 
 // handle file upload
 function handleFile(file, id, length, callback) {
+  // determine if name is illegal
+  const expression = new RegExp(/[/\\?%*:|"<>]/)
+  if (expression.test(file.name)) {
+    callback({success: false, error: e.fs.invalidName})
+    return
+  }
+
   // concatenate a path for the file to go into
   const directory = file.name
   const completeDirectory = "E:/hmpg/" + id + "/" + directory
@@ -259,14 +276,21 @@ function completeDelete(id, link, callback) {
 
 // handles file renaming
 function handleRename(id, link, name, callback) {
+  // determine if name is illegal
+  const expression = new RegExp(/[/\\?%*:|"<>]/)
+  if (expression.test(name)) {
+    callback({success: false, error: e.fs.invalidName})
+    return
+  }
+
   // rename item in hmpgInfo.json
-  info.modifyItem(id, {action: "rename", name: name}, link, (modifyAttempt) => {
-    if (!modifyAttempt.success) {
-      callback({success: false, error: modifyAttempt.error})
+  info.searchItem(id, link, (searchAttempt) => {
+    if (!searchAttempt.success) {
+      callback({success: false, error: searchAttempt.error})
       return
     }
 
-    const itemInfo = modifyAttempt.itemInfo
+    const itemInfo = searchAttempt.itemInfo
 
     // concatename base path from array
     let basePath
@@ -306,7 +330,14 @@ function handleRename(id, link, name, callback) {
           return
         }
 
-        callback({success: true})
+        info.modifyItem(id, {action: "rename", name: name}, link, (modifyAttempt) => {
+          if (!modifyAttempt.success) {
+            callback({success: false, error: modifyAttempt.error})
+            return
+          }
+
+          callback({success: true})
+        })
       })
     })
   })
