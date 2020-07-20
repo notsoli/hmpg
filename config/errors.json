@@ -13,7 +13,9 @@
   "link": {
     "overlapLink": "failed to generate unique link",
     "failedLink": "failed to create link",
-    "failedMove": "error moving file"
+    "failedMove": "error moving file",
+    "failedDelete": "failed to delete link",
+    "failedRename": "failed to rename link"
   },
   "request": {
     "badRequest": "bad request",
@@ -28,7 +30,8 @@
     "directoryExists": "directory already exists",
     "failedDirectory": "failed to create directory",
     "fileExists": "file already exists",
-    "failedInfoWrite": "failed to create info file"
+    "failedInfoWrite": "failed to create info file",
+    "invalidName": "filename is invalid"
   },
   "breaker": {
     "loginDisabled": "sorry, login is disabled at this time",

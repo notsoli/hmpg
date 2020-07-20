@@ -7,11 +7,15 @@ let directoryInput, directoryButton
 // init function
 function init() {
   // dom objects
-  directoryInput = document.querySelector("#directory")
+  directoryInput = document.querySelector("#directoryLabel")
   directoryButton = document.querySelector("#directoryButton")
+  deleteButton = document.querySelector("#deleteButton")
+  renameButton = document.querySelector("#renameButton")
 
   // event listeners
   directoryButton.addEventListener("click", sendDirectoryData)
+  deleteButton.addEventListener("click", handleDelete)
+  renameButton.addEventListener("click", handleRename)
 
   sendFileRequest()
 }
@@ -60,33 +64,141 @@ function renderFileList(list) {
   document.querySelector("#fileWrapper").appendChild(list)
 }
 
-function handleIconClick() {
-  // create container reference
-  const container = this.parentNode.parentNode.querySelector(".container")
+function handleItemSelect() {
+  // get the object's item id
+  const id = this.parentNode.id.split("-")[1]
+  const item = items[id]
 
-  // toggle or un-toggle directory
-  if (this.className.includes("toggled")) {
-    // change icon
-    this.innerHTML = "▼"
+  // set item as focused
+  focused = item
 
-    // show container
-    container.style.display = "block"
+  // store username (this is a stupid way to do it)
+  const username = document.querySelector("#nav-profile").innerHTML
 
-    // remove toggled class
-    this.className = "hideIcon"
+  // determine if item is a file or directory
+  if (item.hasOwnProperty("fileName")) {
+    // file name, size, and type
+    document.querySelector("#itemName").innerHTML = "name: " + item.fileName
+    document.querySelector("#itemSize").innerHTML = "size: " + item.displaySize
+    document.querySelector("#itemType").innerHTML = "type: " + item.fileType
+
+    // file link
+    document.querySelector("#linkLabel").innerHTML = "link:"
+    const completeLink = "http://" + username + ".hmpg.io/" + item.fileLink
+    document.querySelector("#linkValue").innerHTML = item.fileLink
+    document.querySelector("#linkValue").href = completeLink
   } else {
-    // change icon
-    this.innerHTML = "▲"
+    // directory name, size, and type
+    document.querySelector("#itemName").innerHTML = "name: " + item.dirName
+    document.querySelector("#itemSize").innerHTML = "size: " + item.children.length + " items"
+    document.querySelector("#itemType").innerHTML = "type: directory"
 
-    // hide container
-    container.style.display = "none"
-
-    this.className += " toggled"
+    // directory link
+    document.querySelector("#linkLabel").innerHTML = "link:"
+    const completeLink = "http://" + username + ".hmpg.io/" + item.dirLink
+    document.querySelector("#linkValue").innerHTML = item.dirLink
+    document.querySelector("#linkValue").href = completeLink
   }
 }
 
-function handleItemSelect() {
-  // gets the object's item id
-  const id = this.parentNode.id.split("-")[1]
-  document.querySelector("#currentItem").innerHTML = JSON.stringify(items[id])
+function handleDelete() {
+  // determine if any files are selected
+  if (selected.length > 0) {
+    // store confirm result
+    let result
+
+    // send confirm message
+    if (selected.length === 1) {
+      result = confirm("Are you sure you want to delete 1 file?")
+    } else {
+      result = confirm("Are you sure you want to delete " + selected.length + " files?")
+    }
+
+    // check if user confirmed or not
+    if (result === true) {
+      sendDeleteRequest()
+    }
+  }
+}
+
+function sendDeleteRequest() {
+  // create array of links used to identify items later
+  const links = []
+  for (let i = 0; i < selected.length; i++) {
+    const item = items[selected[i]]
+
+    if (item.hasOwnProperty("fileLink")) {
+      links[i] = item.fileLink
+    } else {
+      links[i] = item.dirLink
+    }
+  }
+
+  // create a new ajax request
+  const request = new XMLHttpRequest()
+
+  // prepare to receive response
+  request.addEventListener("readystatechange", handleDeleteResponse)
+
+  // send request
+  request.open("POST", "http://hmpg.io/deleteFiles")
+  request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8')
+  request.send(JSON.stringify(links))
+}
+
+function handleDeleteResponse() {
+  if (this.readyState == 4) {
+    sendFileRequest()
+  }
+}
+
+function handleRename() {
+  // determine if a file is selected
+  if (focused) {
+    // determine name and link
+    let name, link
+    if (focused.fileName) {
+      name = focused.fileName
+      link = focused.fileLink
+    } else {
+      name = focused.dirName
+      link = focused.dirLink
+    }
+
+    // prompt user for new name
+    const result = window.prompt("Please enter the new filename.", name)
+    if (result) {
+      if (focused.fileType) {
+        // concatename and verify filetype
+        const type = "." + focused.fileType.split("/")[1]
+        if (!result.endsWith(type)) {
+          alert("New name does not match filetype. Please try again.")
+          handleRename()
+          return
+        }
+
+        // send rename request
+        sendRenameRequest(link, result)
+      }
+    }
+  }
+}
+
+function sendRenameRequest(link, name) {
+  // create a new ajax request
+  const request = new XMLHttpRequest()
+
+  // prepare to receive response
+  request.addEventListener("readystatechange", handleRenameResponse)
+
+  // send request
+  request.open("POST", "http://hmpg.io/renameFiles")
+  request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8')
+  request.send(JSON.stringify({link: link, name: name}))
+}
+
+function handleRenameResponse() {
+  if (this.readyState == 4) {
+    sendFileRequest()
+  }
 }

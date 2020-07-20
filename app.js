@@ -45,7 +45,7 @@ module.exports = app
 app.use(favicon('./public/images/favicon.ico'))
 
 // route api pages, thank you kingsley solomon!
-const routes = ['getFiles']
+const routes = ['getFiles', 'deleteFiles', 'renameFiles']
 for(let i = 0; i < routes.length; i++) {
   app.use('/' + routes[i], (req, res, next) => {
     // generate main payload

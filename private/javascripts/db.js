@@ -130,7 +130,7 @@ function findDirectory(username, link, callback) {
   })
 }
 
-// create a file link
+// create an item link
 function link(id, directory, length, callback) {
   // store every link created by a user
   const links = [""]
@@ -188,6 +188,48 @@ function link(id, directory, length, callback) {
   })
 }
 
+// remove an item link
+function unlink(id, link, callback) {
+  // get a list of all links created by a user
+  const getLinks = "DELETE FROM fileinfo WHERE userid = ? AND link = ?"
+
+  sql.query(getLinks, [id, link], (err, result) => {
+    if (err) {
+      callback({success: false, error: err})
+    }
+
+    // checks if a row was deleted
+    if (result.affectedRows != 0) {
+      // successful link deletion
+      callback({success: true})
+    } else {
+      // failed link deletion
+      callback({success: false, error: e.link.failedDelete})
+    }
+  })
+}
+
+// remove an item link
+function rename(id, link, name, callback) {
+  // get a list of all links created by a user
+  const getLinks = "UPDATE fileinfo SET directory = ? WHERE userid = ? AND link = ?"
+
+  sql.query(getLinks, [name, id, link], (err, result) => {
+    if (err) {
+      callback({success: false, error: err})
+    }
+
+    // checks if a row was deleted
+    if (result.affectedRows != 0) {
+      // successful link modification
+      callback({success: true})
+    } else {
+      // failed link modification
+      callback({success: false, error: e.link.failedRename})
+    }
+  })
+}
+
 // allows other files to use database functions
 module.exports.validity = validity
 module.exports.login = login
@@ -195,3 +237,5 @@ module.exports.register = register
 module.exports.userid = userid
 module.exports.findDirectory = findDirectory
 module.exports.link = link
+module.exports.unlink = unlink
+module.exports.rename = rename

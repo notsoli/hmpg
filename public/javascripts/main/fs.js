@@ -1,5 +1,11 @@
-// create an array holding each file and directory
+// store each file and directory
 let items = [], itemId = 0
+
+// store currently selected items
+const selected = []
+
+// store currently focused item
+let focused
 
 function sendFileRequest() {
   // create a new ajax request
@@ -62,8 +68,9 @@ function assembleFile(file) {
   fileElement.className = "file"
 
   // create fileInfo element
-  const domString = '<div class="fileInfo" id="item-' + itemId + '"><input type="checkbox" value="selected"><div class="fileType">i</div><div class="fileName">' + file.fileName + '</div></div>'
+  const domString = '<div class="fileInfo" id="item-' + itemId + '"><input class="checkbox" type="checkbox" value="selected"><div class="fileType">i</div><div class="fileName">' + file.fileName + '</div></div>'
   const fileInfo = new DOMParser().parseFromString(domString, 'text/html')
+  fileInfo.querySelector(".checkbox").addEventListener("change", handleItemCheck)
   fileInfo.querySelector(".fileName").addEventListener("click", handleItemSelect)
   fileElement.appendChild(fileInfo.body.firstChild)
 
@@ -83,9 +90,10 @@ function assembleDirectory(dir) {
   dirElement.className = "directory"
 
   // create dirInfo element
-  const domString = '<div class="dirInfo" id="item-' + itemId + '"><div class="hideIcon toggled">▲</div><input type="checkbox" value="selected"><div class="dirType">d</div><div class="dirName">' + dir.dirName + '</div></div>'
+  const domString = '<div class="dirInfo" id="item-' + itemId + '"><div class="hideIcon toggled">▲</div><input class="checkbox" type="checkbox" value="selected"><div class="dirType">d</div><div class="dirName">' + dir.dirName + '</div></div>'
   const dirInfo = new DOMParser().parseFromString(domString, 'text/html')
   dirInfo.querySelector(".hideIcon").addEventListener("click", handleIconClick)
+  dirInfo.querySelector(".checkbox").addEventListener("change", handleItemCheck)
   dirInfo.querySelector(".dirName").addEventListener("click", handleItemSelect)
   dirElement.appendChild(dirInfo.body.firstChild)
 
@@ -114,4 +122,47 @@ function assembleDirectory(dir) {
   dirElement.appendChild(containerElement)
 
   return dirElement
+}
+
+function handleIconClick() {
+  // create container reference
+  const container = this.parentNode.parentNode.querySelector(".container")
+
+  // toggle or un-toggle directory
+  if (this.className.includes("toggled")) {
+    // change icon
+    this.innerHTML = "▼"
+
+    // show container
+    container.style.display = "block"
+
+    // remove toggled class
+    this.className = "hideIcon"
+  } else {
+    // change icon
+    this.innerHTML = "▲"
+
+    // hide container
+    container.style.display = "none"
+
+    this.className += " toggled"
+  }
+}
+
+function handleItemCheck() {
+  // get item id
+  const id = this.parentNode.id.split("-")[1]
+
+  // determine if checkbox is checked
+  if (this.checked) {
+    // push item to selected array
+    selected.push(id)
+  } else {
+    // remove item from selected array
+    for (let i = 0; i < selected.length; i++) {
+      if (selected[i] === id) {
+        selected.splice(i, 1)
+      }
+    }
+  }
 }

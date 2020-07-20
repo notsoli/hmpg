@@ -1,3 +1,69 @@
+#main {
+  margin: 15px;
+}
+
+#filePreview {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  margin: 10px 0;
+}
+
+#previewImage {
+  margin-right: 10px;
+}
+
+#previewInfo {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  overflow-wrap: break-word;
+  overflow: hidden;
+}
+
+#itemLink {
+  display: flex;
+  flex-direction: row;
+}
+
+#linkLabel {
+  margin-right: 5px;
+}
+
+#linkValue {
+  color: #000000;
+}
+
+#fileActions {
+  display: flex;
+  flex-direction: row;
+}
+
+#fileActions > div {
+  width: 80px;
+  height: 30px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  color: #ffffff;
+  border-radius: 5px;
+  margin-right: 10px;
+  user-select: none;
+}
+
+#fileActions > div:hover {
+  cursor: pointer;
+}
+
+#renameButton {
+  background-color: #6090db;
+}
+
+#deleteButton {
+  background-color: #db6b58;
+}
+
 .file, .directory {
   margin: 10px 0;
 }
@@ -20,6 +86,13 @@
 .dirType, .fileType {
   padding: 0 5px;
   text-align: center;
+}
+
+.dirName, .fileName {
+  flex-grow: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dirInfo, .fileInfo {

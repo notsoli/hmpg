@@ -73,7 +73,7 @@ function addItem(id, path, item, callback) {
       newInfo = attempt.newInfo
     } else {
       // directory is multiple above root
-      const attempt = addBase(hmpgInfo, path, item)
+      const attempt = addPath(hmpgInfo, path, item)
       if (!attempt.success) {
         callback({success: false, error: attempt.error})
         return
@@ -126,11 +126,11 @@ function addBase(info, path, item) {
   // add new file to directory
   let found = false
   for (let c = 0; c < root.length; c++) {
-    const child = root.children[c]
+    const child = root[c]
 
     // push new item to identified directory
     if (child.dirName === path) {
-      child.push(item)
+      child.children.push(item)
       found = true
       break
     }
@@ -153,7 +153,10 @@ function addPath(info, path, item) {
 
   // add new file to directory
   const dir = path.split("/")
-  let currentDir = root
+  let currentDir = {children: root}
+
+  // store the current child element
+  let child
 
   // iterate through each directory
   for (let d = 0; d < dir.length; d++) {
@@ -161,7 +164,7 @@ function addPath(info, path, item) {
 
     // iterate through the directory's children
     for (let c = 0; c < currentDir.children.length; c++) {
-      const child = currentDir.children[c]
+      child = currentDir.children[c]
 
       // set the current directory to the identified child
       if (child.dirName === dir[d]) {
@@ -178,10 +181,97 @@ function addPath(info, path, item) {
   }
 
   // push new item to the end directory
-  child.push(item)
+  child.children.push(item)
 
   // return new hmpgInfo
   return {success: true, newInfo: newInfo}
+}
+
+// modifies a file from user's hmpgInfo.json
+function modifyItem(id, request, link, callback) {
+  // concatenate full hmpgInfo.json path
+  const infoPath = "E:/hmpg/" + id + "/hmpgInfo.json"
+
+  // read hmpgInfo.json
+  fs.readFile(infoPath, (err, data) => {
+    if (err) {
+      console.log(err)
+      callback({success: false, error: err})
+      return
+    }
+    const hmpgInfo = JSON.parse(data)
+
+    // search and modify hmpgInfo
+    const itemInfo = searchDirectory(request, link, hmpgInfo.root, 0, [])
+
+    if (!itemInfo.selectedItem) {
+      callback({success: false, error: "item wasn't found"})
+      return
+    }
+
+    // reassemble hmpgInfo.json
+    const fileData = JSON.stringify(hmpgInfo)
+
+    // write to hmpgInfo.json
+    fs.writeFile(infoPath, fileData, (err) => {
+      if (err) {
+        console.log(err)
+        callback({success: false, error: err})
+        return
+      }
+
+      callback({success: true, itemInfo: itemInfo})
+    })
+  })
+}
+
+// recursively search the current directory for link matches
+function searchDirectory(request, link, items, id, _path, _selectedItem) {
+  // store possible selected item
+  path = _path
+  selectedItem = _selectedItem
+
+  // iterate through each child
+  for (let i = 0; i < items.length; i++) {
+    // make sure the item isn't already found
+    // not exactly sure why i need to do this, the break should take care of it
+    if (!selectedItem) {
+      // reset path
+      if (id === 0) {
+        path = []
+      }
+
+      // store current item
+      const item = items[i]
+
+      // check for any matches and search directories
+      if (item.fileLink === link || item.dirLink === link) {
+        // set selectedItem to the found item
+        selectedItem = JSON.parse(JSON.stringify(item))
+
+        // modify item based on the chosen action
+        if (request.action === "delete") {
+          items.splice(i, 1)
+        } else if (request.action === "rename") {
+          if (item.fileName) {
+            item.fileName = request.name
+          } else {
+            item.dirName = request.name
+          }
+        }
+
+        break
+      } else if (item.hasOwnProperty("children")) {
+        // set path
+        path[id] = item.dirName
+        path = path.slice(0, id + 1)
+
+        // recursively check each directory
+        searchDirectory(request, link, item.children, id + 1, path, selectedItem)
+      }
+    }
+  }
+  return {path: path, selectedItem: selectedItem}
 }
 
 function read(id, callback) {
@@ -200,4 +290,5 @@ module.exports.File = File
 module.exports.Directory = Directory
 module.exports.Info = Info
 module.exports.addItem = addItem
+module.exports.modifyItem = modifyItem
 module.exports.read = read

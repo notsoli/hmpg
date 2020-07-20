@@ -9,8 +9,18 @@ block content
   #main
     #directoryWrapper
       #createDirectory
-        input#directory(type='text' name='directory' placeholder="directory")
+        input#directoryLabel(type='text' name='directory' placeholder="directory")
         button#directoryButton create directory
+    #filePreview
+      img#previewImage(src="https://via.placeholder.com/150/" width="150" height="150")
+      #previewInfo
+        #itemName name: ...
+        #itemSize size: ...
+        #itemType type: ...
+        #itemLink
+          #linkLabel link: ...
+          a#linkValue(href="")
+    #fileActions
+      #renameButton rename
+      #deleteButton delete
     #fileWrapper
-      div your files
-      #currentItem item info

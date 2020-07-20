@@ -44,7 +44,7 @@ function handleDirectory(id, directory, length, callback) {
   if (!directory.includes("/")) {
     name = directory
   } else {
-    const directorySplit = directory.split("/")
+    directorySplit = directory.split("/")
     name = directorySplit[directorySplit.length - 1]
   }
 
@@ -167,12 +167,133 @@ function move(file, directory, callback) {
   })
 }
 
-// const testFile = new File("test.png", 10000, "image/png", "xZ3Z")
-// addItem(3, "", testFile, (attempt) => {
-//   console.log(attempt)
-// })
+// handles file deletion
+function handleDelete(id, link, callback) {
+  // delete item from hmpgInfo.json
+  info.modifyItem(id, {action: "delete"}, link, (modifyAttempt) => {
+    if (!modifyAttempt.success) {
+      callback({success: false, error: modifyAttempt.error})
+      return
+    }
+
+    const itemInfo = modifyAttempt.itemInfo
+
+    // concatenate path
+    let basePath = itemInfo.path.join("/") + "/"
+    if (itemInfo.selectedItem.fileName) {
+      basePath += itemInfo.selectedItem.fileName
+    } else {
+      basePath += itemInfo.selectedItem.dirName
+    }
+    const fullPath = "E:/hmpg/" + id + "/" + basePath
+
+    // check if item is a file or directory
+    fs.stat(fullPath, (err, stats) => {
+      if (err) {
+        callback({success: false, error: err})
+        return
+      }
+
+      // remove item from filesystem
+      if (stats.isFile()) {
+        fs.unlink(fullPath, (err) => {
+          if (err) {
+            console.log(err)
+            callback({success: false, error: err})
+            return
+          }
+
+          // remove link from database
+          db.unlink(id, link, (unlinkAttempt) => {
+            if (!unlinkAttempt.success) {
+              console.log("unlink failed")
+              callback({success: false, error: unlinkAttempt.error})
+              return
+            }
+
+            callback({success: true})
+          })
+        })
+      } else {
+        fs.rmdir(fullPath, (err) => {
+          if (err) {
+            callback({success: false, error: err})
+            return
+          }
+
+          // remove link from database
+          db.unlink(id, link, (unlinkAttempt) => {
+            if (!unlinkAttempt.success) {
+              callback({success: false, error: unlinkAttempt.error})
+              return
+            }
+
+            callback({success: true})
+          })
+        })
+      }
+    })
+  })
+}
+
+// handles file renaming
+function handleRename(id, link, name, callback) {
+  // rename item in hmpgInfo.json
+  info.modifyItem(id, {action: "rename", name: name}, link, (modifyAttempt) => {
+    if (!modifyAttempt.success) {
+      callback({success: false, error: modifyAttempt.error})
+      return
+    }
+
+    const itemInfo = modifyAttempt.itemInfo
+
+    // concatename base path from array
+    let basePath
+    if (itemInfo.path.length < 0) {
+      basePath = itemInfo.path.join("/") + "/"
+    } else {
+      basePath = ""
+    }
+
+    // concatenate full path
+    const fullPath = "E:/hmpg/" + id + "/" + basePath
+    let oldName
+    if (itemInfo.selectedItem.fileName) {
+      // verify filetype of new name
+      const fileType = "." + itemInfo.selectedItem.fileType.split("/")[1]
+      if (!name.endsWith(fileType)) {
+        callback({success: false, error: e.fs.invalidName})
+        return
+      }
+
+      oldName = itemInfo.selectedItem.fileName
+    } else {
+      oldName = itemInfo.selectedItem.dirName
+    }
+
+    // rename item in filesystem
+    fs.rename(fullPath + oldName, fullPath + name, (err) => {
+      if (err) {
+        callback({success: false, error: err})
+        return
+      }
+
+      // rename item in database
+      db.rename(id, link, basePath + name, (renameAttempt) => {
+        if (!renameAttempt.success) {
+          callback({success: false, error: renameAttempt.error})
+          return
+        }
+
+        callback({success: true})
+      })
+    })
+  })
+}
 
 module.exports.createRoot = createRoot
 module.exports.handleDirectory = handleDirectory
 module.exports.createDirectory = createDirectory
 module.exports.handleFile = handleFile
+module.exports.handleDelete = handleDelete
+module.exports.handleRename = handleRename
