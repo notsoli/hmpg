@@ -2,7 +2,7 @@
 let items = [], itemId = 0
 
 // store currently selected items
-const selected = []
+let selected = []
 
 // store currently focused item
 let focused
@@ -36,8 +36,8 @@ function handleFileResponse() {
 
 // assemble fileList dom using info
 function assembleFileList(info) {
-  // reset items and itemid
-  items = [], itemId = 0
+  // reset information-storing variables
+  items = [], itemId = 0, selected = [], focused = undefined
 
   // create fileList div
   const list = document.createElement("div")
