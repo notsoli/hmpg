@@ -140,8 +140,22 @@ function handleResponse(message) {
 
 // build file html
 function buildFile(targetFileName, targetFileSize, id) {
+  // create human-readable filesize, from Hristo on StackOverflow
+  let tempSize = targetFileSize
+
+  let i = -1
+  const byteUnits = [' KB', ' MB', ' GB']
+
+  // determine what suffix should be used
+  do {
+      tempSize = tempSize / 1024
+      i++;
+  } while (tempSize > 1024)
+
+  const fileSize = Math.max(tempSize, 0.1).toFixed(1) + byteUnits[i]
+
   // build dom
-  const domString = '<div class="file" id="file-' + id + '"><div class="fileIcon" id="fileIcon-' + id + '">▼</div><div class="fileName">' + targetFileName + '</div><div class="fileDropdown" id="fileDropdown-' + id + '"><div class="fileSize"><div class="attributeName">size:</div><div class="attributeValue">' + targetFileSize + '</div></div><div class="fileLink"><div class="attributeName">link:</div><div class="attributeValue" id="linkAttribute-' + id + '">...</div></div></div><div class="fileStatus" id="fileStatus-' + id + '">uploading</div></div>'
+  const domString = '<div class="file" id="file-' + id + '"><div class="fileIcon" id="fileIcon-' + id + '">▼</div><div class="fileName">' + targetFileName + '</div><div class="fileDropdown" id="fileDropdown-' + id + '"><div class="fileSize"><div class="attributeName">size:</div><div class="attributeValue">' + fileSize + '</div></div><div class="fileLink"><div class="attributeName">link:</div><div class="attributeValue" id="linkAttribute-' + id + '">...</div></div></div><div class="fileStatus" id="fileStatus-' + id + '">uploading</div></div>'
   const file = new DOMParser().parseFromString(domString, 'text/html')
 
   // append to fileList
