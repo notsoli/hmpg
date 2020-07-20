@@ -34,7 +34,7 @@ function sendRegisterData() {
   request.addEventListener("readystatechange", handleResponse)
 
   // send request
-  request.open("POST", "http://hmpg.io/register")
+  request.open("POST", "https://hmpg.io/register")
   request.send(registerForm)
 }
 
@@ -50,10 +50,10 @@ function handleResponse(message) {
       // check if login was successful
       if (response.login == true) {
         // redirect to index
-        window.location.href = "http://hmpg.io"
+        window.location.href = "https://hmpg.io"
       } else {
         // redirect to login
-        window.location.href = "http://hmpg.io/login"
+        window.location.href = "https://hmpg.io/login"
       }
     } else {
       // set status as error message

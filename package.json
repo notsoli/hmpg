@@ -11,6 +11,7 @@
     "debug": "~2.6.9",
     "express": "~4.16.1",
     "express-fileupload": "^1.1.7-alpha.3",
+    "express-https-redirect": "^1.0.0",
     "http-errors": "~1.6.3",
     "lodash": "^4.17.15",
     "morgan": "~1.9.1",

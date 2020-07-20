@@ -15,7 +15,7 @@ function sendFileRequest() {
   request.addEventListener("readystatechange", handleFileResponse)
 
   // send request
-  request.open("GET", "http://hmpg.io/getFiles")
+  request.open("GET", "https://hmpg.io/getFiles")
   request.send()
 }
 

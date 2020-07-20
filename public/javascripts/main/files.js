@@ -35,7 +35,7 @@ function sendDirectoryData() {
   request.addEventListener("readystatechange", handleResponse)
 
   // send request
-  request.open("POST", "http://hmpg.io/files")
+  request.open("POST", "https://hmpg.io/files")
   request.send(directoryForm)
 }
 
@@ -84,7 +84,7 @@ function handleItemSelect() {
 
     // file link
     document.querySelector("#linkLabel").innerHTML = "link:"
-    const completeLink = "http://" + username + ".hmpg.io/" + item.fileLink
+    const completeLink = "https://" + username + ".hmpg.io/" + item.fileLink
     document.querySelector("#linkValue").innerHTML = item.fileLink
     document.querySelector("#linkValue").href = completeLink
   } else {
@@ -105,7 +105,7 @@ function handleItemSelect() {
 
     // directory link
     document.querySelector("#linkLabel").innerHTML = "link:"
-    const completeLink = "http://" + username + ".hmpg.io/" + item.dirLink
+    const completeLink = "https://" + username + ".hmpg.io/" + item.dirLink
     document.querySelector("#linkValue").innerHTML = item.dirLink
     document.querySelector("#linkValue").href = completeLink
   }
@@ -151,7 +151,7 @@ function sendDeleteRequest() {
   request.addEventListener("readystatechange", handleDeleteResponse)
 
   // send request
-  request.open("POST", "http://hmpg.io/deleteFiles")
+  request.open("POST", "https://hmpg.io/deleteFiles")
   request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8')
   request.send(JSON.stringify(links))
 }
@@ -202,7 +202,7 @@ function sendRenameRequest(link, name) {
   request.addEventListener("readystatechange", handleRenameResponse)
 
   // send request
-  request.open("POST", "http://hmpg.io/renameFiles")
+  request.open("POST", "https://hmpg.io/renameFiles")
   request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8')
   request.send(JSON.stringify({link: link, name: name}))
 }

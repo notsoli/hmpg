@@ -47,7 +47,7 @@ router.post('/upload', (req, res) => {
     }
 
     // respond with the new link
-    const completeLink = "http://" + req.info.user + ".hmpg.io/" + handleAttempt.link
+    const completeLink = "https://" + req.info.user + ".hmpg.io/" + handleAttempt.link
     res.send({success: true, link: completeLink, uploads: req.info.uploads})
   })
 })

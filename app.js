@@ -8,6 +8,7 @@ const subdomain = require('wildcard-subdomains')
 const fileUpload = require('express-fileupload');
 const bodyParser = require('body-parser')
 const favicon = require('serve-favicon')
+const httpsRedirect = require('express-https-redirect')
 
 const package = require('./package.json')
 const hash = require('./private/javascripts/hash.js')
@@ -40,6 +41,9 @@ module.exports = app
 // ******
 // ROUTES
 // ******
+
+// configure https redirect
+app.all('*', httpsRedirect())
 
 // serve favicon
 app.use(favicon('./public/images/favicon.ico'))

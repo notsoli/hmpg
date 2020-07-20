@@ -100,7 +100,7 @@ function handleUpload(e, dragFile) {
       requests[fileId].addEventListener("readystatechange", handleResponse)
 
       // send request
-      requests[fileId].open("POST", "http://hmpg.io/upload")
+      requests[fileId].open("POST", "https://hmpg.io/upload")
       requests[fileId].send(fileForm)
 
       // add a new file entry to the list
