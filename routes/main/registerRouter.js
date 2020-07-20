@@ -81,7 +81,6 @@ function completeRegister(username, password, callback) {
         if (!loginAttempt.success) {
           console.log("failed to login")
           callback({success: false, error: loginAttempt.error})
-          console.log("oops3")
           return
         }
 
