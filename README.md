@@ -7,4 +7,4 @@ Latest version: 0.3.4
 
 Production version: 0.3.4
 
-An early version of the site is running on https://www.hmpg.io
+The production version of the site is running on https://www.hmpg.io
