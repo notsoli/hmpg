@@ -2,9 +2,30 @@
   margin: 30px;
 }
 
+#createDirectory {
+  display: flex;
+  flex-direction: row;
+  height: 30px;
+  margin-bottom: 10px;
+}
+
+#createDirectory > * {
+  margin-right: 10px;
+}
+
+#directoryButton {
+  width: 80px;
+  background-color: #000000;
+  color: #ffffff;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+}
+
 #fileActions, #selectionActions {
   display: flex;
   flex-direction: row;
+  margin-bottom: 10px;
 }
 
 #fileActions > div, #selectionActions > div {
@@ -41,4 +62,8 @@
 
 .activeButton:hover {
   cursor: pointer;
+}
+
+#disclaimer {
+  font-style: italic;
 }

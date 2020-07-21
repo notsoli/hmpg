@@ -8,12 +8,9 @@ block links
 
 block content
   #main
-    #directoryWrapper
-      #createDirectory
-        input#directoryLabel(type='text' name='directory' placeholder="directory")
-        button#directoryButton create directory
     #filePreview
-      img#previewImage(src="https://via.placeholder.com/150/" width="150" height="150")
+      #imageWrapper
+        img#previewImage(src="https://via.placeholder.com/150/")
       #previewInfo
         #itemName name: ...
         #itemSize size: ...
@@ -23,7 +20,12 @@ block content
           a#linkValue(href="")
     #fileActions
       #renameButton.inactiveButton rename
+    #directoryWrapper
+      #createDirectory
+        input#directoryLabel(type='text' name='directory' placeholder="directory")
+        button#directoryButton create
     #fileWrapper
     #selectionActions
       #moveButton.inactiveButton move
       #deleteButton.inactiveButton delete
+    #disclaimer please don't move directories containing items just yet. it will work, but the items within the directory will disappear and the links will become unusable

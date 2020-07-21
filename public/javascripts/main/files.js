@@ -1,6 +1,8 @@
 // waits until html data is loaded
 window.addEventListener('load', init)
 
+const simple = false
+
 // dom objects
 let directoryInput, directoryButton, renameButton, moveButton, deleteButton
 

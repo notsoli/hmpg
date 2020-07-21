@@ -174,19 +174,23 @@ function handleItemCheck() {
     }
   }
 
-  // activate/deactivate buttons
-  if (selected.length > 0) {
-    moveButton.className = "activeButton"
-    deleteButton.className = "activeButton"
-  } else {
-    moveButton.className = "inactiveButton"
-    deleteButton.className = "inactiveButton"
+  if (!simple) {
+    // activate/deactivate buttons
+    if (selected.length > 0) {
+      moveButton.className = "activeButton"
+      deleteButton.className = "activeButton"
+    } else {
+      moveButton.className = "inactiveButton"
+      deleteButton.className = "inactiveButton"
+    }
   }
 }
 
 function handleItemSelect() {
-  // activate button
-  renameButton.className = "activeButton"
+  if (!simple) {
+    // activate button
+    renameButton.className = "activeButton"
+  }
 
   // get the object's item id
   const id = this.parentNode.id.split("-")[1]
@@ -217,6 +221,13 @@ function handleItemSelect() {
     const completeLink = "https://" + username + ".hmpg.io/" + item.fileLink
     document.querySelector("#linkValue").innerHTML = item.fileLink
     document.querySelector("#linkValue").href = completeLink
+
+    // file preview
+    if (item.fileType.split("/")[0] === "image") {
+      document.querySelector("#previewImage").src = completeLink
+    } else {
+      document.querySelector("#previewImage").src = "https://via.placeholder.com/150/"
+    }
   } else {
     // directory name
     document.querySelector("#itemName").innerHTML = "name: " + item.dirName
@@ -238,5 +249,8 @@ function handleItemSelect() {
     const completeLink = "https://" + username + ".hmpg.io/" + item.dirLink
     document.querySelector("#linkValue").innerHTML = item.dirLink
     document.querySelector("#linkValue").href = completeLink
+
+    // directory preview
+    document.querySelector("#previewImage").src = "https://via.placeholder.com/150/"
   }
 }

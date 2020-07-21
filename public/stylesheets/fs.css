@@ -5,8 +5,19 @@
   margin: 10px 0;
 }
 
-#previewImage {
+#imageWrapper {
+  width: 150px;
+  height: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin-right: 10px;
+  background-color: #cccccc;
+}
+
+#previewImage {
+  max-width:150px;
+  max-height:150px;
 }
 
 #previewInfo {
