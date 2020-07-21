@@ -1,7 +1,10 @@
 // waits until html data is loaded
 window.addEventListener('load', init)
 
+// dom objects
 let targetid, targetLink
+
+const simple = true
 
 // init function
 function init() {
