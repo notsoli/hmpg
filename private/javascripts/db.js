@@ -191,9 +191,9 @@ function link(id, directory, length, callback) {
 // remove an item link
 function unlink(id, link, callback) {
   // get a list of all links created by a user
-  const getLinks = "DELETE FROM fileinfo WHERE userid = ? AND link = ?"
+  const removeLink = "DELETE FROM fileinfo WHERE userid = ? AND link = ?"
 
-  sql.query(getLinks, [id, link], (err, result) => {
+  sql.query(removeLink, [id, link], (err, result) => {
     if (err) {
       callback({success: false, error: err})
     }
@@ -209,17 +209,17 @@ function unlink(id, link, callback) {
   })
 }
 
-// remove an item link
+// rename an item link
 function rename(id, link, name, callback) {
   // get a list of all links created by a user
-  const getLinks = "UPDATE fileinfo SET directory = ? WHERE userid = ? AND link = ?"
+  const changeLink = "UPDATE fileinfo SET directory = ? WHERE userid = ? AND link = ?"
 
-  sql.query(getLinks, [name, id, link], (err, result) => {
+  sql.query(changeLink, [name, id, link], (err, result) => {
     if (err) {
       callback({success: false, error: err})
     }
 
-    // checks if a row was deleted
+    // checks if a row was modified
     if (result.affectedRows != 0) {
       // successful link modification
       callback({success: true})

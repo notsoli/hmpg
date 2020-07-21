@@ -2,12 +2,12 @@
   margin: 30px;
 }
 
-#fileActions {
+#fileActions, #selectionActions {
   display: flex;
   flex-direction: row;
 }
 
-#fileActions > div {
+#fileActions > div, #selectionActions > div {
   width: 80px;
   height: 30px;
   display: flex;
@@ -19,14 +19,26 @@
   user-select: none;
 }
 
-#fileActions > div:hover {
-  cursor: pointer;
+#renameButton {
+  background-color: #000000;
 }
 
-#renameButton {
-  background-color: #6090db;
+#moveButton {
+  background-color: #000000;
 }
 
 #deleteButton {
   background-color: #db6b58;
+}
+
+.inactiveButton {
+  opacity: 0.5;
+}
+
+.inactiveButton:hover {
+  cursor: default;
+}
+
+.activeButton:hover {
+  cursor: pointer;
 }

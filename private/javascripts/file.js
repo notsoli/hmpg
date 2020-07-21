@@ -184,6 +184,86 @@ function move(file, directory, callback) {
   })
 }
 
+// handles item move
+function handleMove(id, link, path, callback) {
+  info.searchItem(id, link, (searchAttempt) => {
+    if (!searchAttempt.success) {
+      callback({success: false, error: searchAttempt.error})
+      return
+    }
+
+    const itemInfo = searchAttempt.itemInfo
+
+    // concatenate base path from array
+    let basePath
+    if (itemInfo.path.length > 0) {
+      basePath = itemInfo.path.join("/") + "/"
+    } else {
+      basePath = ""
+    }
+
+    // concatenate new path from array
+    let newPath
+    if (path === "") {
+      newPath = path
+    } else {
+      newPath = path + "/"
+    }
+
+    // concatenate main path
+    const mainPath = "E:/hmpg/" + id + "/"
+
+    let name
+    if (itemInfo.selectedItem.fileName) {
+      name = itemInfo.selectedItem.fileName
+    } else {
+      name = itemInfo.selectedItem.dirName
+    }
+
+    // move file in filesystem
+    fs.rename(mainPath + basePath + name, mainPath + newPath + name, (err) => {
+      if (err) {
+        callback({success: false, error: err})
+        return
+      }
+
+      info.modifyItem(id, {action: "delete"}, link, (deleteAttempt) => {
+        if (!deleteAttempt.success) {
+          callback({success: false, error: deleteAttempt.error})
+          return
+        }
+
+        // create item
+        const item = itemInfo.selectedItem
+        let newItem
+        if (item.fileName) {
+          newItem = new info.File(item.fileName, item.fileSize, item.fileType, item.fileLink)
+        } else {
+          newItem = new info.Directory(item.dirName, item.dirLink)
+        }
+
+        // add item to hmpgInfo
+        info.addItem(id, path, newItem, (addAttempt) => {
+          if (!addAttempt.success) {
+            callback({success: false, error: addAttempt.error})
+            return
+          }
+
+          // change link directory
+          db.rename(id, link, newPath + name, (renameAttempt) => {
+            if (!renameAttempt.success) {
+              callback({success: false, error: renameAttempt.error})
+              return
+            }
+
+            callback({success: true})
+          })
+        })
+      })
+    })
+  })
+}
+
 // handles file deletion
 function handleDelete(id, link, callback) {
   // search item in hmpgInfo.json
@@ -292,9 +372,9 @@ function handleRename(id, link, name, callback) {
 
     const itemInfo = searchAttempt.itemInfo
 
-    // concatename base path from array
+    // concatenate base path from array
     let basePath
-    if (itemInfo.path.length < 0) {
+    if (itemInfo.path.length > 0) {
       basePath = itemInfo.path.join("/") + "/"
     } else {
       basePath = ""
@@ -347,5 +427,6 @@ module.exports.createRoot = createRoot
 module.exports.handleDirectory = handleDirectory
 module.exports.createDirectory = createDirectory
 module.exports.handleFile = handleFile
+module.exports.handleMove = handleMove
 module.exports.handleDelete = handleDelete
 module.exports.handleRename = handleRename

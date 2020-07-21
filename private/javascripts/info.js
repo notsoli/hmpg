@@ -41,7 +41,7 @@ function Info() {
   this.root = []
 }
 
-// adds a file to user's hmpgInfo.json
+// adds an item to user's hmpgInfo.json
 function addItem(id, path, item, callback) {
   // concatenate full hmpgInfo.json path
   const infoPath = "E:/hmpg/" + id + "/hmpgInfo.json"
@@ -273,8 +273,8 @@ function searchDirectory(request, link, items, id, _path, _selectedItem) {
     // not exactly sure why i need to do this, the break should take care of it
     if (!selectedItem) {
       // reset path
-      if (id === 0) {
-        path = []
+      if (id < path.length) {
+        path.splice(id, path.length - id)
       }
 
       // store current item

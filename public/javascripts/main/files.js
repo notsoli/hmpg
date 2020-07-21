@@ -2,20 +2,22 @@
 window.addEventListener('load', init)
 
 // dom objects
-let directoryInput, directoryButton
+let directoryInput, directoryButton, renameButton, moveButton, deleteButton
 
 // init function
 function init() {
   // dom objects
   directoryInput = document.querySelector("#directoryLabel")
   directoryButton = document.querySelector("#directoryButton")
-  deleteButton = document.querySelector("#deleteButton")
   renameButton = document.querySelector("#renameButton")
+  moveButton = document.querySelector("#moveButton")
+  deleteButton = document.querySelector("#deleteButton")
 
   // event listeners
   directoryButton.addEventListener("click", sendDirectoryData)
-  deleteButton.addEventListener("click", handleDelete)
   renameButton.addEventListener("click", handleRename)
+  moveButton.addEventListener("click", handleMove)
+  deleteButton.addEventListener("click", handleDelete)
 
   sendFileRequest()
 }
@@ -62,6 +64,49 @@ function renderFileList(list) {
 
   // append new list
   document.querySelector("#fileWrapper").appendChild(list)
+}
+
+function handleMove() {
+  // determine if any files are selected
+  if (selected.length > 0) {
+    // prompt user for new name
+    const result = window.prompt("Please enter the new location.")
+    if (result) {
+      // send move request
+      sendMoveRequest(result)
+    }
+  }
+}
+
+function sendMoveRequest(path) {
+  // create array of links used to identify items later
+  const links = []
+  for (let i = 0; i < selected.length; i++) {
+    const item = items[selected[i]]
+
+    if (item.hasOwnProperty("fileLink")) {
+      links[i] = item.fileLink
+    } else {
+      links[i] = item.dirLink
+    }
+  }
+
+  // create a new ajax request
+  const request = new XMLHttpRequest()
+
+  // prepare to receive response
+  request.addEventListener("readystatechange", handleMoveResponse)
+
+  // send request
+  request.open("POST", "https://hmpg.io/moveFiles")
+  request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8')
+  request.send(JSON.stringify({links: links, path: path}))
+}
+
+function handleMoveResponse() {
+  if (this.readyState == 4) {
+    sendFileRequest()
+  }
 }
 
 function handleDelete() {

@@ -173,9 +173,21 @@ function handleItemCheck() {
       }
     }
   }
+
+  // activate/deactivate buttons
+  if (selected.length > 0) {
+    moveButton.className = "activeButton"
+    deleteButton.className = "activeButton"
+  } else {
+    moveButton.className = "inactiveButton"
+    deleteButton.className = "inactiveButton"
+  }
 }
 
 function handleItemSelect() {
+  // activate button
+  renameButton.className = "activeButton"
+
   // get the object's item id
   const id = this.parentNode.id.split("-")[1]
   const item = items[id]
