@@ -1,8 +1,9 @@
 // database manipulation functions
-
+const util = require('util')
 const mysql = require('mysql')
 const hash = require('./hash')
 const file = require('./file')
+const handle = require('./error').handle
 const e = require('../../config/errors.json')
 const usernameList = require('../../config/invalidUsernames.json')
 
@@ -11,12 +12,42 @@ const invalidUsernames = usernameList.invalidUsernames
 const invalidTerms = usernameList.invalidTerms
 
 // set up sql connection
-const sql = mysql.createConnection({
+const config = {
   host: "localhost",
   user: "root",
   password: "",
   database: "hmpg"
-})
+}
+
+// allow sql to be used with promises
+class Database {
+  constructor(config) {
+    this.connection = mysql.createConnection(config)
+  }
+  query(sql, args) {
+    return new Promise((resolve, reject) => {
+      this.connection.query(sql, args, (err, rows) => {
+        if (err)
+          return reject( err )
+        resolve(rows)
+      })
+    })
+  }
+  close() {
+    return new Promise((resolve, reject) => {
+      this.connection.end(err => {
+        if (err)
+          return reject(err)
+        resolve()
+      })
+    })
+  }
+}
+
+const sql = new Database(config)
+
+// allow sql.query to be used with promises
+// const query = util.promisify(sql.query)
 
 // check if username and password fit criteria for account creation and login
 function validity(username, password, confirmpassword) {
@@ -57,94 +88,111 @@ function validity(username, password, confirmpassword) {
 }
 
 // gets userid from username
-function userid(username, callback) {
-  const selectid = "SELECT userid FROM userinfo WHERE username = ?;"
-  sql.query(selectid, [username], (err, result) => {
+async function userid(username, callback) {
+  try {
+    const selectid = "SELECT userid FROM userinfo WHERE username = ?;"
+    const queryResult = await sql.query(selectid, [username])
+
     // make sure result is an actual entry identification
-    if (result.length == 0) {
+    if (queryResult.length == 0) {
       callback({success: false, error: e.validity.invalidUsername})
       return
     }
 
-    callback({success: true, userid: result[0].userid})
-  })
+    callback({success: true, userid: queryResult[0].userid})
+  } catch (error) {
+    console.log(error.message)
+    callback({success: false, error: error.message})
+  }
 }
 
 // use the sql database to check login information & create a jwt if valid
-function login(username, password, callback) {
-  // converts plaintext password into hashed password
-  const hashedPassword = hash.password(password)
+async function login(username, password, callback) {
+  try {
+    // converts plaintext password into hashed password
+    const hashedPassword = hash.password(password)
 
-  // compare username and password to database
-  const compareInfo = "SELECT * FROM userinfo WHERE username = ? AND password = ?;"
-  sql.query(compareInfo, [username, hashedPassword], (err, result) => {
+    // compare username and password to database
+    const compareInfo = "SELECT * FROM userinfo WHERE username = ? AND password = ?;"
+    const queryResult = await sql.query(compareInfo, [username, hashedPassword])
+
     // make sure result is an actual entry identification
-    if (result.length !== 1 || result[0].username !== username || result[0].password !== hashedPassword) {
+    if (queryResult.length !== 1 || queryResult[0].username !== username || queryResult[0].password !== hashedPassword) {
       callback({success: false, error: e.validity.invalidLogin})
       return
     }
 
     // create payload object
-    const payload = {user: username, userid: result[0].userid}
+    const payload = {user: username, userid: queryResult[0].userid}
 
     // create a jwt
     const jwt = hash.sign(payload)
     callback({success: true, jwt: jwt})
-  })
+  } catch (error) {
+    console.log(error.message)
+    callback({success: false, error: error.message})
+  }
 }
 
 // use the sql database to register a new user
-function register(username, password, callback) {
-  // converts plaintext password into hashed password
-  const hashedPassword = hash.password(password)
+async function register(username, password, callback) {
+  try {
+    // converts plaintext password into hashed password
+    const hashedPassword = hash.password(password)
 
-  // creates a new date and converts it into seconds
-  const registerDate = Math.floor(Date.now()/1000)
+    // creates a new date and converts it into seconds
+    const registerDate = Math.floor(Date.now()/1000)
 
-  // add new user to database
-  const checkExisting = "INSERT IGNORE INTO userinfo(username, password, registerDate) VALUES(?, ?, ?)"
+    // add new user to database
+    const checkExisting = "INSERT IGNORE INTO userinfo(username, password, registerDate) VALUES(?, ?, ?)"
+    const queryResult = await sql.query(checkExisting, [username, hashedPassword, registerDate])
 
-  sql.query(checkExisting, [username, hashedPassword, registerDate], (err, result) => {
     // checks if a new account was actually added
-    if (result.affectedRows != 0) {
+    if (queryResult.affectedRows != 0) {
       callback({success: true})
     } else {
       callback({success: false, error: e.validity.takenUsername})
     }
-  })
+  } catch (error) {
+    console.log(error.message)
+    callback({success: false, error: error.message})
+  }
 }
 
 // finds the directory of a static file
-function findDirectory(username, link, callback) {
-  // find directory using username and link
-  const findDirectory = "SELECT userid, directory FROM fileinfo WHERE userid IN (SELECT userid FROM userinfo WHERE username = ?) AND link = ?"
+async function findDirectory(username, link, callback) {
+  try {
+    // find directory using username and link
+    const findDirectory = "SELECT userid, directory FROM fileinfo WHERE userid IN (SELECT userid FROM userinfo WHERE username = ?) AND link = ?"
+    const queryResult = await sql.query(findDirectory, [username, link])
 
-  sql.query(findDirectory, [username, link], (err, result) => {
     // checks if a directory was found
-    if (result.length > 0) {
+    if (queryResult.length > 0) {
       // return directory on success
-      callback({success: true, result: result[0]})
+      callback({success: true, result: queryResult[0]})
     } else {
       callback({success: false, error: ""})
     }
-  })
+  } catch (error) {
+    console.log(error.message)
+    callback({success: false, error: error.message})
+  }
 }
 
 // create an item link
-function link(id, directory, length, callback) {
-  // store every link created by a user
-  const links = [""]
+async function link(id, directory, length, callback) {
+  try {
+    // store every link created by a user
+    const links = [""]
 
-  // get a list of all links created by a user
-  const getLinks = "SELECT link FROM fileinfo WHERE userid = ?"
-
-  sql.query(getLinks, id, (err, result) => {
-    if (err) throw err
+    // get a list of all links created by a user
+    const getLinks = "SELECT link FROM fileinfo WHERE userid = ?"
+    const getResult = await sql.query(getLinks, id)
 
     // checks if any links were found
-    if (result.length > 0) {
-      for (let r = 0; r < result.length; r++) {
-        links[r] = result[r].link
+    if (getResult.length > 0) {
+      for (let r = 0; r < getResult.length; r++) {
+        links[r] = getResult[r].link
       }
     }
 
@@ -175,59 +223,62 @@ function link(id, directory, length, callback) {
 
     // add the new link to the fileinfo database
     const addLink = "INSERT IGNORE INTO fileinfo(userid, link, directory) VALUES(?, ?, ?)"
+    const addResult = await sql.query(addLink, [id, fileLink, directory])
 
-    sql.query(addLink, [id, fileLink, directory], (err, result) => {
-      if (result.affectedRows != 0) {
-        // successful link creation
-        callback({success: true, link: fileLink})
-      } else {
-        // failed link creation
-        callback({success: false, error: e.link.failedLink})
-      }
-    })
-  })
+    // make sure a link was added
+    if (addResult.affectedRows != 0) {
+      // successful link creation
+      callback({success: true, link: fileLink})
+    } else {
+      // failed link creation
+      callback({success: false, error: e.link.failedLink})
+    }
+  } catch (error) {
+    console.log(error.message)
+    callback({success: false, error: error.message})
+  }
 }
 
 // remove an item link
-function unlink(id, link, callback) {
-  // get a list of all links created by a user
-  const removeLink = "DELETE FROM fileinfo WHERE userid = ? AND link = ?"
-
-  sql.query(removeLink, [id, link], (err, result) => {
-    if (err) {
-      callback({success: false, error: err})
-    }
+async function unlink(id, link, callback) {
+  try {
+    // get a list of all links created by a user
+    const removeLink = "DELETE FROM fileinfo WHERE userid = ? AND link = ?"
+    const queryResult = await sql.query(removeLink, [id, link])
 
     // checks if a row was deleted
-    if (result.affectedRows != 0) {
+    if (queryResult.affectedRows != 0) {
       // successful link deletion
       callback({success: true})
     } else {
       // failed link deletion
       callback({success: false, error: e.link.failedDelete})
     }
-  })
+  } catch (error) {
+    console.log(error.message)
+    callback({success: false, error: error.message})
+  }
 }
 
 // rename an item link
-function rename(id, link, name, callback) {
-  // get a list of all links created by a user
-  const changeLink = "UPDATE fileinfo SET directory = ? WHERE userid = ? AND link = ?"
-
-  sql.query(changeLink, [name, id, link], (err, result) => {
-    if (err) {
-      callback({success: false, error: err})
-    }
+async function rename(id, link, name, callback) {
+  try {
+    // get a list of all links created by a user
+    const changeLink = "UPDATE fileinfo SET directory = ? WHERE userid = ? AND link = ?"
+    const queryResult = await sql.query(changeLink, [name, id, link])
 
     // checks if a row was modified
-    if (result.affectedRows != 0) {
+    if (queryResult.affectedRows != 0) {
       // successful link modification
       callback({success: true})
     } else {
       // failed link modification
       callback({success: false, error: e.link.failedRename})
     }
-  })
+  } catch (error) {
+    console.log(error.message)
+    callback({success: false, error: error.message})
+  }
 }
 
 // allows other files to use database functions
