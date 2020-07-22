@@ -1,5 +1,4 @@
 // database manipulation functions
-const util = require('util')
 const mysql = require('mysql')
 const hash = require('./hash')
 const file = require('./file')
@@ -21,14 +20,11 @@ const config = {
 
 // allow sql to be used with promises
 class Database {
-  constructor(config) {
-    this.connection = mysql.createConnection(config)
-  }
+  constructor(config) {this.connection = mysql.createConnection(config)}
   query(sql, args) {
     return new Promise((resolve, reject) => {
       this.connection.query(sql, args, (err, rows) => {
-        if (err)
-          return reject( err )
+        if (err) {return reject(err)}
         resolve(rows)
       })
     })
@@ -36,8 +32,7 @@ class Database {
   close() {
     return new Promise((resolve, reject) => {
       this.connection.end(err => {
-        if (err)
-          return reject(err)
+        if (err) {return reject(err)}
         resolve()
       })
     })
@@ -45,9 +40,6 @@ class Database {
 }
 
 const sql = new Database(config)
-
-// allow sql.query to be used with promises
-// const query = util.promisify(sql.query)
 
 // check if username and password fit criteria for account creation and login
 function validity(username, password, confirmpassword) {
