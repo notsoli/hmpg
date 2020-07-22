@@ -2,7 +2,7 @@
 const express = require('express')
 const router = express.Router()
 
-const sql = require('../../private/javascripts/db')
+const db = require('../../private/javascripts/db')
 const file = require('../../private/javascripts/file')
 const e = require('../../config/errors.json')
 const breaker = require('../../config/breaker.json')
@@ -26,7 +26,7 @@ router.post('/register', (req, res, next) => {
   const {username, password, confirmpassword} = req.body
 
   // make sure username and password fit criteria for account creation
-  const validity = sql.validity(username, password, confirmpassword)
+  const validity = db.validity(username, password, confirmpassword)
   if (!validity.result) {
     console.log("failed to register account\nreason: " + validity.reason)
     res.send({success: false, error: validity.reason})
@@ -34,7 +34,7 @@ router.post('/register', (req, res, next) => {
   }
 
   // register user
-  sql.register(username, password, (registerAttempt) => {
+  db.register(username, password, (registerAttempt) => {
     // send confirmation and redirect back to homepage
     if (!registerAttempt.success) {
       console.log("failed to register account\nreason: " + registerAttempt.error)
@@ -61,7 +61,7 @@ router.post('/register', (req, res, next) => {
 // sets the new user up following a successful register
 function completeRegister(username, password, callback) {
   // get userid
-  sql.userid(username, (idAttempt) => {
+  db.userid(username, (idAttempt) => {
     // check if userid grab was successful
     if(!idAttempt.success) {
       callback({success: false, error: idAttempt.error})
@@ -76,7 +76,7 @@ function completeRegister(username, password, callback) {
       }
 
       // log the new user in
-      sql.login(username, password, (loginAttempt) => {
+      db.login(username, password, (loginAttempt) => {
         // check if login was successful
         if (!loginAttempt.success) {
           console.log("failed to login")

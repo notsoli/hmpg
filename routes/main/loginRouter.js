@@ -2,7 +2,7 @@
 const express = require('express')
 const router = express.Router()
 
-const sql = require('../../private/javascripts/db')
+const db = require('../../private/javascripts/db')
 const e = require('../../config/errors.json')
 const breaker = require('../../config/breaker.json')
 
@@ -25,7 +25,7 @@ router.post('/login', (req, res) => {
   const {username, password} = req.body
 
   // make sure username and password fit criteria for login
-  const validity = sql.validity(username, password, password)
+  const validity = db.validity(username, password, password)
   if (!validity.result) {
     console.log("username or password is incorrect")
     res.send({success: false, error: e.validity.invalidLogin})
@@ -33,7 +33,7 @@ router.post('/login', (req, res) => {
   }
 
   // attempt logging in
-  sql.login(username, password, (attempt) => {
+  db.login(username, password, (attempt) => {
     if (!attempt.success) {
       console.log("username or password is incorrect")
       res.send({success: false, error: attempt.error})
