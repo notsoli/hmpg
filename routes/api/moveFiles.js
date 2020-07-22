@@ -41,7 +41,7 @@ async function moveItem(userid, body, id, callback, _completed, _failed) {
     console.log("successfully moved item")
     completed.push({link: body.links[id]})
   } catch (error) {
-    console.log("failed to move item")
+    console.log(error)
     failed.push({link: body.links[id], error: error.message})
   }
 

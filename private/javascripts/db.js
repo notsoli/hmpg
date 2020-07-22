@@ -77,204 +77,153 @@ function validity(username, password, confirmpassword) {
 }
 
 // gets userid from username
-function userid(username) {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const selectid = "SELECT userid FROM userinfo WHERE username = ?;"
-      const queryResult = await sql.query(selectid, [username])
+async function userid(username) {
+  const selectid = "SELECT userid FROM userinfo WHERE username = ?;"
+  const queryResult = await sql.query(selectid, [username])
 
-      // make sure result is an actual entry identification
-      if (queryResult.length == 0) {
-        throw new Error(e.validity.invalidUsername)
-        return
-      }
+  // make sure result is an actual entry identification
+  if (queryResult.length == 0) {
+    throw new Error(e.validity.invalidUsername)
+    return
+  }
 
-      resolve(queryResult[0].userid)
-    } catch (error) {
-      reject(error)
-    }
-  })
+  return queryResult[0].userid
 }
 
 // use the sql database to check login information & create a jwt if valid
-function login(username, password) {
-  return new Promise(async (resolve, reject) => {
-    try {
-      // converts plaintext password into hashed password
-      const hashedPassword = hash.password(password)
+async function login(username, password) {
+  // converts plaintext password into hashed password
+  const hashedPassword = hash.password(password)
 
-      // compare username and password to database
-      const compareInfo = "SELECT * FROM userinfo WHERE username = ? AND password = ?;"
-      const queryResult = await sql.query(compareInfo, [username, hashedPassword])
+  // compare username and password to database
+  const compareInfo = "SELECT * FROM userinfo WHERE username = ? AND password = ?;"
+  const queryResult = await sql.query(compareInfo, [username, hashedPassword])
 
-      // make sure result is an actual entry identification
-      if (queryResult.length !== 1 || queryResult[0].username !== username || queryResult[0].password !== hashedPassword) {
-        throw new Error(e.validity.invalidLogin)
-        return
-      }
+  // make sure result is an actual entry identification
+  if (queryResult.length !== 1 || queryResult[0].username !== username || queryResult[0].password !== hashedPassword) {
+    throw new Error(e.validity.invalidLogin)
+  }
 
-      // create payload object
-      const payload = {user: username, userid: queryResult[0].userid}
+  // create payload object
+  const payload = {user: username, userid: queryResult[0].userid}
 
-      // create a jwt
-      const jwt = hash.sign(payload)
-      resolve(jwt)
-    } catch (error) {
-      reject(error)
-    }
-  })
+  // create a jwt
+  const jwt = hash.sign(payload)
+  return jwt
 }
 
 // use the sql database to register a new user
-function register(username, password) {
-  return new Promise(async (resolve, reject) => {
-    try {
-      // converts plaintext password into hashed password
-      const hashedPassword = hash.password(password)
+async function register(username, password) {
+  // converts plaintext password into hashed password
+  const hashedPassword = hash.password(password)
 
-      // creates a new date and converts it into seconds
-      const registerDate = Math.floor(Date.now()/1000)
+  // creates a new date and converts it into seconds
+  const registerDate = Math.floor(Date.now()/1000)
 
-      // add new user to database
-      const checkExisting = "INSERT IGNORE INTO userinfo(username, password, registerDate) VALUES(?, ?, ?)"
-      const queryResult = await sql.query(checkExisting, [username, hashedPassword, registerDate])
+  // add new user to database
+  const checkExisting = "INSERT IGNORE INTO userinfo(username, password, registerDate) VALUES(?, ?, ?)"
+  const queryResult = await sql.query(checkExisting, [username, hashedPassword, registerDate])
 
-      // checks if a new account was actually added
-      if (queryResult.affectedRows != 0) {
-        resolve()
-      } else {
-        throw new Error(e.validity.takenUsername)
-      }
-    } catch (error) {
-      reject(error)
-    }
-  })
+  // checks if a new account was actually added
+  if (queryResult.affectedRows === 0) {
+    throw new Error(e.validity.takenUsername)
+  }
 }
 
 // finds the directory of a static file
-function findDirectory(username, link) {
-  return new Promise(async (resolve, reject) => {
-    try {
-      // find directory using username and link
-      const findDirectory = "SELECT userid, directory FROM fileinfo WHERE userid IN (SELECT userid FROM userinfo WHERE username = ?) AND link = ?"
-      const queryResult = await sql.query(findDirectory, [username, link])
+async function findDirectory(username, link) {
+  // find directory using username and link
+  const findDirectory = "SELECT userid, directory FROM fileinfo WHERE userid IN (SELECT userid FROM userinfo WHERE username = ?) AND link = ?"
+  const queryResult = await sql.query(findDirectory, [username, link])
 
-      // checks if a directory was found
-      if (queryResult.length > 0) {
-        // return directory on success
-        resolve(queryResult[0])
-      } else {
-        throw new Error("directory not found")
-      }
-    } catch (error) {
-      reject(error)
-    }
-  })
+  // checks if a directory was found
+  if (queryResult.length > 0) {
+    // return directory on success
+    return queryResult[0]
+  } else {
+    throw new Error("directory not found")
+  }
 }
 
 // create an item link
-function link(id, directory, length) {
-  return new Promise(async (resolve, reject) => {
-    try {
-      // store every link created by a user
-      const links = [""]
+async function link(id, directory, length) {
+  // store every link created by a user
+  const links = [""]
 
-      // get a list of all links created by a user
-      const getLinks = "SELECT link FROM fileinfo WHERE userid = ?"
-      const getResult = await sql.query(getLinks, id)
+  // get a list of all links created by a user
+  const getLinks = "SELECT link FROM fileinfo WHERE userid = ?"
+  const getResult = await sql.query(getLinks, id)
 
-      // checks if any links were found
-      if (getResult.length > 0) {
-        for (let r = 0; r < getResult.length; r++) {
-          links[r] = getResult[r].link
-        }
-      }
-
-      // used to determine if a unique link has been created
-      let unique = false, repeats = 1, fileLink
-
-      // repeat until a uniqle link is found
-      while (!unique) {
-        // generate a random link
-        fileLink = hash.alphanumeric(length)
-
-        // iterate through each link
-        unique = true
-        for (let l = 0; l < links.length; l++) {
-          // compare it to the newly created link
-          if (links[l] == fileLink) {
-            unique = false
-          }
-        }
-
-        // check if the repeats has exceeded 100
-        if (repeats >= 100) {
-          throw new Error(e.link.overlapLink)
-        }
-
-        repeats++
-      }
-
-      // add the new link to the fileinfo database
-      const addLink = "INSERT IGNORE INTO fileinfo(userid, link, directory) VALUES(?, ?, ?)"
-      const addResult = await sql.query(addLink, [id, fileLink, directory])
-
-      // make sure a link was added
-      if (addResult.affectedRows != 0) {
-        // successful link creation
-        resolve(fileLink)
-      } else {
-        // failed link creation
-        throw new Error(e.link.failedLink)
-      }
-    } catch (error) {
-      reject(error)
+  // checks if any links were found
+  if (getResult.length > 0) {
+    for (let r = 0; r < getResult.length; r++) {
+      links[r] = getResult[r].link
     }
-  })
+  }
+
+  // used to determine if a unique link has been created
+  let unique = false, repeats = 1, fileLink
+
+  // repeat until a uniqle link is found
+  while (!unique) {
+    // generate a random link
+    fileLink = hash.alphanumeric(length)
+
+    // iterate through each link
+    unique = true
+    for (let l = 0; l < links.length; l++) {
+      // compare it to the newly created link
+      if (links[l] == fileLink) {
+        unique = false
+      }
+    }
+
+    // check if the repeats has exceeded 100
+    if (repeats >= 100) {
+      throw new Error(e.link.overlapLink)
+    }
+
+    repeats++
+  }
+
+  // add the new link to the fileinfo database
+  const addLink = "INSERT IGNORE INTO fileinfo(userid, link, directory) VALUES(?, ?, ?)"
+  const addResult = await sql.query(addLink, [id, fileLink, directory])
+
+  // make sure a link was added
+  if (addResult.affectedRows != 0) {
+    // successful link creation
+    return fileLink
+  } else {
+    // failed link creation
+    throw new Error(e.link.failedLink)
+  }
 }
 
 // remove an item link
-function unlink(id, link) {
-  return new Promise(async (resolve, reject) => {
-    try {
-      // get a list of all links created by a user
-      const removeLink = "DELETE FROM fileinfo WHERE userid = ? AND link = ?"
-      const queryResult = await sql.query(removeLink, [id, link])
+async function unlink(id, link) {
+  // get a list of all links created by a user
+  const removeLink = "DELETE FROM fileinfo WHERE userid = ? AND link = ?"
+  const queryResult = await sql.query(removeLink, [id, link])
 
-      // checks if a row was deleted
-      if (queryResult.affectedRows != 0) {
-        // successful link deletion
-        resolve()
-      } else {
-        // failed link deletion
-        throw new Error(e.link.failedDelete)
-      }
-    } catch (error) {
-      reject(error)
-    }
-  })
+  // checks if a row was deleted
+  if (queryResult.affectedRows === 0) {
+    // failed link deletion
+    throw new Error(e.link.failedDelete)
+  }
 }
 
 // rename an item link
-function rename(id, link, name) {
-  return new Promise(async (resolve, reject) => {
-    try {
-      // get a list of all links created by a user
-      const changeLink = "UPDATE fileinfo SET directory = ? WHERE userid = ? AND link = ?"
-      const queryResult = await sql.query(changeLink, [name, id, link])
+async function rename(id, link, name) {
+  // get a list of all links created by a user
+  const changeLink = "UPDATE fileinfo SET directory = ? WHERE userid = ? AND link = ?"
+  const queryResult = await sql.query(changeLink, [name, id, link])
 
-      // checks if a row was modified
-      if (queryResult.affectedRows != 0) {
-        // successful link modification
-        resolve()
-      } else {
-        // failed link modification
-        throw new Error(e.link.failedRename)
-      }
-    } catch (error) {
-      reject(error)
-    }
-  })
+  // checks if a row was modified
+  if (queryResult.affectedRows === 0) {
+    // failed link modification
+    throw new Error(e.link.failedRename)
+  }
 }
 
 // allows other files to use database functions

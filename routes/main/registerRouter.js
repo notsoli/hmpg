@@ -41,23 +41,17 @@ router.post('/register', async (req, res, next) => {
 })
 
 // sets the new user up following a successful register
-function completeRegister(username, password) {
-  return new Promise(async (resolve, reject) => {
-    try {
-      // get userid
-      const userid = await db.userid(username)
+async function completeRegister(username, password) {
+  // get userid
+  const userid = await db.userid(username)
 
-      // create an upload directory
-      file.createRoot(userid)
+  // create an upload directory
+  file.createRoot(userid)
 
-      // log the new user in
-      const jwt = await db.login(username, password)
-      console.log("successfully logged in to account '" + username + "'")
-      resolve(jwt)
-    } catch (error) {
-      reject(error)
-    }
-  })
+  // log the new user in
+  const jwt = await db.login(username, password)
+  console.log("successfully logged in to account '" + username + "'")
+  resolve(jwt)
 }
 
 function verifyBody(body) {

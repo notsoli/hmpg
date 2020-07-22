@@ -42,7 +42,7 @@ async function deleteItem(userid, items, id, callback, _completed, _failed) {
     console.log("successfully deleted item")
     completed.push({link: items[id]})
   } catch (error) {
-    console.log("failed to delete item")
+    console.log(error)
     failed.push({link: items[id], error: error.message})
   }
 
