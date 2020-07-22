@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 
-// const sql = require('../private/javascripts/db')
+// const db = require('../private/javascripts/db')
 // const hash = require('../private/javascripts/hash')
 
 // get & render page

@@ -2,7 +2,7 @@
 const express = require('express')
 const router = express.Router()
 
-const sql = require('../private/javascripts/db')
+const db = require('../private/javascripts/db')
 const hash = require('../private/javascripts/hash')
 const fs = require('fs')
 
@@ -28,7 +28,7 @@ router.all('/s/:target/:link', function(req, res, next) {
   const link = req.params.link
 
   // find directory of file
-  sql.findDirectory(target, link, (attempt) => {
+  db.findDirectory(target, link, (attempt) => {
     // check if directory was found
     if (!attempt.success) {
       console.log("failed to find file")
