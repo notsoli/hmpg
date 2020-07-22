@@ -24,7 +24,8 @@ router.post('/', function(req, res, next) {
   })
 })
 
-function deleteItem(userid, items, id, callback, _completed, _failed) {
+// delete items sequentially
+async function deleteItem(userid, items, id, callback, _completed, _failed) {
   // check if completed
   if (id == items.length) {
     callback(_completed, _failed)
@@ -36,17 +37,16 @@ function deleteItem(userid, items, id, callback, _completed, _failed) {
   if (_completed) {completed = _completed}
   if (_failed) {failed = _failed}
 
-  file.handleDelete(userid, items[id], (deleteAttempt) => {
-    if (!deleteAttempt.success) {
-      console.log("failed to delete item")
-      failed.push({link: items[id], error: deleteAttempt.error})
-    } else {
-      console.log("successfully deleted item")
-      completed.push({link: items[id]})
-    }
+  try {
+    await file.handleDelete(userid, items[id])
+    console.log("successfully deleted item")
+    completed.push({link: items[id]})
+  } catch (error) {
+    console.log("failed to delete item")
+    failed.push({link: items[id], error: error.message})
+  }
 
-    deleteItem(userid, items, id + 1, callback, completed, failed)
-  })
+  deleteItem(userid, items, id + 1, callback, completed, failed)
 }
 
 module.exports = router

@@ -47,59 +47,48 @@ function Info() {
 }
 
 // adds an item to user's hmpgInfo.json
-async function addItem(id, path, item, callback) {
-  try {
-    // concatenate full hmpgInfo.json path
-    const infoPath = "E:/hmpg/" + id + "/hmpgInfo.json"
+function addItem(id, path, item) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // concatenate full hmpgInfo.json path
+      const infoPath = "E:/hmpg/" + id + "/hmpgInfo.json"
 
-    // read hmpgInfo.json
-    const data = await readFile(infoPath)
+      // read hmpgInfo.json
+      const data = await readFile(infoPath)
 
-    const hmpgInfo = JSON.parse(data)
-    const root = hmpgInfo.root
-    let newInfo
+      const hmpgInfo = JSON.parse(data)
+      const root = hmpgInfo.root
+      let newInfo
 
-    // insert item into correct directory
-    if (path === "") {
-      // root directory
-      newInfo = addRoot(hmpgInfo, item)
-    } else if (!path.includes("/")) {
-      // directory is 1 above root
-      const attempt = addBase(hmpgInfo, path, item)
-      if (!attempt.success) {
-        callback({success: false, error: attempt.error})
-        return
+      // insert item into correct directory
+      if (path === "") {
+        // root directory
+        newInfo = addRoot(hmpgInfo, item)
+      } else if (!path.includes("/")) {
+        // directory is 1 above root
+        newInfo = addBase(hmpgInfo, path, item)
+      } else {
+        // directory is multiple above root
+        newInfo = addPath(hmpgInfo, path, item)
       }
 
-      newInfo = attempt.newInfo
-    } else {
-      // directory is multiple above root
-      const attempt = addPath(hmpgInfo, path, item)
-      if (!attempt.success) {
-        callback({success: false, error: attempt.error})
-        return
+      if (item instanceof File) {
+        newInfo.totalFiles++
+        newInfo.totalSize += item.fileSize
+      } else if (item instanceof Directory) {
+        newInfo.totalDirectories++
       }
 
-      newInfo = attempt.newInfo
+      // reassemble hmpgInfo.json
+      const fileData = JSON.stringify(newInfo)
+
+      // write to hmpgInfo.json
+      await writeFile(infoPath, fileData)
+      resolve()
+    } catch (error) {
+      reject(error)
     }
-
-    if (item instanceof File) {
-      newInfo.totalFiles++
-      newInfo.totalSize += item.fileSize
-    } else if (item instanceof Directory) {
-      newInfo.totalDirectories++
-    }
-
-    // reassemble hmpgInfo.json
-    const fileData = JSON.stringify(newInfo)
-
-    // write to hmpgInfo.json
-    await writeFile(infoPath, fileData)
-    callback({success: true})
-  } catch (error) {
-    console.log(error.message)
-    callback({success: false, error: error.message})
-  }
+  })
 }
 
 // add item to root directory
@@ -135,11 +124,11 @@ function addBase(info, path, item) {
 
   // directory wasn't found
   if (!found) {
-    return {success: false, error: "directory wasn't found"}
+    throw new Error("directory wasn't found")
   }
 
   // return new hmpgInfo
-  return {success: true, newInfo: newInfo}
+  return newInfo
 }
 
 // add item to directory multiple under root
@@ -173,7 +162,7 @@ function addPath(info, path, item) {
 
     // directory wasn't found
     if (!found) {
-      return {success: false, error: "directory wasn't found"}
+      throw new Error("directory wasn't found")
     }
   }
 
@@ -181,72 +170,72 @@ function addPath(info, path, item) {
   child.children.push(item)
 
   // return new hmpgInfo
-  return {success: true, newInfo: newInfo}
+  return newInfo
 }
 
 // searches for an item from user's hmpgInfo.json
-async function searchItem(id, link, callback) {
-  try {
-    // concatenate full hmpgInfo.json path
-    const infoPath = "E:/hmpg/" + id + "/hmpgInfo.json"
+function searchItem(id, link) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // concatenate full hmpgInfo.json path
+      const infoPath = "E:/hmpg/" + id + "/hmpgInfo.json"
 
-    // read hmpgInfo.json
-    const data = await readFile(infoPath)
-    const hmpgInfo = JSON.parse(data)
+      // read hmpgInfo.json
+      const data = await readFile(infoPath)
+      const hmpgInfo = JSON.parse(data)
 
-    // search and modify hmpgInfo
-    const itemInfo = searchDirectory({action: "search"}, link, hmpgInfo.root, 0, [])
+      // search and modify hmpgInfo
+      const itemInfo = searchDirectory({action: "search"}, link, hmpgInfo.root, 0, [])
 
-    if (!itemInfo.selectedItem) {
-      callback({success: false, error: "item wasn't found"})
-      return
+      if (!itemInfo.selectedItem) {
+        throw new Error("item wasn't found")
+      }
+
+      resolve({itemInfo: itemInfo, hmpgInfo: hmpgInfo})
+    } catch (error) {
+      reject(error)
     }
-
-    callback({success: true, itemInfo: itemInfo, hmpgInfo: hmpgInfo})
-  } catch (error) {
-    console.log(error.message)
-    callback({success: false, error: error.message})
-  }
+  })
 }
 
 // modifies a file from user's hmpgInfo.json
-async function modifyItem(id, request, link, callback) {
-  try {
-    // concatenate full hmpgInfo.json path
-    const infoPath = "E:/hmpg/" + id + "/hmpgInfo.json"
+function modifyItem(id, request, link) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // concatenate full hmpgInfo.json path
+      const infoPath = "E:/hmpg/" + id + "/hmpgInfo.json"
 
-    // read hmpgInfo.json
-    const data = await readFile(infoPath)
-    const hmpgInfo = JSON.parse(data)
+      // read hmpgInfo.json
+      const data = await readFile(infoPath)
+      const hmpgInfo = JSON.parse(data)
 
-    // search and modify hmpgInfo
-    const itemInfo = searchDirectory(request, link, hmpgInfo.root, 0, [])
+      // search and modify hmpgInfo
+      const itemInfo = searchDirectory(request, link, hmpgInfo.root, 0, [])
 
-    if (!itemInfo.selectedItem) {
-      callback({success: false, error: "item wasn't found"})
-      return
-    }
-
-    // remove item from total
-    if (request.action === "delete") {
-      if (itemInfo.selectedItem.fileName) {
-        hmpgInfo.totalFiles--
-        hmpgInfo.totalSize -= itemInfo.selectedItem.fileSize
-      } else {
-        hmpgInfo.totalDirectories--
+      if (!itemInfo.selectedItem) {
+        throw new Error("item wasn't found")
       }
+
+      // remove item from total
+      if (request.action === "delete") {
+        if (itemInfo.selectedItem.fileName) {
+          hmpgInfo.totalFiles--
+          hmpgInfo.totalSize -= itemInfo.selectedItem.fileSize
+        } else {
+          hmpgInfo.totalDirectories--
+        }
+      }
+
+      // reassemble hmpgInfo.json
+      const fileData = JSON.stringify(hmpgInfo)
+
+      // write to hmpgInfo.json
+      await writeFile(infoPath, fileData)
+      resolve(itemInfo)
+    } catch (error) {
+      reject(error)
     }
-
-    // reassemble hmpgInfo.json
-    const fileData = JSON.stringify(hmpgInfo)
-
-    // write to hmpgInfo.json
-    await writeFile(infoPath, fileData)
-    callback({success: true, itemInfo: itemInfo})
-  } catch (error) {
-    console.log(error.message)
-    callback({success: false, error: error.message})
-  }
+  })
 }
 
 // recursively search the current directory for link matches
@@ -299,29 +288,32 @@ function searchDirectory(request, link, items, id, _path, _selectedItem) {
 }
 
 // read user's hmpgInfo.json
-async function read(id, callback) {
-  try {
-    const data = await readFile("E:/hmpg/" + id + "/hmpgInfo.json", "utf8")
-    callback({success: true, info: data})
-  } catch (error) {
-    console.log(error.message)
-    callback({success: false, error: error.message})
-  }
+// i think this is an antipattern?
+function read(id) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const data = await readFile("E:/hmpg/" + id + "/hmpgInfo.json", "utf8")
+      resolve(data)
+    } catch (error) {
+      reject(error)
+    }
+  })
 }
 
 // send hmpgInfo with target directory's children as root
-function handleView(id, link, callback) {
-  searchItem(id, link, (searchAttempt) => {
-    if (!searchAttempt.success) {
-      callback({success: false, error: searchAttempt.error})
-      return
+function handleView(id, link) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const search = await searchItem(id, link)
+
+      // create dummy hmpgInfo object
+      const hmpgInfo = search.hmpgInfo
+      hmpgInfo.root = search.itemInfo.selectedItem.children
+
+      resolve(JSON.stringify(hmpgInfo))
+    } catch (error) {
+      reject(error)
     }
-
-    // create dummy hmpgInfo object
-    const hmpgInfo = searchAttempt.hmpgInfo
-    hmpgInfo.root = searchAttempt.itemInfo.selectedItem.children
-
-    callback({success: true, info: JSON.stringify(hmpgInfo)})
   })
 }
 

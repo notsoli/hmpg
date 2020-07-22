@@ -7,51 +7,39 @@ const e = require('../../config/errors.json')
 const breaker = require('../../config/breaker.json')
 
 // create a new directory
-router.post('/files', (req, res) => {
-  // check if file uploads are enabled
-  if (!breaker.uploadEnabled) {
-    res.send({success: false, error: e.breaker.registerDisabled})
-    return
-  }
-
-  // check if user is signed in
-  if (!req.info.user) {
-    res.send({success: false, error: e.request.noSession})
-    return
-  }
-
-  // make sure body content is valid
-  const verifyResult = verifyBody(req.body)
-  if (!verifyResult.success) {
-    res.send({success: false, error: verifyResult.error})
-    return
-  }
-
-  file.handleDirectory(req.info.userid, req.body.directory, 4, (handleAttempt) => {
-    if (!handleAttempt.success) {
-      console.log("failed to create directory")
-      console.log(handleAttempt.error)
-      res.send({success: false, error: e.upload.failedUpload})
-      return
+router.post('/files', async (req, res) => {
+  try {
+    // check if file uploads are enabled
+    if (!breaker.uploadEnabled) {
+      throw new Error(e.breaker.registerDisabled)
     }
 
-    // respond with the new link
+    // check if user is signed in
+    if (!req.info.user) {
+      throw new Error(e.request.noSession)
+    }
+
+    // make sure body content is valid
+    verifyBody(req.body)
+
+    await file.handleDirectory(req.info.userid, req.body.directory, 4,)
     res.send({success: true})
-  })
+  } catch (error) {
+    console.log(error)
+    res.send({success: false, error: error.message})
+  }
 })
 
 function verifyBody(body) {
   // verify post request length
   if (Object.keys(body).length !== 1) {
-    return {success: false, error: e.request.badRequest}
+    throw new Error(e.request.badRequest)
   }
 
   // verify existence and type of directory
   if (!body.directory || typeof(body.directory) !== "string") {
-    return {success: false, error: e.request.badRequest}
+    throw new Error(e.request.badRequest)
   }
-
-  return {success: true}
 }
 
 // get & render page

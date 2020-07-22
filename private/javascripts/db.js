@@ -85,13 +85,12 @@ function userid(username) {
 
       // make sure result is an actual entry identification
       if (queryResult.length == 0) {
-        reject(e.validity.invalidUsername)
+        throw new Error(e.validity.invalidUsername)
         return
       }
 
       resolve(queryResult[0].userid)
     } catch (error) {
-      console.log(error.message)
       reject(error)
     }
   })
@@ -110,7 +109,7 @@ function login(username, password) {
 
       // make sure result is an actual entry identification
       if (queryResult.length !== 1 || queryResult[0].username !== username || queryResult[0].password !== hashedPassword) {
-        reject(new Error(e.validity.invalidLogin))
+        throw new Error(e.validity.invalidLogin)
         return
       }
 
@@ -121,7 +120,6 @@ function login(username, password) {
       const jwt = hash.sign(payload)
       resolve(jwt)
     } catch (error) {
-      console.log(error.message)
       reject(error)
     }
   })
@@ -145,135 +143,138 @@ function register(username, password) {
       if (queryResult.affectedRows != 0) {
         resolve()
       } else {
-        reject(e.validity.takenUsername)
+        throw new Error(e.validity.takenUsername)
       }
     } catch (error) {
-      console.log(error.message)
       reject(error)
     }
   })
 }
 
 // finds the directory of a static file
-async function findDirectory(username, link, callback) {
-  try {
-    // find directory using username and link
-    const findDirectory = "SELECT userid, directory FROM fileinfo WHERE userid IN (SELECT userid FROM userinfo WHERE username = ?) AND link = ?"
-    const queryResult = await sql.query(findDirectory, [username, link])
+function findDirectory(username, link) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // find directory using username and link
+      const findDirectory = "SELECT userid, directory FROM fileinfo WHERE userid IN (SELECT userid FROM userinfo WHERE username = ?) AND link = ?"
+      const queryResult = await sql.query(findDirectory, [username, link])
 
-    // checks if a directory was found
-    if (queryResult.length > 0) {
-      // return directory on success
-      callback({success: true, result: queryResult[0]})
-    } else {
-      callback({success: false, error: ""})
+      // checks if a directory was found
+      if (queryResult.length > 0) {
+        // return directory on success
+        resolve(queryResult[0])
+      } else {
+        throw new Error("directory not found")
+      }
+    } catch (error) {
+      reject(error)
     }
-  } catch (error) {
-    console.log(error.message)
-    callback({success: false, error: error.message})
-  }
+  })
 }
 
 // create an item link
-async function link(id, directory, length, callback) {
-  try {
-    // store every link created by a user
-    const links = [""]
+function link(id, directory, length) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // store every link created by a user
+      const links = [""]
 
-    // get a list of all links created by a user
-    const getLinks = "SELECT link FROM fileinfo WHERE userid = ?"
-    const getResult = await sql.query(getLinks, id)
+      // get a list of all links created by a user
+      const getLinks = "SELECT link FROM fileinfo WHERE userid = ?"
+      const getResult = await sql.query(getLinks, id)
 
-    // checks if any links were found
-    if (getResult.length > 0) {
-      for (let r = 0; r < getResult.length; r++) {
-        links[r] = getResult[r].link
-      }
-    }
-
-    // used to determine if a unique link has been created
-    let unique = false, repeats = 1, fileLink
-
-    // repeat until a uniqle link is found
-    while (!unique) {
-      // generate a random link
-      fileLink = hash.alphanumeric(length)
-
-      // iterate through each link
-      unique = true
-      for (let l = 0; l < links.length; l++) {
-        // compare it to the newly created link
-        if (links[l] == fileLink) {
-          unique = false
+      // checks if any links were found
+      if (getResult.length > 0) {
+        for (let r = 0; r < getResult.length; r++) {
+          links[r] = getResult[r].link
         }
       }
 
-      // check if the repeats has exceeded 100
-      if (repeats >= 100) {
-        callback({success: false, error: e.link.overlapLink})
+      // used to determine if a unique link has been created
+      let unique = false, repeats = 1, fileLink
+
+      // repeat until a uniqle link is found
+      while (!unique) {
+        // generate a random link
+        fileLink = hash.alphanumeric(length)
+
+        // iterate through each link
+        unique = true
+        for (let l = 0; l < links.length; l++) {
+          // compare it to the newly created link
+          if (links[l] == fileLink) {
+            unique = false
+          }
+        }
+
+        // check if the repeats has exceeded 100
+        if (repeats >= 100) {
+          throw new Error(e.link.overlapLink)
+        }
+
+        repeats++
       }
 
-      repeats++
-    }
+      // add the new link to the fileinfo database
+      const addLink = "INSERT IGNORE INTO fileinfo(userid, link, directory) VALUES(?, ?, ?)"
+      const addResult = await sql.query(addLink, [id, fileLink, directory])
 
-    // add the new link to the fileinfo database
-    const addLink = "INSERT IGNORE INTO fileinfo(userid, link, directory) VALUES(?, ?, ?)"
-    const addResult = await sql.query(addLink, [id, fileLink, directory])
-
-    // make sure a link was added
-    if (addResult.affectedRows != 0) {
-      // successful link creation
-      callback({success: true, link: fileLink})
-    } else {
-      // failed link creation
-      callback({success: false, error: e.link.failedLink})
+      // make sure a link was added
+      if (addResult.affectedRows != 0) {
+        // successful link creation
+        resolve(fileLink)
+      } else {
+        // failed link creation
+        throw new Error(e.link.failedLink)
+      }
+    } catch (error) {
+      reject(error)
     }
-  } catch (error) {
-    console.log(error.message)
-    callback({success: false, error: error.message})
-  }
+  })
 }
 
 // remove an item link
-async function unlink(id, link, callback) {
-  try {
-    // get a list of all links created by a user
-    const removeLink = "DELETE FROM fileinfo WHERE userid = ? AND link = ?"
-    const queryResult = await sql.query(removeLink, [id, link])
+function unlink(id, link) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // get a list of all links created by a user
+      const removeLink = "DELETE FROM fileinfo WHERE userid = ? AND link = ?"
+      const queryResult = await sql.query(removeLink, [id, link])
 
-    // checks if a row was deleted
-    if (queryResult.affectedRows != 0) {
-      // successful link deletion
-      callback({success: true})
-    } else {
-      // failed link deletion
-      callback({success: false, error: e.link.failedDelete})
+      // checks if a row was deleted
+      if (queryResult.affectedRows != 0) {
+        // successful link deletion
+        resolve()
+      } else {
+        // failed link deletion
+        throw new Error(e.link.failedDelete)
+      }
+    } catch (error) {
+      reject(error)
     }
-  } catch (error) {
-    console.log(error.message)
-    callback({success: false, error: error.message})
-  }
+  })
 }
 
 // rename an item link
-async function rename(id, link, name, callback) {
-  try {
-    // get a list of all links created by a user
-    const changeLink = "UPDATE fileinfo SET directory = ? WHERE userid = ? AND link = ?"
-    const queryResult = await sql.query(changeLink, [name, id, link])
+function rename(id, link, name) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // get a list of all links created by a user
+      const changeLink = "UPDATE fileinfo SET directory = ? WHERE userid = ? AND link = ?"
+      const queryResult = await sql.query(changeLink, [name, id, link])
 
-    // checks if a row was modified
-    if (queryResult.affectedRows != 0) {
-      // successful link modification
-      callback({success: true})
-    } else {
-      // failed link modification
-      callback({success: false, error: e.link.failedRename})
+      // checks if a row was modified
+      if (queryResult.affectedRows != 0) {
+        // successful link modification
+        resolve()
+      } else {
+        // failed link modification
+        throw new Error(e.link.failedRename)
+      }
+    } catch (error) {
+      reject(error)
     }
-  } catch (error) {
-    console.log(error.message)
-    callback({success: false, error: error.message})
-  }
+  })
 }
 
 // allows other files to use database functions

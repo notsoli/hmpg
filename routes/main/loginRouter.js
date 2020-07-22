@@ -31,7 +31,7 @@ router.post('/login', async (req, res) => {
     res.cookie('jwtToken', jwt, {maxAge: 900000, httpOnly: true, domain: 'hmpg.io'})
     res.send({success: true})
   } catch (error) {
-    console.log(error.message)
+    console.log(error)
     res.send({success: false, error: error.message})
   }
 })

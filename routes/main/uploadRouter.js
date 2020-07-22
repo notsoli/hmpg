@@ -8,48 +8,41 @@ const e = require('../../config/errors.json')
 const breaker = require('../../config/breaker.json')
 
 // handle file uploads and other ajax requests
-router.post('/upload', (req, res) => {
-  // determine if upload is enabled
-  if (!breaker.uploadEnabled) {
-    res.send({success: false, error: e.breaker.uploadDisabled})
-    return
-  }
-
-  // check if user is signed in
-  if (!req.info.user) {
-    res.send({success: false, error: e.request.noSession})
-    return
-  }
-
-  // check if user has uploaded files
-  if (!req.files) {
-    res.send({success: false, error: e.upload.noFiles})
-    return
-  }
-
-  // create file object
-  const files = req.files.file
-
-  // check if either one or multiple files are selected
-  if (files.length) {
-    // multiple files
-    console.log("only one file per request")
-    res.send({success: false, error: e.upload.multipleFiles})
-    return
-  }
-
-  // single file
-  file.handleFile(files, req.info.userid, 4, (handleAttempt) => {
-    if (!handleAttempt.success) {
-      console.log("failed to upload file")
-      res.send({success: false, error: handleAttempt.error})
-      return
+router.post('/upload', async (req, res) => {
+  try {
+    // determine if upload is enabled
+    if (!breaker.uploadEnabled) {
+      throw new Error(e.breaker.uploadDisabled)
     }
 
+    // check if user is signed in
+    if (!req.info.user) {
+      throw new Error(e.request.noSession)
+    }
+
+    // check if user has uploaded files
+    if (!req.files) {
+      throw new Error(e.upload.noFiles)
+    }
+
+    // create file object
+    const files = req.files.file
+
+    // check if either multiple files are selected
+    if (files.length) {
+      throw new Error(e.upload.multipleFiles)
+    }
+
+    // single file
+    const link = await file.handleFile(files, req.info.userid, 4)
+
     // respond with the new link
-    const completeLink = "https://" + req.info.user + ".hmpg.io/" + handleAttempt.link
+    const completeLink = "https://" + req.info.user + ".hmpg.io/" + link
     res.send({success: true, link: completeLink, uploads: req.info.uploads})
-  })
+  } catch (error) {
+    console.log(error)
+    res.send({success: false, error: error.message})
+  }
 })
 
 // get & render page

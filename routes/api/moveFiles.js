@@ -24,7 +24,7 @@ router.post('/', function(req, res, next) {
   })
 })
 
-function moveItem(userid, body, id, callback, _completed, _failed) {
+async function moveItem(userid, body, id, callback, _completed, _failed) {
   // check if completed
   if (id == body.links.length) {
     callback(_completed, _failed)
@@ -36,17 +36,16 @@ function moveItem(userid, body, id, callback, _completed, _failed) {
   if (_completed) {completed = _completed}
   if (_failed) {failed = _failed}
 
-  file.handleMove(userid, body.links[id], body.path, (moveAttempt) => {
-    if (!moveAttempt.success) {
-      console.log("failed to move item")
-      failed.push({link: body.links[id], error: moveAttempt.error})
-    } else {
-      console.log("successfully moved item")
-      completed.push({link: body.links[id]})
-    }
+  try {
+    await file.handleMove(userid, body.links[id], body.path)
+    console.log("successfully moved item")
+    completed.push({link: body.links[id]})
+  } catch (error) {
+    console.log("failed to move item")
+    failed.push({link: body.links[id], error: error.message})
+  }
 
-    moveItem(userid, body, id + 1, callback, completed, failed)
-  })
+  moveItem(userid, body, id + 1, callback, completed, failed)
 }
 
 module.exports = router
