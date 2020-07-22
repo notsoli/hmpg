@@ -1,37 +1,31 @@
 // filesystem manipulation functions
-
+const fs = require('fs')
+const util = require('util')
 const db = require('./db')
 const info = require('./info')
-const fs = require('fs')
 const e = require('../../config/errors.json')
 
+// allows fs functions to use promises
+const mkdir = util.promisify(fs.mkdir)
+const writeFile = util.promisify(fs.writeFile)
+const access = util.promisify(fs.access)
+
 // sets up an upload directory for user
-function createRoot(id, callback) {
-  // concatenate full path
-  const fullPath = "E:/hmpg/" + id
+async function createRoot(id, callback) {
+  try {
+    // concatenate full path
+    const fullPath = "E:/hmpg/" + id
 
-  // create directory
-  fs.mkdir(fullPath, (mkdirError) => {
-    // check if directory creation was unsuccessful
-    if (mkdirError) {
-      callback({success: false, error: e.fs.failedDirectory})
-      return
-    }
-
-    // create base json
+    // create directory and info file
+    await mkdir(fullPath)
     const hmpgInfo = new info.Info()
+    await writeFile("E:/hmpg/" + id + "/hmpgInfo.json", JSON.stringify(hmpgInfo))
 
-    // create info file
-    fs.writeFile("E:/hmpg/" + id + "/hmpgInfo.json", JSON.stringify(hmpgInfo), (err) => {
-      if (err) {
-        console.log("error creating info file")
-        callback({success: false, error: e.fs.failedInfoWrite})
-        return
-      }
-
-      callback({success: true})
-    })
-  })
+    callback({success: true})
+  } catch (error) {
+    console.log(error.message)
+    callback({success: false, error: error.message})
+  }
 }
 
 // handle directory creation
@@ -101,26 +95,18 @@ function handleDirectory(id, directory, length, callback) {
 }
 
 // creates a directory if it doesn't already exist
-function createDirectory(path, callback) {
-  fs.access(path, fs.constants.F_OK, (accessError) => {
-    // check if directory already exists
-    if (!accessError || accessError.code !== "ENOENT") {
-      callback({success: false, error: e.fs.directoryExists})
-      return
-    }
-
+// this function is dummmmmbbbbb
+async function createDirectory(path, callback) {
+  try {
     // create directory
-    fs.mkdir(path, (mkdirError) => {
-      // check if directory creation was unsuccessful
-      if (mkdirError) {
-        callback({success: false, error: e.fs.failedDirectory})
-        return
-      }
+    await mkdir(path)
 
-      console.log("successfully created directory " + path)
-      callback({success: true})
-    })
-  })
+    console.log("successfully created directory " + path)
+    callback({success: true})
+  } catch (error) {
+    console.log(error.message)
+    callback({success: false, error: error.message})
+  }
 }
 
 // handle file upload

@@ -1,7 +1,12 @@
 // hmpgInfo.json manipulation functions
 
 const fs = require('fs')
+const util = require('util')
 const e = require('../../config/errors.json')
+
+// allows fs functions to use promises
+const readFile = util.promisify(fs.readFile)
+const writeFile = util.promisify(fs.writeFile)
 
 // file constructor function
 function File(fileName, fileSize, fileType, fileLink) {
@@ -42,17 +47,13 @@ function Info() {
 }
 
 // adds an item to user's hmpgInfo.json
-function addItem(id, path, item, callback) {
-  // concatenate full hmpgInfo.json path
-  const infoPath = "E:/hmpg/" + id + "/hmpgInfo.json"
+async function addItem(id, path, item, callback) {
+  try {
+    // concatenate full hmpgInfo.json path
+    const infoPath = "E:/hmpg/" + id + "/hmpgInfo.json"
 
-  // read hmpgInfo.json
-  fs.readFile(infoPath, (err, data) => {
-    if (err) {
-      console.log(err)
-      callback({success: false, error: err})
-      return
-    }
+    // read hmpgInfo.json
+    const data = await readFile(infoPath)
 
     const hmpgInfo = JSON.parse(data)
     const root = hmpgInfo.root
@@ -93,16 +94,12 @@ function addItem(id, path, item, callback) {
     const fileData = JSON.stringify(newInfo)
 
     // write to hmpgInfo.json
-    fs.writeFile(infoPath, fileData, (err) => {
-      if (err) {
-        console.log(err)
-        callback({success: false, error: err})
-        return
-      }
-
-      callback({success: true})
-    })
-  })
+    await writeFile(infoPath, fileData)
+    callback({success: true})
+  } catch (error) {
+    console.log(error.message)
+    callback({success: false, error: error.message})
+  }
 }
 
 // add item to root directory
@@ -188,17 +185,13 @@ function addPath(info, path, item) {
 }
 
 // searches for an item from user's hmpgInfo.json
-function searchItem(id, link, callback) {
-  // concatenate full hmpgInfo.json path
-  const infoPath = "E:/hmpg/" + id + "/hmpgInfo.json"
+await function searchItem(id, link, callback) {
+  try {
+    // concatenate full hmpgInfo.json path
+    const infoPath = "E:/hmpg/" + id + "/hmpgInfo.json"
 
-  // read hmpgInfo.json
-  fs.readFile(infoPath, (err, data) => {
-    if (err) {
-      console.log(err)
-      callback({success: false, error: err})
-      return
-    }
+    // read hmpgInfo.json
+    const data = await readFile(infoPath)
     const hmpgInfo = JSON.parse(data)
 
     // search and modify hmpgInfo
@@ -210,21 +203,20 @@ function searchItem(id, link, callback) {
     }
 
     callback({success: true, itemInfo: itemInfo, hmpgInfo: hmpgInfo})
-  })
+  } catch (error) {
+    console.log(error.message)
+    callback({success: false, error: error.message})
+  }
 }
 
 // modifies a file from user's hmpgInfo.json
-function modifyItem(id, request, link, callback) {
-  // concatenate full hmpgInfo.json path
-  const infoPath = "E:/hmpg/" + id + "/hmpgInfo.json"
+await function modifyItem(id, request, link, callback) {
+  try {
+    // concatenate full hmpgInfo.json path
+    const infoPath = "E:/hmpg/" + id + "/hmpgInfo.json"
 
-  // read hmpgInfo.json
-  fs.readFile(infoPath, (err, data) => {
-    if (err) {
-      console.log(err)
-      callback({success: false, error: err})
-      return
-    }
+    // read hmpgInfo.json
+    const data = await readFile(infoPath)
     const hmpgInfo = JSON.parse(data)
 
     // search and modify hmpgInfo
@@ -249,16 +241,12 @@ function modifyItem(id, request, link, callback) {
     const fileData = JSON.stringify(hmpgInfo)
 
     // write to hmpgInfo.json
-    fs.writeFile(infoPath, fileData, (err) => {
-      if (err) {
-        console.log(err)
-        callback({success: false, error: err})
-        return
-      }
-
-      callback({success: true, itemInfo: itemInfo})
-    })
-  })
+    await writeFile(infoPath, fileData)
+    callback({success: true, itemInfo: itemInfo})
+  } catch (error) {
+    console.log(error.message)
+    callback({success: false, error: error.message})
+  }
 }
 
 // recursively search the current directory for link matches
@@ -311,16 +299,14 @@ function searchDirectory(request, link, items, id, _path, _selectedItem) {
 }
 
 // read user's hmpgInfo.json
-function read(id, callback) {
-  fs.readFile("E:/hmpg/" + id + "/hmpgInfo.json", "utf8", (err, data) => {
-    if (err) {
-      console.log(err)
-      callback({success: false, error: err})
-      return
-    }
-
+await function read(id, callback) {
+  try {
+    const data = await readFile("E:/hmpg/" + id + "/hmpgInfo.json", "utf8")
     callback({success: true, info: data})
-  })
+  } catch (error) {
+    console.log(error.message)
+    callback({success: false, error: error.message})
+  }
 }
 
 // send hmpgInfo with target directory's children as root
