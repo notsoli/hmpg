@@ -185,7 +185,7 @@ function addPath(info, path, item) {
 }
 
 // searches for an item from user's hmpgInfo.json
-await function searchItem(id, link, callback) {
+async function searchItem(id, link, callback) {
   try {
     // concatenate full hmpgInfo.json path
     const infoPath = "E:/hmpg/" + id + "/hmpgInfo.json"
@@ -210,7 +210,7 @@ await function searchItem(id, link, callback) {
 }
 
 // modifies a file from user's hmpgInfo.json
-await function modifyItem(id, request, link, callback) {
+async function modifyItem(id, request, link, callback) {
   try {
     // concatenate full hmpgInfo.json path
     const infoPath = "E:/hmpg/" + id + "/hmpgInfo.json"
@@ -299,7 +299,7 @@ function searchDirectory(request, link, items, id, _path, _selectedItem) {
 }
 
 // read user's hmpgInfo.json
-await function read(id, callback) {
+async function read(id, callback) {
   try {
     const data = await readFile("E:/hmpg/" + id + "/hmpgInfo.json", "utf8")
     callback({success: true, info: data})

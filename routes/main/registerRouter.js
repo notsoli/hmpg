@@ -8,111 +8,78 @@ const e = require('../../config/errors.json')
 const breaker = require('../../config/breaker.json')
 
 // register a new user
-router.post('/register', (req, res, next) => {
-  // determine if registration is enabled
-  if (!breaker.registerEnabled) {
-    res.send({success: false, error: e.breaker.registerDisabled})
-    return
-  }
-
-  // make sure body content is valid
-  const verifyResult = verifyBody(req.body)
-  if (!verifyResult.success) {
-    res.send ({success: false, error: verifyResult.error})
-    return
-  }
-
-  // assign form information to variables
-  const {username, password, confirmpassword} = req.body
-
-  // make sure username and password fit criteria for account creation
-  const validity = db.validity(username, password, confirmpassword)
-  if (!validity.result) {
-    console.log("failed to register account\nreason: " + validity.reason)
-    res.send({success: false, error: validity.reason})
-    return
-  }
-
-  // register user
-  db.register(username, password, (registerAttempt) => {
-    // send confirmation and redirect back to homepage
-    if (!registerAttempt.success) {
-      console.log("failed to register account\nreason: " + registerAttempt.error)
-      res.send({success: false, error: registerAttempt.error})
-      return
+router.post('/register', async (req, res, next) => {
+  try {
+    // determine if registration is enabled
+    if (!breaker.registerEnabled) {
+      throw new Error(e.breaker.registerDisabled)
     }
 
+    // make sure body content is valid
+    verifyBody(req.body)
+
+    // assign form information to variables
+    const {username, password, confirmpassword} = req.body
+
+    // make sure username and password fit criteria for account creation
+    db.validity(username, password, confirmpassword)
+
+    // register user
+    await db.register(username, password)
     console.log("successfully registered account '" + username + "'")
-    completeRegister(username, password, (completeAttempt) => {
-      if(!completeAttempt.success) {
-        res.send({success: true, login: false})
-        return
-      }
 
-      console.log("successfully set up account'" + username + "'")
+    const jwt = await completeRegister(username, password)
+    console.log("successfully set up account'" + username + "'")
 
-      // send jwt to user
-      res.cookie('jwtToken', completeAttempt.jwt, {maxAge: 900000, httpOnly: true, domain: 'hmpg.io'})
-      res.send({success: true, login: true})
-    })
-  })
+    // send jwt to user
+    res.cookie('jwtToken', jwt, {maxAge: 900000, httpOnly: true, domain: 'hmpg.io'})
+    res.send({success: true, login: true})
+  } catch (error) {
+    console.log(error)
+    res.send({success: false, error: error.message})
+  }
 })
 
 // sets the new user up following a successful register
-function completeRegister(username, password, callback) {
-  // get userid
-  db.userid(username, (idAttempt) => {
-    // check if userid grab was successful
-    if(!idAttempt.success) {
-      callback({success: false, error: idAttempt.error})
-      return
-    }
+function completeRegister(username, password) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // get userid
+      const userid = await db.userid(username)
 
-    // create an upload directory
-    file.createRoot(idAttempt.userid, (rootAttempt) => {
-      if(!rootAttempt.success) {
-        callback({success: false, error: rootAttempt.error})
-        return
-      }
+      // create an upload directory
+      file.createRoot(userid)
 
       // log the new user in
-      db.login(username, password, (loginAttempt) => {
-        // check if login was successful
-        if (!loginAttempt.success) {
-          console.log("failed to login")
-          callback({success: false, error: loginAttempt.error})
-          return
-        }
-
-        console.log("successfully logged in to account '" + username + "'")
-        callback({success: true, jwt: loginAttempt.jwt})
-      })
-    })
+      const jwt = await db.login(username, password)
+      console.log("successfully logged in to account '" + username + "'")
+      resolve(jwt)
+    } catch (error) {
+      reject(error)
+    }
   })
 }
 
 function verifyBody(body) {
   // verify post request length
   if (Object.keys(body).length !== 3) {
-    return {success: false, error: e.request.badRequest}
+    throw new Error(e.request.badRequest)
   }
 
   // verify existence and type of username
   if (!body.username || typeof(body.username) !== "string") {
-    return {success: false, error: e.request.badRequest}
+    throw new Error(e.request.badRequest)
   }
 
   // verify existence and type of password
   if (!body.password || typeof(body.password) !== "string") {
-    return {success: false, error: e.request.badRequest}
+    throw new Error(e.request.badRequest)
   }
 
   // verify existence and type of confirmpassword
   if (!body.confirmpassword || typeof(body.confirmpassword) !== "string") {
-    return {success: false, error: e.request.badRequest}
+    throw new Error(e.request.badRequest)
   }
-
-  return {success: true}
 }
 
 // get & render page

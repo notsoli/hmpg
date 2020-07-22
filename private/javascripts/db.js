@@ -41,114 +41,117 @@ class Database {
 
 const sql = new Database(config)
 
-// check if username and password fit criteria for account creation and login
 function validity(username, password, confirmpassword) {
   // verify username length
   if (username.length > 16) {
-    return {result: false, reason: e.validity.longUsername}
+    throw new Error(e.validity.longUsername)
   } else if (username.length < 3) {
-    return {result: false, reason: e.validity.shortUsername}
+    throw new Error(e.validity.shortUsername)
   }
 
   // verify password length
   if (password.length > 32) {
-    return {result: false, reason: e.validity.longPassword}
+    throw new Error(e.validity.longPassword)
   } else if (password.length < 8) {
-    return {result: false, reason: e.validity.shortPassword}
+    throw new Error(e.validity.shortPassword)
   }
 
   // verify that passwords match
   if (password !== confirmpassword) {
-    return {result: false, reason: e.validity.differentPassword}
+    throw new Error(e.validity.differentPassword)
   }
 
   // verify that username is alphanumeric
   const expression = new RegExp(/[\s~`!@#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?()\._]/)
   if (expression.test(username)) {
-    return {result: false, reason: e.validity.specialUsername}
+    throw new Error(e.validity.specialUsername)
   }
 
   // verify that username is allowed
   const lowerUser = username.toLowerCase()
   for (let i = 0; i < invalidUsernames.length; i++) {
     if (invalidUsernames[i] === lowerUser) {
-      return {result: false, reason: e.validity.invalidUsername}
+      throw new Error(e.validity.invalidUsername)
     }
   }
-
-  return {result: true}
 }
 
 // gets userid from username
-async function userid(username, callback) {
-  try {
-    const selectid = "SELECT userid FROM userinfo WHERE username = ?;"
-    const queryResult = await sql.query(selectid, [username])
+function userid(username) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const selectid = "SELECT userid FROM userinfo WHERE username = ?;"
+      const queryResult = await sql.query(selectid, [username])
 
-    // make sure result is an actual entry identification
-    if (queryResult.length == 0) {
-      callback({success: false, error: e.validity.invalidUsername})
-      return
+      // make sure result is an actual entry identification
+      if (queryResult.length == 0) {
+        reject(e.validity.invalidUsername)
+        return
+      }
+
+      resolve(queryResult[0].userid)
+    } catch (error) {
+      console.log(error.message)
+      reject(error)
     }
-
-    callback({success: true, userid: queryResult[0].userid})
-  } catch (error) {
-    console.log(error.message)
-    callback({success: false, error: error.message})
-  }
+  })
 }
 
 // use the sql database to check login information & create a jwt if valid
-async function login(username, password, callback) {
-  try {
-    // converts plaintext password into hashed password
-    const hashedPassword = hash.password(password)
+function login(username, password) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // converts plaintext password into hashed password
+      const hashedPassword = hash.password(password)
 
-    // compare username and password to database
-    const compareInfo = "SELECT * FROM userinfo WHERE username = ? AND password = ?;"
-    const queryResult = await sql.query(compareInfo, [username, hashedPassword])
+      // compare username and password to database
+      const compareInfo = "SELECT * FROM userinfo WHERE username = ? AND password = ?;"
+      const queryResult = await sql.query(compareInfo, [username, hashedPassword])
 
-    // make sure result is an actual entry identification
-    if (queryResult.length !== 1 || queryResult[0].username !== username || queryResult[0].password !== hashedPassword) {
-      callback({success: false, error: e.validity.invalidLogin})
-      return
+      // make sure result is an actual entry identification
+      if (queryResult.length !== 1 || queryResult[0].username !== username || queryResult[0].password !== hashedPassword) {
+        reject(new Error(e.validity.invalidLogin))
+        return
+      }
+
+      // create payload object
+      const payload = {user: username, userid: queryResult[0].userid}
+
+      // create a jwt
+      const jwt = hash.sign(payload)
+      resolve(jwt)
+    } catch (error) {
+      console.log(error.message)
+      reject(error)
     }
-
-    // create payload object
-    const payload = {user: username, userid: queryResult[0].userid}
-
-    // create a jwt
-    const jwt = hash.sign(payload)
-    callback({success: true, jwt: jwt})
-  } catch (error) {
-    console.log(error.message)
-    callback({success: false, error: error.message})
-  }
+  })
 }
 
 // use the sql database to register a new user
-async function register(username, password, callback) {
-  try {
-    // converts plaintext password into hashed password
-    const hashedPassword = hash.password(password)
+function register(username, password) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // converts plaintext password into hashed password
+      const hashedPassword = hash.password(password)
 
-    // creates a new date and converts it into seconds
-    const registerDate = Math.floor(Date.now()/1000)
+      // creates a new date and converts it into seconds
+      const registerDate = Math.floor(Date.now()/1000)
 
-    // add new user to database
-    const checkExisting = "INSERT IGNORE INTO userinfo(username, password, registerDate) VALUES(?, ?, ?)"
-    const queryResult = await sql.query(checkExisting, [username, hashedPassword, registerDate])
+      // add new user to database
+      const checkExisting = "INSERT IGNORE INTO userinfo(username, password, registerDate) VALUES(?, ?, ?)"
+      const queryResult = await sql.query(checkExisting, [username, hashedPassword, registerDate])
 
-    // checks if a new account was actually added
-    if (queryResult.affectedRows != 0) {
-      callback({success: true})
-    } else {
-      callback({success: false, error: e.validity.takenUsername})
+      // checks if a new account was actually added
+      if (queryResult.affectedRows != 0) {
+        resolve()
+      } else {
+        reject(e.validity.takenUsername)
+      }
+    } catch (error) {
+      console.log(error.message)
+      reject(error)
     }
-  } catch (error) {
-    console.log(error.message)
-    callback({success: false, error: error.message})
-  }
+  })
 }
 
 // finds the directory of a static file

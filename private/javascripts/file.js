@@ -11,21 +11,23 @@ const writeFile = util.promisify(fs.writeFile)
 const access = util.promisify(fs.access)
 
 // sets up an upload directory for user
-async function createRoot(id, callback) {
-  try {
-    // concatenate full path
-    const fullPath = "E:/hmpg/" + id
+function createRoot(id) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // concatenate full path
+      const fullPath = "E:/hmpg/" + id
 
-    // create directory and info file
-    await mkdir(fullPath)
-    const hmpgInfo = new info.Info()
-    await writeFile("E:/hmpg/" + id + "/hmpgInfo.json", JSON.stringify(hmpgInfo))
+      // create directory and info file
+      await mkdir(fullPath)
+      const hmpgInfo = new info.Info()
+      await writeFile("E:/hmpg/" + id + "/hmpgInfo.json", JSON.stringify(hmpgInfo))
 
-    callback({success: true})
-  } catch (error) {
-    console.log(error.message)
-    callback({success: false, error: error.message})
-  }
+      resolve()
+    } catch (error) {
+      console.log(error.message)
+      reject(error)
+    }
+  })
 }
 
 // handle directory creation
