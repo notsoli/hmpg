@@ -82,15 +82,11 @@ function handleMove() {
 
 function sendMoveRequest(path) {
   // create array of links used to identify items later
-  const links = []
+  const paths = []
   for (let i = 0; i < selected.length; i++) {
     const item = items[selected[i]]
-
-    if (item.hasOwnProperty("fileLink")) {
-      links[i] = item.fileLink
-    } else {
-      links[i] = item.dirLink
-    }
+    paths[i] = item.path
+    paths[i].push(item.name)
   }
 
   // create a new ajax request
@@ -102,7 +98,7 @@ function sendMoveRequest(path) {
   // send request
   request.open("POST", "https://hmpg.io/moveFiles")
   request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8')
-  request.send(JSON.stringify({links: links, path: path}))
+  request.send(JSON.stringify({paths: paths, path: path}))
 }
 
 function handleMoveResponse() {
@@ -133,15 +129,11 @@ function handleDelete() {
 
 function sendDeleteRequest() {
   // create array of links used to identify items later
-  const links = []
+  const paths = []
   for (let i = 0; i < selected.length; i++) {
     const item = items[selected[i]]
-
-    if (item.hasOwnProperty("fileLink")) {
-      links[i] = item.fileLink
-    } else {
-      links[i] = item.dirLink
-    }
+    paths[i] = item.path
+    paths[i].push(item.name)
   }
 
   // create a new ajax request
@@ -153,7 +145,7 @@ function sendDeleteRequest() {
   // send request
   request.open("POST", "https://hmpg.io/deleteFiles")
   request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8')
-  request.send(JSON.stringify(links))
+  request.send(JSON.stringify(paths))
 }
 
 function handleDeleteResponse() {
@@ -165,15 +157,10 @@ function handleDeleteResponse() {
 function handleRename() {
   // determine if a file is selected
   if (focused) {
-    // determine name and link
-    let name, link
-    if (focused.fileName) {
-      name = focused.fileName
-      link = focused.fileLink
-    } else {
-      name = focused.dirName
-      link = focused.dirLink
-    }
+    // determine name and path
+    const name = focused.name
+    const path = focused.path
+    path.push(name)
 
     // prompt user for new name
     const result = window.prompt("Please enter the new filename.", name)
@@ -189,12 +176,12 @@ function handleRename() {
       }
 
       // send rename request
-      sendRenameRequest(link, result)
+      sendRenameRequest(path, result)
     }
   }
 }
 
-function sendRenameRequest(link, name) {
+function sendRenameRequest(path, name) {
   // create a new ajax request
   const request = new XMLHttpRequest()
 
@@ -204,7 +191,7 @@ function sendRenameRequest(link, name) {
   // send request
   request.open("POST", "https://hmpg.io/renameFiles")
   request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8')
-  request.send(JSON.stringify({link: link, name: name}))
+  request.send(JSON.stringify({path: path, name: name}))
 }
 
 function handleRenameResponse() {

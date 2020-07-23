@@ -40,7 +40,7 @@ async function handleDirectory(id, directory, length) {
   const completeDirectory = "E:/hmpg/" + id + "/" + directory
 
   // figure out directory name
-  let name, directorySplit
+  let name, directorySplit = []
   if (!directory.includes("/")) {
     name = directory
   } else {
@@ -58,19 +58,11 @@ async function handleDirectory(id, directory, length) {
 
   // add the directory to the user's hmpgInfo
   const newDirectory = new info.Directory(name, link)
-
-  // remove last part of directory
-  let baseDirectory
-  if (!directory.includes("/")) {
-    baseDirectory = ""
-  } else {
-    directorySplit.pop()
-    baseDirectory = directorySplit.join("/")
-  }
+  directorySplit.pop()
 
   // add item to hmpgInfo
-  await info.addItem(id, baseDirectory, newDirectory)
-  console.log("successfully added item")
+  await info.modifyItem(id, {action: "add", item: newDirectory}, directorySplit)
+  console.log("successfully created directory")
   return link
 }
 
@@ -97,7 +89,7 @@ async function handleFile(file, id, length) {
   // add the file to the user's hmpgInfo
   const newFile = new info.File(file.name, file.size, file.mimetype, link)
 
-  await info.addItem(id, "", newFile)
+  await info.modifyItem(id, {action: "add", item: newFile}, [])
   return link
 }
 
@@ -112,72 +104,59 @@ function move(file, directory) {
 }
 
 // handles item move
-async function handleMove(id, link, path) {
-  // search for item
-  const search = await info.searchItem(id, link)
-  const itemInfo = search.itemInfo
+async function handleMove(id, path, newPath) {
+  // select item in hmpgInfo
+  const item = await info.modifyItem(id, {action: "search"}, path)
+
+  // determine name
+  const name = path[path.length - 1]
+
+  // remove last item from path
+  path.pop()
 
   // concatenate base path from array
   let basePath
-  if (itemInfo.path.length > 0) {
-    basePath = itemInfo.path.join("/") + "/"
+  if (path.length > 0) {
+    basePath = path.join("/") + "/"
   } else {
     basePath = ""
   }
 
   // concatenate new path from array
-  let newPath
-  if (path === "") {
-    newPath = path
-  } else {
-    newPath = path + "/"
+  let splitPath = []
+  if (newPath !== "") {
+    splitPath = newPath.split("/")
+    newPath += "/"
   }
 
   // concatenate main path
   const mainPath = "E:/hmpg/" + id + "/"
 
-  let name
-  if (itemInfo.selectedItem.fileName) {
-    name = itemInfo.selectedItem.fileName
-  } else {
-    name = itemInfo.selectedItem.dirName
-  }
-
   // move file in filesystem
   await rename(mainPath + basePath + name, mainPath + newPath + name)
 
-  await info.modifyItem(id, {action: "delete"}, link)
+  // remove file from hmpgItem
+  await info.modifyItem(id, {action: "delete", name: name}, path)
 
   // create item
-  const item = itemInfo.selectedItem
   let newItem
-  if (item.fileName) {
-    newItem = new info.File(item.fileName, item.fileSize, item.fileType, item.fileLink)
+  if (item.type === "file") {
+    newItem = new info.File(item.name, item.size, item.filetype, item.link)
   } else {
-    newItem = new info.Directory(item.dirName, item.dirLink)
+    newItem = new info.Directory(item.name, item.link)
   }
 
   // add item to hmpgInfo
-  await info.addItem(id, path, newItem)
+  await info.modifyItem(id, {action: "add", item: newItem}, splitPath)
 
   // change link directory
-  await db.rename(id, link, newPath + name)
+  await db.rename(id, basePath + name, newPath + name)
 }
 
 // handles item deletion
-async function handleDelete(id, link) {
-  // search item in hmpgInfo.json
-  const search = await info.searchItem(id, link)
-  const itemInfo = search.itemInfo
-
+async function handleDelete(id, path) {
   // concatenate path
-  let basePath = itemInfo.path.join("/") + "/"
-  if (itemInfo.selectedItem.fileName) {
-    basePath += itemInfo.selectedItem.fileName
-  } else {
-    basePath += itemInfo.selectedItem.dirName
-  }
-  const fullPath = "E:/hmpg/" + id + "/" + basePath
+  const fullPath = "E:/hmpg/" + id + "/" + path.join("/")
 
   // check if item is a file or directory
   const stats = await stat(fullPath)
@@ -190,54 +169,54 @@ async function handleDelete(id, link) {
   }
 
   // remove link from database
-  await db.unlink(id, link)
+  await db.unlink(id, path.join("/"))
+
+  // determine filename
+  const name = path[path.length - 1]
+  path.pop()
 
   // delete item from hmpgInfo.json
-  await info.modifyItem(id, {action: "delete"}, link)
+  await info.modifyItem(id, {action: "delete", name: name}, path)
 }
 
 // handles file renaming
-async function handleRename(id, link, name) {
+async function handleRename(id, path, name) {
   // determine if name is illegal
   const expression = new RegExp(/[/\\?%*:|"<>]/)
   if (expression.test(name)) {throw new Error(e.fs.invalidName)}
 
-  // rename item in hmpgInfo.json
-  const search = await info.searchItem(id, link)
-  const itemInfo = search.itemInfo
+  // search for item in hmpgInfo
+  const item = await info.modifyItem(id, {action: "search"}, path)
 
-  // concatenate base path from array
-  let basePath
-  if (itemInfo.path.length > 0) {
-    basePath = itemInfo.path.join("/") + "/"
-  } else {
-    basePath = ""
-  }
-
-  // concatenate full path
-  const fullPath = "E:/hmpg/" + id + "/" + basePath
-  let oldName
-  if (itemInfo.selectedItem.fileName) {
-    // verify filetype of new name
-    const fileType = "." + itemInfo.selectedItem.fileType.split("/")[1]
+  // verify filetype of new name
+  if (item.type === "file") {
+    const fileType = "." + item.filetype.split("/")[1]
     if (!name.endsWith(fileType)) {
       throw new Error(e.fs.invalidName)
-      return
     }
-
-    oldName = itemInfo.selectedItem.fileName
-  } else {
-    oldName = itemInfo.selectedItem.dirName
   }
 
+  // concatenate filepaths
+  const rootPath = "E:/hmpg/" + id + "/"
+
+  let filePath = ""
+  if (path.length > 1) {
+    filePath = Array.from(path)
+    filePath.pop()
+    filePath = filePath.join("/") + "/"
+  }
+
+  const oldPath = filePath + path[path.length - 1]
+  const newPath = filePath + name
+
   // rename item in filesystem
-  await rename(fullPath + oldName, fullPath + name)
+  await rename(rootPath + oldPath, rootPath + newPath)
 
   // rename item in database
-  await db.rename(id, link, basePath + name)
+  await db.rename(id, oldPath, newPath)
 
   // rename item in hmpgInfo
-  await info.modifyItem(id, {action: "rename", name: name}, link)
+  await info.modifyItem(id, {action: "rename", name: name}, path)
 }
 
 module.exports.createRoot = createRoot

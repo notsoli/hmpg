@@ -18,6 +18,7 @@ router.post('/', function(req, res, next) {
     res.send({success: false, error: e.request.badRequest})
     return
   }
+  console.log(req.body)
 
   deleteItem(req.info.userid, req.body, 0, (completed, failed) => {
     res.send({success: true, completed: completed, failed: failed})

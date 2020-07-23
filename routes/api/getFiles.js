@@ -26,12 +26,12 @@ router.get('/', async function(req, res, next) {
 router.post('/', async function(req, res, next) {
   try {
     // verify post contents
-    if (!req.body.userid || !req.body.link) {
+    if (!req.body.userid || !req.body.path) {
       throw new Error(e.request.badRequest)
     }
 
     // read target directory
-    const hmpgInfo = await info.handleView(req.body.userid, req.body.link)
+    const hmpgInfo = await info.handleView(req.body.userid, req.body.path)
     res.send({success: true, info: hmpgInfo})
   } catch (error) {
     res.send({success: false, error: error.message})

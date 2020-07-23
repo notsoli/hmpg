@@ -201,10 +201,10 @@ async function link(id, directory, length) {
 }
 
 // remove an item link
-async function unlink(id, link) {
+async function unlink(id, directory) {
   // get a list of all links created by a user
-  const removeLink = "DELETE FROM fileinfo WHERE userid = ? AND link = ?"
-  const queryResult = await sql.query(removeLink, [id, link])
+  const removeLink = "DELETE FROM fileinfo WHERE userid = ? AND directory = ?"
+  const queryResult = await sql.query(removeLink, [id, directory])
 
   // checks if a row was deleted
   if (queryResult.affectedRows === 0) {
@@ -214,10 +214,10 @@ async function unlink(id, link) {
 }
 
 // rename an item link
-async function rename(id, link, name) {
+async function rename(id, directory, name) {
   // get a list of all links created by a user
-  const changeLink = "UPDATE fileinfo SET directory = ? WHERE userid = ? AND link = ?"
-  const queryResult = await sql.query(changeLink, [name, id, link])
+  const changeLink = "UPDATE fileinfo SET directory = ? WHERE userid = ? AND directory = ?"
+  const queryResult = await sql.query(changeLink, [name, id, directory])
 
   // checks if a row was modified
   if (queryResult.affectedRows === 0) {

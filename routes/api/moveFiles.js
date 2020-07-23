@@ -14,7 +14,7 @@ router.post('/', function(req, res, next) {
   }
 
   // verify post contents
-  if (!Array.isArray(req.body.links) || typeof req.body.path !== "string") {
+  if (!Array.isArray(req.body.paths) || typeof req.body.path !== "string") {
     res.send({success: false, error: e.request.badRequest})
     return
   }
@@ -26,7 +26,7 @@ router.post('/', function(req, res, next) {
 
 async function moveItem(userid, body, id, callback, _completed, _failed) {
   // check if completed
-  if (id == body.links.length) {
+  if (id == body.paths.length) {
     callback(_completed, _failed)
     return
   }
@@ -37,12 +37,12 @@ async function moveItem(userid, body, id, callback, _completed, _failed) {
   if (_failed) {failed = _failed}
 
   try {
-    await file.handleMove(userid, body.links[id], body.path)
+    await file.handleMove(userid, body.paths[id], body.path)
     console.log("successfully moved item")
-    completed.push({link: body.links[id]})
+    completed.push({path: body.paths[id]})
   } catch (error) {
     console.log(error)
-    failed.push({link: body.links[id], error: error.message})
+    failed.push({path: body.paths[id], error: error.message})
   }
 
   moveItem(userid, body, id + 1, callback, completed, failed)

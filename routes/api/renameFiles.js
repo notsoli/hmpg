@@ -14,12 +14,12 @@ router.post('/', async function(req, res, next) {
     }
 
     // verify post contents
-    if (typeof req.body !== "object" || !req.body.link || !req.body.name) {
+    if (typeof req.body !== "object" || !req.body.path || !req.body.name) {
       throw new Error(e.request.badRequest)
     }
 
     // rename file
-    await file.handleRename(req.info.userid, req.body.link, req.body.name)
+    await file.handleRename(req.info.userid, req.body.path, req.body.name)
     res.send({success: true})
   } catch (error) {
     console.log(error)

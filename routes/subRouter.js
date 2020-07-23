@@ -49,7 +49,7 @@ router.all('/s/:target/:link', async function(req, res, next) {
 
       // set response cookies
       res.cookie("targetid", result.userid, {maxAge: 900000, domain: 'hmpg.io'})
-      res.cookie("targetLink", req.params.link, {maxAge: 900000, domain: 'hmpg.io'})
+      res.cookie("targetPath", JSON.stringify(result.directory.split("/")), {maxAge: 900000, domain: 'hmpg.io'})
 
       // set response title
       req.info.title = "hmpg:directory"

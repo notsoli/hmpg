@@ -2,7 +2,7 @@
 window.addEventListener('load', init)
 
 // dom objects
-let targetid, targetLink
+let targetid, targetPath
 
 const simple = true
 
@@ -10,8 +10,8 @@ const simple = true
 function init() {
   const cookies = document.cookie.split("; ")
   targetid = cookies[0].split("=")[1]
-  targetLink = cookies[1].split("=")[1]
-  sendFileRequest(targetid, targetLink)
+  targetPath = JSON.parse(decodeURIComponent(cookies[1].split("=")[1]))
+  sendFileRequest(targetid, targetPath)
 }
 
 // render file list dom created by fs.js

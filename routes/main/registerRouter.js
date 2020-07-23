@@ -51,7 +51,7 @@ async function completeRegister(username, password) {
   // log the new user in
   const jwt = await db.login(username, password)
   console.log("successfully logged in to account '" + username + "'")
-  resolve(jwt)
+  return jwt
 }
 
 function verifyBody(body) {

@@ -7,7 +7,7 @@ let selected = []
 // store currently focused item
 let focused
 
-function sendFileRequest(userid, link) {
+function sendFileRequest(userid, path) {
   // create a new ajax request
   const request = new XMLHttpRequest()
 
@@ -15,11 +15,11 @@ function sendFileRequest(userid, link) {
   request.addEventListener("readystatechange", handleFileResponse)
 
   // send different request based on parameters
-  if (userid !== undefined && link !== undefined) {
+  if (userid !== undefined && path !== undefined) {
     // send request
     request.open("POST", "getFiles")
     request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8')
-    request.send(JSON.stringify({userid: userid, link: link}))
+    request.send(JSON.stringify({userid: userid, path: path}))
   } else {
     // send request
     request.open("GET", "getFiles")
@@ -51,15 +51,16 @@ function assembleFileList(info) {
   const list = document.createElement("div")
   list.id = "fileList"
 
-  // iterate through root
-  for (let i = 0; i < info.root.length; i++) {
-    const child = info.root[i]
+  // iterate through base
+  for (let i = 0; i < info.children.length; i++) {
+    const child = info.children[i]
+    child.path = []
 
     // check if child is a file or directory
-    if (child.hasOwnProperty('fileName')) {
+    if (child.type === "file") {
       list.appendChild(assembleFile(child))
-    } else if (child.hasOwnProperty('dirName')) {
-      list.appendChild(assembleDirectory(child))
+    } else if (child.type === "directory") {
+      list.appendChild(assembleDirectory(child, [child.name]))
     }
   }
 
@@ -76,7 +77,7 @@ function assembleFile(file) {
   fileElement.className = "file"
 
   // create fileInfo element
-  const domString = '<div class="fileInfo" id="item-' + itemId + '"><input class="checkbox" type="checkbox" value="selected"><div class="fileType">i</div><div class="fileName">' + file.fileName + '</div></div>'
+  const domString = '<div class="fileInfo" id="item-' + itemId + '"><input class="checkbox" type="checkbox" value="selected"><div class="fileType">i</div><div class="fileName">' + file.name + '</div></div>'
   const fileInfo = new DOMParser().parseFromString(domString, 'text/html')
   fileInfo.querySelector(".checkbox").addEventListener("change", handleItemCheck)
   fileInfo.querySelector(".fileName").addEventListener("click", handleItemSelect)
@@ -89,7 +90,7 @@ function assembleFile(file) {
 }
 
 // create directory object
-function assembleDirectory(dir) {
+function assembleDirectory(dir, path) {
   // add to items
   items[itemId] = dir
 
@@ -98,7 +99,7 @@ function assembleDirectory(dir) {
   dirElement.className = "directory"
 
   // create dirInfo element
-  const domString = '<div class="dirInfo" id="item-' + itemId + '"><div class="hideIcon toggled">▲</div><input class="checkbox" type="checkbox" value="selected"><div class="dirType">d</div><div class="dirName">' + dir.dirName + '</div></div>'
+  const domString = '<div class="dirInfo" id="item-' + itemId + '"><div class="hideIcon toggled">▲</div><input class="checkbox" type="checkbox" value="selected"><div class="dirType">d</div><div class="dirName">' + dir.name + '</div></div>'
   const dirInfo = new DOMParser().parseFromString(domString, 'text/html')
   dirInfo.querySelector(".hideIcon").addEventListener("click", handleIconClick)
   dirInfo.querySelector(".checkbox").addEventListener("change", handleItemCheck)
@@ -116,13 +117,19 @@ function assembleDirectory(dir) {
   for (let i = 0; i < dir.children.length; i++) {
     const child = dir.children[i]
 
+    child.path = path
+
     // check if child is a file or directory
-    if (child.hasOwnProperty('fileName')) {
+    if (child.type === "file") {
       // append file object
       containerElement.appendChild(assembleFile(child))
-    } else if (child.hasOwnProperty('dirName')) {
+    } else if (child.type === "directory") {
+      // make a copy of path and add the directory name to it
+      const newPath = JSON.parse(JSON.stringify(path))
+      newPath.push(child.name)
+
       // recursively append directory object
-      containerElement.appendChild(assembleDirectory(child))
+      containerElement.appendChild(assembleDirectory(child, newPath))
     }
   }
 
@@ -210,27 +217,27 @@ function handleItemSelect() {
   }
 
   // determine if item is a file or directory
-  if (item.hasOwnProperty("fileName")) {
+  if (item.type === "file") {
     // file name, size, and type
-    document.querySelector("#itemName").innerHTML = "name: " + item.fileName
-    document.querySelector("#itemSize").innerHTML = "size: " + item.displaySize
-    document.querySelector("#itemType").innerHTML = "type: " + item.fileType
+    document.querySelector("#itemName").innerHTML = "name: " + item.name
+    document.querySelector("#itemSize").innerHTML = "size: " + item.size
+    document.querySelector("#itemType").innerHTML = "type: " + item.filetype
 
     // file link
     document.querySelector("#linkLabel").innerHTML = "link:"
-    const completeLink = "https://" + username + ".hmpg.io/" + item.fileLink
-    document.querySelector("#linkValue").innerHTML = item.fileLink
+    const completeLink = "https://" + username + ".hmpg.io/" + item.link
+    document.querySelector("#linkValue").innerHTML = item.link
     document.querySelector("#linkValue").href = completeLink
 
     // file preview
-    if (item.fileType.split("/")[0] === "image") {
+    if (item.filetype.split("/")[0] === "image") {
       document.querySelector("#previewImage").src = completeLink
     } else {
       document.querySelector("#previewImage").src = "https://via.placeholder.com/150/"
     }
   } else {
     // directory name
-    document.querySelector("#itemName").innerHTML = "name: " + item.dirName
+    document.querySelector("#itemName").innerHTML = "name: " + item.name
 
     // directory size
     let suffix
@@ -246,8 +253,8 @@ function handleItemSelect() {
 
     // directory link
     document.querySelector("#linkLabel").innerHTML = "link:"
-    const completeLink = "https://" + username + ".hmpg.io/" + item.dirLink
-    document.querySelector("#linkValue").innerHTML = item.dirLink
+    const completeLink = "https://" + username + ".hmpg.io/" + item.link
+    document.querySelector("#linkValue").innerHTML = item.link
     document.querySelector("#linkValue").href = completeLink
 
     // directory preview
