@@ -52,6 +52,19 @@
   cursor: pointer;
 }
 
+#linkLength {
+  display: flex;
+  padding: 10px 30px;
+}
+
+#linkLength > p {
+  margin-right: 10px;
+}
+
+#linkInput {
+  width: 30px;
+}
+
 #requestStatus {
   padding: 0 25px;
   height: 25px;
@@ -130,6 +143,10 @@
 }
 
 @media only screen  and (max-width : 1223px) {
+  #fileWrapper {
+    height: 100px;
+  }
+
   #fileDropper>p, #fileDropper>div {
     display: none;
   }

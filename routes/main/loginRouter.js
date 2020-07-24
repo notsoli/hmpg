@@ -27,7 +27,7 @@ router.post('/login', async (req, res) => {
     const jwt = await db.login(username, password)
     console.log("successfully logged in to account '" + username + "'")
 
-    // send jwt to user
+    // send info to user
     res.cookie('jwtToken', jwt, {maxAge: 900000, httpOnly: true, domain: 'hmpg.io'})
     res.send({success: true})
   } catch (error) {

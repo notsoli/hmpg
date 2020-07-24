@@ -25,6 +25,11 @@ router.post('/upload', async (req, res) => {
       throw new Error(e.upload.noFiles)
     }
 
+    // check if length is too long
+    if (req.body.length > 16) {
+      throw new Error("link can't be longer than 16 characters")
+    }
+
     // create file object
     const files = req.files.file
 
@@ -34,7 +39,7 @@ router.post('/upload', async (req, res) => {
     }
 
     // single file
-    const link = await file.handleFile(files, req.info.userid, 4)
+    const link = await file.handleFile(files, req.info.userid, req.body.length)
 
     // respond with the new link
     const completeLink = "https://" + req.info.user + ".hmpg.io/" + link

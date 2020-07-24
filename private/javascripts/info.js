@@ -35,6 +35,7 @@ function File(name, size, filetype, link) {
 // directory constuctor function
 function Directory(name, link) {
   this.type = "directory"
+  this.display = "default"
   this.name = name
   this.link = link
   this.children = []
@@ -45,6 +46,10 @@ function Info() {
   this.totalFiles = 0
   this.totalDirectories = 0
   this.totalSize = 0
+  this.settings = {
+    "defaultFileLinkLength": 4,
+    "defaultDirectoryLinkLength": 8
+  }
   this.children = []
 }
 
@@ -142,9 +147,47 @@ async function handleView(id, path) {
   return JSON.stringify(hmpgInfo)
 }
 
+// change hmpgInfo settings
+async function changeSettings(id, items) {
+  // store completed and failed changes
+  const completed = [], failed = []
+
+  // read user's hmpgInfo settings
+  const hmpgInfo = JSON.parse(await read(id))
+  const settings = hmpgInfo.settings
+
+  // iterate through each requested change
+  const keys = Object.keys(items)
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i]
+    if (settings[key] !== undefined) {
+      settings[key] = items[key]
+      completed.push(key)
+    } else {
+      failed.push(key)
+    }
+  }
+
+  // write to hmpgInfo.json
+  await writeFile("E:/hmpg/" + id + "/hmpgInfo.json", JSON.stringify(hmpgInfo))
+
+  return {completed: completed, failed: failed, settings: settings}
+}
+
+async function readSetting(id, value) {
+  const settings = JSON.parse(await read(id)).settings
+  if (settings.value !== undefined) {
+    return settings.value
+  } else {
+    throw new Error("failed to find setting")
+  }
+}
+
 module.exports.File = File
 module.exports.Directory = Directory
 module.exports.Info = Info
 module.exports.modifyItem = modifyItem
 module.exports.read = read
 module.exports.handleView = handleView
+module.exports.changeSettings = changeSettings
+module.exports.readSetting = readSetting

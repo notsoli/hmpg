@@ -138,16 +138,8 @@ async function handleMove(id, path, newPath) {
   // remove file from hmpgItem
   await info.modifyItem(id, {action: "delete", name: name}, path)
 
-  // create item
-  let newItem
-  if (item.type === "file") {
-    newItem = new info.File(item.name, item.size, item.filetype, item.link)
-  } else {
-    newItem = new info.Directory(item.name, item.link)
-  }
-
   // add item to hmpgInfo
-  await info.modifyItem(id, {action: "add", item: newItem}, splitPath)
+  await info.modifyItem(id, {action: "add", item: item}, splitPath)
 
   // change link directory
   await db.rename(id, basePath + name, newPath + name)

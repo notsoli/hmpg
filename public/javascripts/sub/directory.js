@@ -1,17 +1,25 @@
 // waits until html data is loaded
 window.addEventListener('load', init)
 
-// dom objects
-let targetid, targetPath
-
 const simple = true
 
 // init function
 function init() {
+  let targetid, targetPath
   const cookies = document.cookie.split("; ")
-  targetid = cookies[0].split("=")[1]
-  targetPath = JSON.parse(decodeURIComponent(cookies[1].split("=")[1]))
-  sendFileRequest(targetid, targetPath)
+  for (let i = 0; i < cookies.length; i++) {
+    const currentCookie = cookies[i].split("=")
+    if (currentCookie[0] === "targetid") {
+      targetid = currentCookie[1]
+    } else if (currentCookie[0] === "targetPath") {
+      targetPath = JSON.parse(decodeURIComponent(currentCookie[1]))
+    }
+  }
+
+  // check if both components were found
+  if (targetid && targetPath) {
+    sendFileRequest(targetid, targetPath)
+  }
 }
 
 // render file list dom created by fs.js

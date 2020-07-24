@@ -22,7 +22,16 @@ router.post('/files', async (req, res) => {
     // make sure body content is valid
     verifyBody(req.body)
 
-    await file.handleDirectory(req.info.userid, req.body.directory, 4,)
+    // convert length to an int
+    let length = req.body.length
+    length = parseInt(length)
+
+    // make sure length isn't too long
+    if (length > 16) {
+      throw new Error(e.request.badRequest)
+    }
+
+    await file.handleDirectory(req.info.userid, req.body.directory, length)
     res.send({success: true})
   } catch (error) {
     console.log(error)
@@ -32,12 +41,17 @@ router.post('/files', async (req, res) => {
 
 function verifyBody(body) {
   // verify post request length
-  if (Object.keys(body).length !== 1) {
+  if (Object.keys(body).length !== 2) {
     throw new Error(e.request.badRequest)
   }
 
   // verify existence and type of directory
   if (!body.directory || typeof(body.directory) !== "string") {
+    throw new Error(e.request.badRequest)
+  }
+
+  // verify existence of length
+  if (!body.length) {
     throw new Error(e.request.badRequest)
   }
 }

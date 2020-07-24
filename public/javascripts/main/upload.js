@@ -2,7 +2,10 @@
 window.addEventListener('load', init)
 
 // dom objects
-let main, fileInput, uploadButton, formStatus, fileList
+let main, fileInput, uploadButton, formStatus, fileList, linkInput
+
+// cookie variables
+let cookie
 
 // create an array of requests
 const requests = []
@@ -15,12 +18,25 @@ let desktop
 
 // init function
 function init() {
+  // populate cookie variables
+  const cookies = document.cookie.split("; ")
+  for (let i = 0; i < cookies.length; i++) {
+    const currentCookie = cookies[i].split("=")
+    if (currentCookie[0] === "settings") {
+      settings = JSON.parse(decodeURIComponent(currentCookie[1]))
+    }
+  }
+
   // dom objects
   dropZone = document.querySelector("#dropZone")
   fileInput = document.querySelector("#fileInput")
   fileButton = document.querySelector("#fileButton")
   formStatus = document.querySelector("#formStatus")
   fileList = document.querySelector("#fileList")
+  linkInput = document.querySelector("#linkInput")
+
+  // set value of link input to default
+  linkInput.value = settings.defaultFileLinkLength
 
   // populate desktop
   if (window.innerWidth >= 1224) {
@@ -83,32 +99,44 @@ function handleUpload(e, dragFile) {
     files = [dragFile]
   }
 
+  // make sure files are uploaded
+  if (files.length === 0) {return}
+
   // creates a new AJAX request for each file
-  if (files.length > 0) {
-    for (let i = 0; i < files.length; i++) {
-      // create a FormData object for ajax requests
-      const fileForm = new FormData()
-      fileForm.append("file", files[i])
+  for (let i = 0; i < files.length; i++) {
+    // create a FormData object for ajax requests
+    const fileForm = new FormData()
 
-      // create a new ajax request
-      requests[fileId] = new XMLHttpRequest()
+    // append file to form data
+    fileForm.append("file", files[i])
 
-      // give the request an id
-      requests[fileId].id = fileId
-
-      // prepare to receive response
-      requests[fileId].addEventListener("readystatechange", handleResponse)
-
-      // send request
-      requests[fileId].open("POST", "https://hmpg.io/upload")
-      requests[fileId].send(fileForm)
-
-      // add a new file entry to the list
-      buildFile(files[i].name, files[i].size, fileId)
-
-      // increment fileid
-      fileId++
+    // verify link length
+    if (linkInput.value > 16) {
+      requestStatus.innerHTML = "link can't be longer than 16 characters"
+      return
     }
+
+    // append length to form data
+    fileForm.append("length", linkInput.value)
+
+    // create a new ajax request
+    requests[fileId] = new XMLHttpRequest()
+
+    // give the request an id
+    requests[fileId].id = fileId
+
+    // prepare to receive response
+    requests[fileId].addEventListener("readystatechange", handleResponse)
+
+    // send request
+    requests[fileId].open("POST", "https://hmpg.io/upload")
+    requests[fileId].send(fileForm)
+
+    // add a new file entry to the list
+    buildFile(files[i].name, files[i].size, fileId)
+
+    // increment fileid
+    fileId++
   }
 }
 

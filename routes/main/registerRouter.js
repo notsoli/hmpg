@@ -31,7 +31,7 @@ router.post('/register', async (req, res, next) => {
     const jwt = await completeRegister(username, password)
     console.log("successfully set up account'" + username + "'")
 
-    // send jwt to user
+    // send info to user
     res.cookie('jwtToken', jwt, {maxAge: 900000, httpOnly: true, domain: 'hmpg.io'})
     res.send({success: true, login: true})
   } catch (error) {
@@ -46,7 +46,7 @@ async function completeRegister(username, password) {
   const userid = await db.userid(username)
 
   // create an upload directory
-  file.createRoot(userid)
+  await file.createRoot(userid)
 
   // log the new user in
   const jwt = await db.login(username, password)

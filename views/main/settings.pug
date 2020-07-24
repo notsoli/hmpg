@@ -1,10 +1,31 @@
 extends ../layout
 
 block links
-  link(rel='stylesheet', href='/stylesheets/main/account.css')
+  link(rel='stylesheet', href='/stylesheets/main/settings.css')
+  script(src="/javascripts/main/settings.js")
 
 block content
   #main
-    #info
-      #subtitle [page under construction]
+    #settingsWrapper
+      #menu
+        .menuItem#account Account
+        .menuItem#security Security
+      #content
+        .contentItem#accountContent
+          h1 Account Settings
+        .contentItem#securityContent
+          h1 Security Settings
+          #links
+            h2 Link Settings
+            p Change the default link length for files and directories.
+            #fileLink
+              p Default file link length:
+              input#defaultFileLinkLength(type="number" name="defaultFileLinkLength")
+            #directoryLink
+              p Default directory link length:
+              input#defaultDirectoryLinkLength(type="number" name="defaultDirectoryLinkLength")
+        #actions
+          #confirmButton confirm
+          #cancelButton cancel
+            
     

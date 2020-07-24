@@ -8,10 +8,8 @@ const hash = require('../private/javascripts/hash')
 // route index
 router.all('/', (req, res, next) => {
   // generate main payload
-  req.info = hash.payload(req, res, next)
-
-  // create account url
-  const user = req.info.user
+  hash.payload(req, res)
+  if (!req.info) {req.info = {}}
 
   next()
 }, require('./main/indexRouter'))
@@ -23,10 +21,8 @@ const routes = ['login', 'register', 'upload', 'files', 'account', 'settings', '
 for(let i = 0; i < routes.length; i++) {
   router.all('/' + routes[i], (req, res, next) => {
     // generate main payload
-    req.info = hash.payload(req, res, next)
-
-    // create account url
-    const user = req.info.user
+    hash.payload(req, res)
+    if (!req.info) {req.info = {}}
 
     next()
   }, require('./main/' + routes[i] + 'Router'))

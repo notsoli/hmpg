@@ -2,6 +2,7 @@
 const mysql = require('mysql')
 const hash = require('./hash')
 const file = require('./file')
+const info = require('./info')
 const handle = require('./error').handle
 const e = require('../../config/errors.json')
 const usernameList = require('../../config/invalidUsernames.json')
@@ -104,11 +105,16 @@ async function login(username, password) {
     throw new Error(e.validity.invalidLogin)
   }
 
+  // create settings object
+  const settings = JSON.parse(await info.read(queryResult[0].userid)).settings
+  console.log(settings)
+
   // create payload object
-  const payload = {user: username, userid: queryResult[0].userid}
+  const payload = {user: username, userid: queryResult[0].userid, settings: settings}
 
   // create a jwt
   const jwt = hash.sign(payload)
+
   return jwt
 }
 

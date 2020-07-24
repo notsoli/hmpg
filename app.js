@@ -53,7 +53,8 @@ const routes = ['deleteFiles', 'getFiles', 'moveFiles', 'renameFiles']
 for(let i = 0; i < routes.length; i++) {
   app.use('/' + routes[i], (req, res, next) => {
     // generate main payload
-    req.info = hash.payload(req, res, next)
+    hash.payload(req, res)
+    if (!req.info) {req.info = {}}
 
     next()
   }, require('./routes/api/' + routes[i]))

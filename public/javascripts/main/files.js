@@ -4,16 +4,32 @@ window.addEventListener('load', init)
 const simple = false
 
 // dom objects
-let directoryInput, directoryButton, renameButton, moveButton, deleteButton
+let directoryInput, linkInput, directoryButton, renameButton, moveButton, deleteButton
+
+// cookie variables
+let cookie
 
 // init function
 function init() {
+  // populate cookie variables
+  const cookies = document.cookie.split("; ")
+  for (let i = 0; i < cookies.length; i++) {
+    const currentCookie = cookies[i].split("=")
+    if (currentCookie[0] === "settings") {
+      settings = JSON.parse(decodeURIComponent(currentCookie[1]))
+    }
+  }
+
   // dom objects
   directoryInput = document.querySelector("#directoryLabel")
+  linkInput = document.querySelector("#linkInput")
   directoryButton = document.querySelector("#directoryButton")
   renameButton = document.querySelector("#renameButton")
   moveButton = document.querySelector("#moveButton")
   deleteButton = document.querySelector("#deleteButton")
+
+  // set value of link input to default
+  linkInput.value = settings.defaultDirectoryLinkLength
 
   // event listeners
   directoryButton.addEventListener("click", sendDirectoryData)
@@ -29,8 +45,16 @@ function sendDirectoryData() {
   // create a FormData object for ajax requests
   const directoryForm = new FormData()
 
-  // append username and password to form data
+  // append directory to form data
   directoryForm.append('directory', directoryInput.value)
+
+  // make sure length isn't too long
+  if (linkInput.value > 16) {
+    return
+  }
+
+  // append length to form data
+  directoryForm.append('length', linkInput.value)
 
   // create a new ajax request
   const request = new XMLHttpRequest()

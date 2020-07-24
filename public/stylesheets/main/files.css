@@ -13,6 +13,10 @@
   margin-right: 10px;
 }
 
+#linkInput {
+  width: 30px;
+}
+
 #directoryButton {
   width: 80px;
   background-color: #000000;
