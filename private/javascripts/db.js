@@ -107,7 +107,6 @@ async function login(username, password) {
 
   // create settings object
   const settings = JSON.parse(await info.read(queryResult[0].userid)).settings
-  console.log(settings)
 
   // create payload object
   const payload = {user: username, userid: queryResult[0].userid, settings: settings}
