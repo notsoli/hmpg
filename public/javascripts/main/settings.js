@@ -11,7 +11,7 @@ let contentItems, menuItems
 let defaultFileLinkLength, defaultDirectoryLinkLength
 
 // track the current active page
-let activePage = "security"
+let activePage = "account"
 
 function init() {
   // populate cookie variables
@@ -39,9 +39,6 @@ function init() {
   document.querySelector("#cancelButton").addEventListener("click", resetValues)
 
   resetValues()
-
-  // select first menu item
-  menuItems[1].click()
 }
 
 // handle menu item selection
