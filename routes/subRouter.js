@@ -13,12 +13,15 @@ const stat = util.promisify(fs.stat)
 // render base homepage
 const hmpgRouter = require('./sub/hmpgRouter')
 router.all('/s/:target/', function(req, res, next) {
-  // generate main payload
-  hash.payload(req, res)
-  if (!req.info) {req.info = {}}
+  req.info = hash.payload(req, res, next)
+
+  // create account url
+  const user = req.info.user
 
   // store target
   req.info.target = req.params.target
+
+  // console.log(req.info)
   next()
 }, hmpgRouter)
 
@@ -41,9 +44,8 @@ router.all('/s/:target/:link', async function(req, res, next) {
     } else if (stats.isDirectory()) {
       console.log("serving directory " + directory)
 
-      // generate main payload
-      hash.payload(req, res)
-      if (!req.info) {req.info = {}}
+      // set login information
+      req.info = hash.payload(req, res, next)
 
       // set response cookies
       res.cookie("targetid", result.userid, {maxAge: 900000, domain: 'hmpg.io'})
