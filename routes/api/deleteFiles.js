@@ -6,47 +6,36 @@ const file = require('../../private/javascripts/file')
 const e = require('../../config/errors.json')
 
 // get file info for user
-router.post('/', function(req, res, next) {
-  // make sure user is signed in
-  if (!req.info.user) {
-    res.send({success: false, error: e.request.noSession})
-    return
-  }
-
-  // verify post contents
-  if (!Array.isArray(req.body)) {
-    res.send({success: false, error: e.request.badRequest})
-    return
-  }
-
-  deleteItem(req.info.userid, req.body, 0, (completed, failed) => {
-    res.send({success: true, completed: completed, failed: failed})
-  })
-})
-
-// delete items sequentially
-async function deleteItem(userid, items, id, callback, _completed, _failed) {
-  // check if completed
-  if (id == items.length) {
-    callback(_completed, _failed)
-    return
-  }
-
-  // populate completed and failed arrays
-  let completed = [], failed = []
-  if (_completed) {completed = _completed}
-  if (_failed) {failed = _failed}
-
+router.post('/', async function(req, res, next) {
   try {
-    await file.handleDelete(userid, items[id])
-    console.log("successfully deleted item")
-    completed.push({link: items[id]})
-  } catch (error) {
-    console.log(error)
-    failed.push({link: items[id], error: error.message})
-  }
+    // make sure user is signed in
+    if (!req.info.user) {
+      throw new Error(e.request.noSession)
+    }
 
-  deleteItem(userid, items, id + 1, callback, completed, failed)
-}
+    // verify post contents
+    if (!Array.isArray(req.body)) {
+      throw new Error(e.request.badRequest)
+    }
+
+    // create completed and failed arrays
+    let completed = [], failed = []
+
+    // iterate through each delete request
+    for (let i = 0; i < req.body.length; i++) {
+      try {
+        await file.handleDelete(req.info.userid, req.body[i])
+        completed.push(req.body[i])
+      } catch (error) {
+        console.log(error)
+        failed.push(req.body[i])
+      }
+    }
+
+    res.send({success: true, completed: completed, failed: failed})
+  } catch (error) {
+    res.send({success: false, error: error.message})
+  }
+})
 
 module.exports = router

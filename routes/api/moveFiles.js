@@ -6,7 +6,7 @@ const file = require('../../private/javascripts/file')
 const e = require('../../config/errors.json')
 
 // get file info for user
-router.post('/', function(req, res, next) {
+router.post('/', async function(req, res, next) {
   // make sure user is signed in
   if (!req.info.user) {
     res.send({success: false, error: e.request.noSession})
@@ -19,33 +19,20 @@ router.post('/', function(req, res, next) {
     return
   }
 
-  moveItem(req.info.userid, req.body, 0, (completed, failed) => {
-    res.send({success: true, completed: completed, failed: failed})
-  })
-})
-
-async function moveItem(userid, body, id, callback, _completed, _failed) {
-  // check if completed
-  if (id == body.paths.length) {
-    callback(_completed, _failed)
-    return
-  }
-
-  // populate completed and failed arrays
+  // create completed and failed arrays
   let completed = [], failed = []
-  if (_completed) {completed = _completed}
-  if (_failed) {failed = _failed}
 
-  try {
-    await file.handleMove(userid, body.paths[id], body.path)
-    console.log("successfully moved item")
-    completed.push({path: body.paths[id]})
-  } catch (error) {
-    console.log(error)
-    failed.push({path: body.paths[id], error: error.message})
+  // iterate through each move request
+  for (let i = 0; i < req.body.paths.length; i++) {
+    try {
+      await file.handleMove(req.info.userid, req.body.paths[i], req.body.path)
+      completed.push(req.body[i])
+    } catch (error) {
+      failed.push(req.body[i])
+    }
   }
 
-  moveItem(userid, body, id + 1, callback, completed, failed)
-}
+  res.send({success: true, completed: completed, failed: failed})
+})
 
 module.exports = router

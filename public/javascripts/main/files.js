@@ -108,7 +108,7 @@ function sendMoveRequest(path) {
   // create array of links used to identify items later
   const paths = []
   for (let i = 0; i < selected.length; i++) {
-    const item = items[selected[i]]
+    const item = JSON.parse(JSON.stringify(items[selected[i]]))
     paths[i] = item.path
     paths[i].push(item.name)
   }
@@ -155,7 +155,7 @@ function sendDeleteRequest() {
   // create array of links used to identify items later
   const paths = []
   for (let i = 0; i < selected.length; i++) {
-    const item = items[selected[i]]
+    const item = JSON.parse(JSON.stringify(items[selected[i]]))
     paths[i] = item.path
     paths[i].push(item.name)
   }

@@ -63,7 +63,6 @@ function assembleFileList(info) {
       list.appendChild(assembleDirectory(child, [child.name]))
     }
   }
-
   renderFileList(list)
 }
 
