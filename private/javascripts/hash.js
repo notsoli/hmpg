@@ -113,10 +113,7 @@ function validateJSON(string) {
 }
 
 // generate a payload using cookies
-function payload(req, res, next) {
-  // create an object to store payload
-  const payload = {}
-
+function payload(req, res) {
   // get a list of all cookies
   const cookies = req.cookies
 

@@ -20,7 +20,7 @@ const sql = mysql.createConnection(config)
 readline.question("Are you sure you want to truncate the fileinfo table? (y/N): ", (input) => {
   readline.close()
   if (input === "y" || input === "Y") {
-    sql.query("TRUNCATE TABLE fileinfo", (err, result) => {
+    sql.query("TRUNCATE TABLE fileinfo", (err) => {
       if (err) throw err
       console.log("Successfully truncated fileinfo")
       process.exit()

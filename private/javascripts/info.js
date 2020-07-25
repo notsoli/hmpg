@@ -176,8 +176,8 @@ async function changeSettings(id, items) {
 
 async function readSetting(id, value) {
   const settings = JSON.parse(await read(id)).settings
-  if (settings.value !== undefined) {
-    return settings.value
+  if (settings[value] !== undefined) {
+    return settings[value]
   } else {
     throw new Error("failed to find setting")
   }

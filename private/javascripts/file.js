@@ -8,7 +8,6 @@ const e = require('../../config/errors.json')
 // allows fs functions to use promises
 const mkdir = util.promisify(fs.mkdir)
 const writeFile = util.promisify(fs.writeFile)
-const access = util.promisify(fs.access)
 const rename = util.promisify(fs.rename)
 const stat = util.promisify(fs.stat)
 const unlink = util.promisify(fs.unlink)
@@ -95,7 +94,7 @@ async function handleFile(file, id, length) {
 
 // move file into user filesystem
 function move(file, directory) {
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
     file.mv(directory, (err) => {
       if (err) {reject(err)}
       resolve()

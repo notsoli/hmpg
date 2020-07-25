@@ -1,9 +1,7 @@
 // database manipulation functions
 const mysql = require('mysql')
 const hash = require('./hash')
-const file = require('./file')
 const info = require('./info')
-const handle = require('./error').handle
 const e = require('../../config/errors.json')
 const usernameList = require('../../config/invalidUsernames.json')
 
@@ -85,7 +83,6 @@ async function userid(username) {
   // make sure result is an actual entry identification
   if (queryResult.length == 0) {
     throw new Error(e.validity.invalidUsername)
-    return
   }
 
   return queryResult[0].userid
