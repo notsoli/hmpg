@@ -46,7 +46,7 @@ function handleResponse(message) {
     // check if login was successful
     if (response.success == true) {
       // redirect to index
-      window.location.href = "https://hmpg.io"
+      window.location.href = "https://hmpg.io/files"
     } else {
       // set status as error message
       loginStatus.innerHTML = response.error
