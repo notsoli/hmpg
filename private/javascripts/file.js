@@ -142,10 +142,47 @@ async function handleMove(id, path, newPath) {
 
   // change link directory
   await db.rename(id, basePath + name, newPath + name)
+
+  // iterate through and rename children
+  if (item.type === "directory") {
+    for (let i = 0; i < item.children.length; i++) {
+      const child = item.children[i]
+      await moveChild(id, basePath + name + "/" + child.name, newPath + name + "/" + child.name, child)
+    }
+  }
+}
+
+// handles file moving for children
+async function moveChild(id, oldPath, newPath, item) {
+  await db.rename(id, oldPath, newPath)
+
+  // recursively moves the item's children
+  if (item.type === "directory") {
+    for (let i = 0; i < item.children.length; i++) {
+      const child = item.children[i]
+      await moveChild(id, oldPath + "/" + child.name, newPath + "/" + child.name, child)
+    }
+  }
 }
 
 // handles item deletion
-async function handleDelete(id, path) {
+async function handleDelete(id, path, item) {
+  // search for item
+  if (!item) {
+    item = await info.modifyItem(id, {action: "search"}, path)
+  }
+
+  // if it has children, iterate through them
+  if (item.children && item.children.length > 0) {
+    for (let i = 0; i < item.children.length; i++) {
+      // recursively delete the child element
+      const child = item.children[i]
+      const newPath = JSON.parse(JSON.stringify(path))
+      newPath.push(child.name)
+      await handleDelete(id, newPath, child)
+    }
+  }
+
   // concatenate path
   const fullPath = "E:/hmpg/" + id + "/" + path.join("/")
 
@@ -208,6 +245,27 @@ async function handleRename(id, path, name) {
 
   // rename item in hmpgInfo
   await info.modifyItem(id, {action: "rename", name: name}, path)
+
+  // iterate through and rename children
+  if (item.type === "directory") {
+    for (let i = 0; i < item.children.length; i++) {
+      const child = item.children[i]
+      await renameChild(id, oldPath + "/" + child.name, newPath + "/" + child.name, child)
+    }
+  }
+}
+
+// handles file renaming for children
+async function renameChild(id, oldPath, newPath, item) {
+  await db.rename(id, oldPath, newPath)
+
+  // recursively renames the item's children
+  if (item.type === "directory") {
+    for (let i = 0; i < item.children.length; i++) {
+      const child = item.children[i]
+      await renameChild(id, oldPath + "/" + child.name, newPath + "/" + child.name, child)
+    }
+  }
 }
 
 module.exports.createRoot = createRoot

@@ -67,7 +67,3 @@
 .activeButton:hover {
   cursor: pointer;
 }
-
-#disclaimer {
-  font-style: italic;
-}
