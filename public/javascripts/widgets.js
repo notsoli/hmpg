@@ -13,6 +13,22 @@ const nav = (() => {
   // dom objects
   let dom
 
+  // assemble preview dom
+  function assemblePreview() {
+    // create preview element
+    const domString = '<div id="filePreview"><div id="imageWrapper"><img id="previewImage" src="https://via.placeholder.com/150/"/></div><div id="previewInfo"><div id="itemName">name: ...</div><div id="itemSize">size: ...</div><div id="itemType">type: ...</div><div id="itemLink"><div id="linkLabel">link: ...</div><a id="linkValue" href=""></a></div></div></div>'
+    const previewInfo = new DOMParser().parseFromString(domString, 'text/html')
+
+    dom.itemName = previewInfo.querySelector("#itemName")
+    dom.itemSize = previewInfo.querySelector("#itemSize")
+    dom.itemType = previewInfo.querySelector("#itemType")
+    dom.linkLabel = previewInfo.querySelector("#linkLabel")
+    dom.linkValue = previewInfo.querySelector("#linkValue")
+    dom.previewImage = previewInfo.querySelector("#previewImage")
+
+    return previewInfo.body.firstChild
+  }
+
   // assemble fileList dom using info
   function assembleFileList(info, domObjects, simple) {
     // reset information-storing variables
@@ -101,6 +117,17 @@ const nav = (() => {
 
   // add event listeners for objects
   function init(element, domObjects, simple) {
+    // assign dom objects
+    dom = domObjects
+
+    // reset buttons
+    dom.renameButton.className = "inactiveButton"
+    dom.moveButton.className = "inactiveButton"
+    dom.deleteButton.className = "inactiveButton"
+
+    // create and append file preview
+    dom.previewTarget.appendChild(assemblePreview())
+
     // checkboxes
     if (!simple) {
       const checkboxes = element.getElementsByClassName('checkbox')
@@ -127,10 +154,8 @@ const nav = (() => {
       hideIcons[i].addEventListener('click', handleIconClick)
     }
 
-    // assign dom objects
-    dom = domObjects
-
-    dom.target.appendChild(element)
+    // append created list
+    dom.fileTarget.appendChild(element)
   }
 
   // handle checkbox clicks
@@ -459,6 +484,12 @@ const edit = (() => {
     const fileList = document.querySelector("#fileList")
     if (fileList) {
       fileList.remove()
+    }
+
+    // remove current preview if it exists
+    const filePreview = document.querySelector("#filePreview")
+    if (filePreview) {
+      filePreview.remove()
     }
 
     // setup new list

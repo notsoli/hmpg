@@ -19,13 +19,8 @@
 
       // dom objects
       const dom = {
-        itemName: document.querySelector("#itemName"),
-        itemSize: document.querySelector("#itemSize"),
-        itemType: document.querySelector("#itemType"),
-        linkLabel: document.querySelector("#linkLabel"),
-        linkValue: document.querySelector("#linkValue"),
-        previewImage: document.querySelector("#previewImage"),
-        target: document.querySelector("#fileWrapper")
+        previewTarget: document.querySelector("#previewWrapper"),
+        fileTarget: document.querySelector("#fileWrapper")
       }
 
       // check if both components were found
