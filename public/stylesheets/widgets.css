@@ -1,0 +1,156 @@
+#filePreview {
+  width: calc(100% - 30px);
+  display: flex;
+  flex-direction: row;
+  margin: 30px 0 10px 30px;
+}
+
+#imageWrapper {
+  width: 150px;
+  height: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 10px;
+  background-color: #cccccc;
+}
+
+#previewImage {
+  max-width:150px;
+  max-height:150px;
+}
+
+#previewInfo {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  overflow-wrap: break-word;
+  overflow: hidden;
+}
+
+#itemLink {
+  display: flex;
+  flex-direction: row;
+}
+
+#linkLabel {
+  margin-right: 5px;
+}
+
+#linkValue {
+  color: #000000;
+}
+
+#fileList {
+  margin-left: 30px;
+}
+
+.file, .directory {
+  margin: 10px 0;
+}
+
+.file {
+  margin-left: 20px;
+}
+
+.container {
+  display: none;
+  margin-left: 30px;
+  border-left: 2px dotted #000000;
+}
+
+.container > div {
+  padding-left: 5px;
+}
+
+.hideIcon {
+  width: 20px;
+  text-align: center;
+}
+
+.dirType, .fileType {
+  padding: 0 5px;
+  text-align: center;
+}
+
+.dirName, .fileName {
+  flex-grow: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dirInfo, .fileInfo {
+  display: flex;
+  flex-direction: row;
+}
+
+.hideIcon:hover, .dirName:hover, .fileName:hover {
+  cursor: pointer;
+}
+
+#galleryButtons {
+  display: flex;
+  justify-content: space-between;
+  width: calc(100% - 40px);
+  height: 50px;
+  position: relative;
+  bottom: calc(50% + 95px);
+  margin: 0 20px;
+}
+
+#galleryButtons > div {
+  display: flex;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  color: white;
+  font-size: 30px;
+  font-weight: bold;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 30px;
+  user-select: none;
+}
+
+#galleryButtons > div:hover {
+  cursor: pointer;
+}
+
+#galleryWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background-color: #a1a1a1;
+}
+
+#galleryContent {
+  max-width: 100%;
+  max-height: 100%;
+  position: absolute;
+}
+
+#galleryPreviews {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 70px;
+  position: relative;
+  top: -70px;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.galleryPreview {
+  width: 50px;
+  height: 50px;
+  margin: 0 10px;
+}
+
+.galleryPreview:hover, .activePreview {
+  outline: 3px solid white;
+  cursor: pointer;
+}

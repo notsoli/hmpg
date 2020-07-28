@@ -18,7 +18,8 @@
         fileTarget: document.querySelector("#fileWrapper")
       }
 
-      await edit.init(dom)
+      const fileEdit = new Edit()
+      await fileEdit.init(dom)
     } catch (error) {
       throw error
     }

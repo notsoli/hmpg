@@ -1,6 +1,6 @@
 // provides utilities for rendering specific widgets
-// basic filesystem explorer
-const nav = (() => {
+// base for filesystem explorer
+function Nav() {
   // store each file and directory
   let items = [], itemId = 0
 
@@ -13,26 +13,10 @@ const nav = (() => {
   // dom objects
   let dom
 
-  // assemble preview dom
-  function assemblePreview() {
-    // create preview element
-    const domString = '<div id="filePreview"><div id="imageWrapper"><img id="previewImage" src="https://via.placeholder.com/150/"/></div><div id="previewInfo"><div id="itemName">name: ...</div><div id="itemSize">size: ...</div><div id="itemType">type: ...</div><div id="itemLink"><div id="linkLabel">link: ...</div><a id="linkValue" href=""></a></div></div></div>'
-    const previewInfo = new DOMParser().parseFromString(domString, 'text/html')
-
-    dom.itemName = previewInfo.querySelector("#itemName")
-    dom.itemSize = previewInfo.querySelector("#itemSize")
-    dom.itemType = previewInfo.querySelector("#itemType")
-    dom.linkLabel = previewInfo.querySelector("#linkLabel")
-    dom.linkValue = previewInfo.querySelector("#linkValue")
-    dom.previewImage = previewInfo.querySelector("#previewImage")
-
-    return previewInfo.body.firstChild
-  }
-
   // assemble fileList dom using info
-  function assembleFileList(info, domObjects, simple) {
+  this.assembleFileList = (info, domObjects, simple) => {
     // reset information-storing variables
-    nav.items = [], nav.itemId = 0, nav.selected = [], nav.focused = undefined
+    items = [], itemId = 0, selected = [], focused = undefined
 
     // create fileList div
     const list = document.createElement("div")
@@ -49,13 +33,16 @@ const nav = (() => {
       }
     }
 
-    init(list, domObjects, simple)
+    // set items
+    this.items = items
+
+    this.init(list, domObjects, simple)
   }
 
   // create file object
   function assembleFile(file) {
     // add to items
-    nav.items[itemId] = file
+    items[itemId] = file
 
     // create file element
     const fileElement = document.createElement("div")
@@ -76,7 +63,7 @@ const nav = (() => {
   // create directory object
   function assembleDirectory(dir) {
     // add to items
-    nav.items[itemId] = dir
+    items[itemId] = dir
 
     // create directory wrapper
     const dirElement = document.createElement("div")
@@ -115,37 +102,55 @@ const nav = (() => {
     return dirElement
   }
 
+  // assemble preview dom
+  function assemblePreview() {
+    // create preview element
+    const domString = '<div id="filePreview"><div id="imageWrapper"><img id="previewImage" src="https://via.placeholder.com/150/"/></div><div id="previewInfo"><div id="itemName">name: ...</div><div id="itemSize">size: ...</div><div id="itemType">type: ...</div><div id="itemLink"><div id="linkLabel">link: ...</div><a id="linkValue" href=""></a></div></div></div>'
+    const previewInfo = new DOMParser().parseFromString(domString, 'text/html')
+
+    dom.itemName = previewInfo.querySelector("#itemName")
+    dom.itemSize = previewInfo.querySelector("#itemSize")
+    dom.itemType = previewInfo.querySelector("#itemType")
+    dom.linkLabel = previewInfo.querySelector("#linkLabel")
+    dom.linkValue = previewInfo.querySelector("#linkValue")
+    dom.previewImage = previewInfo.querySelector("#previewImage")
+
+    return previewInfo.body.firstChild
+  }
+
   // add event listeners for objects
-  function init(element, domObjects, simple) {
+  this.init = (element, domObjects, simple) => {
     // assign dom objects
     dom = domObjects
 
-    // reset buttons
-    dom.renameButton.className = "inactiveButton"
-    dom.moveButton.className = "inactiveButton"
-    dom.deleteButton.className = "inactiveButton"
-
     // create and append file preview
     dom.previewTarget.appendChild(assemblePreview())
+
+    // reset buttons
+    if (!simple) {
+      dom.renameButton.className = "inactiveButton"
+      dom.moveButton.className = "inactiveButton"
+      dom.deleteButton.className = "inactiveButton"
+    }
 
     // checkboxes
     if (!simple) {
       const checkboxes = element.getElementsByClassName('checkbox')
       for (let i = 0; i < checkboxes.length; i++) {
-        checkboxes[i].addEventListener('change', handleItemCheck)
+        checkboxes[i].addEventListener('change', (req) => {this.handleItemCheck(req.target)})
       }
     }
 
     // file names
     const fileNames = element.getElementsByClassName('fileName')
     for (let i = 0; i < fileNames.length; i++) {
-      fileNames[i].addEventListener('click', (req) => {handleItemSelect(req.target, simple)})
+      fileNames[i].addEventListener('click', (req) => {this.handleItemSelect(req.target, simple)})
     }
 
     // directory names
     const dirNames = element.getElementsByClassName('dirName')
     for (let i = 0; i < dirNames.length; i++) {
-      dirNames[i].addEventListener('click', (req) => {handleItemSelect(req.target, simple)})
+      dirNames[i].addEventListener('click', (req) => {this.handleItemSelect(req.target, simple)})
     }
 
     // display/collapse icons
@@ -159,35 +164,37 @@ const nav = (() => {
   }
 
   // handle checkbox clicks
-  function handleItemCheck() {
+  this.handleItemCheck = (target) => {
     // get item id
-    const id = this.parentNode.id.split("-")[1]
+    const id = target.parentNode.id.split("-")[1]
 
     // determine if checkbox is checked
-    if (this.checked) {
+    if (target.checked) {
       // push item to selected array
-      nav.selected.push(id)
+      selected.push(id)
     } else {
       // remove item from selected array
-      for (let i = 0; i < nav.selected.length; i++) {
-        if (nav.selected[i] === id) {
-          nav.selected.splice(i, 1)
+      for (let i = 0; i < selected.length; i++) {
+        if (selected[i] === id) {
+          selected.splice(i, 1)
         }
       }
     }
 
     // activate/deactivate buttons
-    if (nav.selected.length > 0) {
+    if (selected.length > 0) {
       dom.moveButton.className = "activeButton"
       dom.deleteButton.className = "activeButton"
     } else {
       dom.moveButton.className = "inactiveButton"
       dom.deleteButton.className = "inactiveButton"
     }
+
+    this.selected = selected
   }
 
   // handle item selection
-  function handleItemSelect(target, simple) {
+  this.handleItemSelect = (target, simple) => {
     if (!simple) {
       // activate button
       dom.renameButton.className = "activeButton"
@@ -195,10 +202,10 @@ const nav = (() => {
 
     // get the object's item id
     const id = target.parentNode.id.split("-")[1]
-    const item = nav.items[id]
+    const item = items[id]
 
     // set item as focused
-    nav.focused = item
+    focused = item
 
     // get username
     const subdomain = window.location.host.split(".")[0]
@@ -254,6 +261,8 @@ const nav = (() => {
       // directory preview
       dom.previewImage.src = "https://via.placeholder.com/150/"
     }
+
+    this.focused = focused
   }
 
   // display and collapse directories
@@ -281,15 +290,10 @@ const nav = (() => {
       this.className += " toggled"
     }
   }
-
-  // return values and functions so other files can use them
-  return {
-    assembleFileList: assembleFileList
-  }
-})()
+}
 
 // filesystem explorer and editor
-const edit = (() => {
+function Edit() {
   // dom objects
   let dom
 
@@ -299,8 +303,11 @@ const edit = (() => {
   // store info
   let info
 
+  // store nav
+  const editNav = new Nav()
+
   // init function
-  async function init(domObjects) {
+  this.init = async (domObjects) => {
     // populate cookie variables
     const cookies = document.cookie.split("; ")
     for (let i = 0; i < cookies.length; i++) {
@@ -325,7 +332,7 @@ const edit = (() => {
 
     info = await fs.sendFullRequest()
     info = fs.addPaths(info)
-    await nav.assembleFileList(info, domObjects, false)
+    await editNav.assembleFileList(info, domObjects, false)
   }
 
   // send directory creation request
@@ -366,14 +373,14 @@ const edit = (() => {
   // send move request
   function handleMove() {
     // determine if any files are selected
-    if (nav.selected.length > 0) {
+    if (editNav.selected.length > 0) {
       // prompt user for new name
       const path = window.prompt("Please enter the new location.")
       if (path) {
         // create array of links used to identify items later
         const paths = []
-        for (let i = 0; i < nav.selected.length; i++) {
-          const item = JSON.parse(JSON.stringify(nav.items[nav.selected[i]]))
+        for (let i = 0; i < editNav.selected.length; i++) {
+          const item = JSON.parse(JSON.stringify(editNav.items[editNav.selected[i]]))
           paths[i] = item.path
           paths[i].push(item.name)
         }
@@ -399,23 +406,23 @@ const edit = (() => {
   // send delete request
   function handleDelete() {
     // determine if any files are selected
-    if (nav.selected.length > 0) {
+    if (editNav.selected.length > 0) {
       // store confirm result
       let result
 
       // send confirm message
-      if (nav.selected.length === 1) {
+      if (editNav.selected.length === 1) {
         result = confirm("Are you sure you want to delete 1 file?")
       } else {
-        result = confirm("Are you sure you want to delete " + nav.selected.length + " files?")
+        result = confirm("Are you sure you want to delete " + editNav.selected.length + " files?")
       }
 
       // check if user confirmed or not
       if (result === true) {
         // create array of links used to identify items later
         const paths = []
-        for (let i = 0; i < nav.selected.length; i++) {
-          const item = JSON.parse(JSON.stringify(nav.items[nav.selected[i]]))
+        for (let i = 0; i < editNav.selected.length; i++) {
+          const item = JSON.parse(JSON.stringify(editNav.items[editNav.selected[i]]))
           paths[i] = item.path
           paths[i].push(item.name)
         }
@@ -441,18 +448,18 @@ const edit = (() => {
   // send rename request
   function handleRename() {
     // determine if a file is selected
-    if (nav.focused) {
+    if (editNav.focused) {
       // determine name and path
-      const name = nav.focused.name
-      const path = nav.focused.path
+      const name = editNav.focused.name
+      const path = editNav.focused.path
       path.push(name)
 
       // prompt user for new name
       const newName = window.prompt("Please enter the new filename.", name)
       if (newName) {
-        if (nav.focused.fileType) {
+        if (editNav.focused.fileType) {
           // concatename and verify filetype
-          const type = "." + nav.focused.fileType.split("/")[1]
+          const type = "." + editNav.focused.fileType.split("/")[1]
           if (!newName.endsWith(type)) {
             alert("New name does not match filetype. Please try again.")
             handleRename()
@@ -495,33 +502,122 @@ const edit = (() => {
     // setup new list
     info = await fs.sendFullRequest()
     info = fs.addPaths(info)
-    nav.assembleFileList(info, dom, false)
+    editNav.assembleFileList(info, dom, false)
   }
-
-
-  // return values and functions so other files can use them
-  return {
-    init: init
-  }
-})()
+}
 
 // filesystem explorer for specific directories
-const explore = (() => {
-  async function init(domObjects, targetid, targetPath) {
+function Explore() {
+  // store nav
+  const exploreNav = new Nav()
+
+  this.init = async (domObjects, info) => {
     // dom objects
     dom = domObjects
-    info = await fs.sendPartialRequest(targetid, targetPath)
-    await nav.assembleFileList(info, domObjects, true)
+    await exploreNav.assembleFileList(info, domObjects, true)
   }
-  // return values and functions so other files can use them
-  return {
-    init: init
-  }
-})()
+}
 
 // image gallery
-const gallery = (() => {
-  // return values and functions so other files can use them
-  return {
+function Gallery() {
+  // store images
+  const images = []
+
+  // store dom
+  let dom
+
+  // store selected image
+  let selected
+
+  // store username
+  let username
+
+  // store object
+  let galleryObject
+
+  this.init = async (domObjects, info) => {
+    // store dom objects
+    dom = domObjects
+
+    // iterate through children
+    for (let i = 0; i < info.children.length; i++) {
+      const child = info.children[i]
+
+      // determine if item is an image
+      if (child.type === "file" && child.filetype.split("/")[0] === "image") {
+        images.push(child)
+      }
+    }
+
+    // assemble gallery
+    assembleGallery()
   }
-})()
+
+  // generate gallery dom object
+  function assembleGallery() {
+    // store domString
+    let domString
+
+    if (images.length > 0) {
+      // get username
+      username = window.location.host.split(".")[0]
+
+      // set selected
+      selected = 0
+
+      domString = '<div id="gallery"><div id="galleryWrapper"><img id="galleryContent" src="https://' + username + '.hmpg.io/' + images[0].link + '"/></div><div id="galleryPreviews"><img class="galleryPreview activePreview" id="galleryPreview-0" src="https://' + username + '.hmpg.io/' + images[0].link + '"/>'
+      for (let i = 1; i < images.length; i++) {
+        const image = images[i]
+        domString += '<img class="galleryPreview" id="galleryPreview-' + i + '" src="https://' + username + '.hmpg.io/' + image.link + '"/>'
+      }
+      domString += '</div><div id="galleryButtons"><div id="leftButton">&lt;</div><div id="rightButton">&gt;</div></div></div>'
+    } else {
+      domString = '<div id="galleryWrapper"><div id="galleryContent"></div><div id="galleryPreviews"></div><div id="galleryButtons"><div id="leftButton">&lt;</div><div id="rightButton">&gt;</div></div></div>'
+    }
+
+    // parse string into dom object
+    const domInfo = new DOMParser().parseFromString(domString, 'text/html')
+    galleryObject = domInfo.body.firstChild
+
+    // add event listeners
+    const previews = galleryObject.getElementsByClassName("galleryPreview")
+    for (let i = 0; i < previews.length; i++) {
+      previews[i].addEventListener('click', handlePreviewClick)
+    }
+    galleryObject.querySelector("#leftButton").addEventListener('click', cycleLeft)
+    galleryObject.querySelector("#rightButton").addEventListener('click', cycleRight)
+
+    // append completed dom
+    dom.galleryTarget.appendChild(galleryObject)
+  }
+
+  // handle preview click
+  function handlePreviewClick() {
+    // get id
+    const id = parseInt(this.id.split("-")[1])
+
+    // activate preview
+    this.classList.add("activePreview")
+
+    // deactivate old preview
+    galleryObject.querySelector("#galleryPreview-" + selected).className = "galleryPreview"
+
+    // set new link
+    galleryObject.querySelector("#galleryContent").src = "https://" + username + ".hmpg.io/" + images[id].link
+
+    // set new id as selected
+    selected = id
+  }
+
+  function cycleLeft() {
+    if (selected > 0) {
+      galleryObject.querySelector("#galleryPreview-" + (selected - 1)).click()
+    }
+  }
+
+  function cycleRight() {
+    if (selected < images.length - 1) {
+      galleryObject.querySelector("#galleryPreview-" + (selected + 1)).click()
+    }
+  }
+}

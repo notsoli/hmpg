@@ -22,18 +22,24 @@ router.get('/', async function(req, res, next) {
   }
 })
 
-// get file info for specific directory
+// get file info for specific directory or directories
 router.post('/', async function(req, res, next) {
   try {
     // verify post contents
-    if (!req.body.userid || !req.body.path) {
+    if (!req.body.userid || !req.body.paths) {
       throw new Error(e.request.badRequest)
     }
 
-    // read target directory
-    const hmpgInfo = await info.handleView(req.body.userid, req.body.path)
-    res.send({success: true, info: hmpgInfo})
+    const hmpgInfo = []
+
+    // read target directory or directories
+    for (let i = 0; i < req.body.paths.length; i++) {
+      hmpgInfo[i] = await info.handleView(req.body.userid, req.body.paths[i])
+    }
+
+    res.send({success: true, info: JSON.stringify(hmpgInfo)})
   } catch (error) {
+    console.log(error)
     res.send({success: false, error: error.message})
   }
 })

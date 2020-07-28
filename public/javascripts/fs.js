@@ -28,7 +28,7 @@ const fs = (() => {
   }
 
   // send request for partial filesystem (specific directory)
-  function sendPartialRequest(userid, path) {
+  function sendPartialRequest(userid, paths) {
     return new Promise((resolve, reject) => {
       // create a new ajax request
       const request = new XMLHttpRequest()
@@ -39,7 +39,7 @@ const fs = (() => {
           // store request response
           const response = JSON.parse(request.response)
 
-          // check if login was successful
+          // check if request was successful
           if (response.success == true) {
             resolve(JSON.parse(response.info))
           } else {
@@ -51,7 +51,7 @@ const fs = (() => {
       // send request
       request.open("POST", "getFiles")
       request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8')
-      request.send(JSON.stringify({userid: userid, path: path}))
+      request.send(JSON.stringify({userid: userid, paths: paths}))
     })
   }
 

@@ -138,13 +138,7 @@ async function read(id) {
 
 // send hmpgInfo with target directory's children as base
 async function handleView(id, path) {
-  const search = await modifyItem(id, {action: "search"}, path)
-
-  // create dummy hmpgInfo object
-  const hmpgInfo = JSON.parse(await read(id))
-  hmpgInfo.children = search.children
-
-  return JSON.stringify(hmpgInfo)
+  return = await modifyItem(id, {action: "search"}, path)
 }
 
 // change hmpgInfo settings
