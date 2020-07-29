@@ -7,6 +7,12 @@ let settings
 // main dom objects
 let contentItems, menuItems
 
+// account dom objects
+let newUsername, password, submitUsername, oldPassword, newPassword, confirmPassword, submitPassword
+
+// store username and password for later login
+let loginUsername, loginPassword
+
 // security dom objects
 let defaultFileLinkLength, defaultDirectoryLinkLength
 
@@ -27,6 +33,15 @@ function init() {
   contentItems = document.getElementsByClassName("contentItem")
   menuItems = document.getElementsByClassName("menuItem")
 
+  // populate account dom objects
+  newUsername = document.querySelector("#newUsername")
+  password = document.querySelector("#password")
+  submitUsername = document.querySelector("#submitUsername")
+  oldPassword = document.querySelector("#oldPassword")
+  newPassword = document.querySelector("#newPassword")
+  confirmPassword = document.querySelector("#confirmPassword")
+  submitPassword = document.querySelector("#submitPassword")
+
   // populate security dom objects
   defaultFileLinkLength = document.querySelector("#defaultFileLinkLength")
   defaultDirectoryLinkLength = document.querySelector("#defaultDirectoryLinkLength")
@@ -37,6 +52,10 @@ function init() {
   }
   document.querySelector("#confirmButton").addEventListener("click", handleSubmit)
   document.querySelector("#cancelButton").addEventListener("click", resetValues)
+
+  // account event listeners
+  submitUsername.addEventListener("click", handleUsername)
+  submitPassword.addEventListener("click", handlePassword)
 
   resetValues()
 }
@@ -55,6 +74,112 @@ function handleMenuClick() {
   activePage = this.id
 }
 
+// submit username change request
+function handleUsername() {
+  // create a FormData object for ajax requests
+  const form = new FormData()
+
+  // create a new ajax request
+  const request = new XMLHttpRequest()
+
+  // append old password to form data
+  form.append("newUsername", newUsername.value)
+  loginUsername = newUsername.value
+
+  // append new password to form data
+  form.append("password", password.value)
+  loginPassword = password.value
+
+  // prepare to receive response
+  request.addEventListener("readystatechange", handleChangeResponse)
+
+  // send request
+  request.open("POST", "https://hmpg.io/changeDetails")
+  request.send(form)
+}
+
+// submit password change request
+function handlePassword() {
+  // make sure new password matches confirmed password
+  if (newPassword.value !== confirmPassword.value) {
+    return
+  }
+
+  // create a FormData object for ajax requests
+  const form = new FormData()
+
+  // create a new ajax request
+  const request = new XMLHttpRequest()
+
+  // set username
+  loginUsername = document.querySelector("#nav-profile").innerHTML
+
+  // append old password to form data
+  form.append("oldPassword", oldPassword.value)
+
+  // append new password to form data
+  form.append("newPassword", newPassword.value)
+  loginPassword = newPassword.value
+
+  // prepare to receive response
+  request.addEventListener("readystatechange", handleChangeResponse)
+
+  // send request
+  request.open("POST", "https://hmpg.io/changeDetails")
+  request.send(form)
+}
+
+// handle account change response
+function handleChangeResponse() {
+  if (this.readyState == 4) {
+    // store request response
+    const response = JSON.parse(this.response)
+
+    // check if change was successful
+    if (response.success == true) {
+      // create a FormData object for ajax requests
+      const form = new FormData()
+
+      // create a new ajax request
+      const request = new XMLHttpRequest()
+
+      // append old password to form data
+      form.append("username", loginUsername)
+
+      // append new password to form data
+      form.append("password", loginPassword)
+
+      // prepare to receive response
+      request.addEventListener("readystatechange", handleLoginResponse)
+
+      // send request
+      request.open("POST", "https://hmpg.io/login")
+      request.send(form)
+    } else {
+      // set status as error message
+      console.log(response.error)
+    }
+  }
+}
+
+function handleLoginResponse() {
+  if (this.readyState == 4) {
+    // store request response
+    const response = JSON.parse(this.response)
+    console.log(response)
+
+    // check if login was successful
+    if (response.success == true) {
+      // redirect to settings
+      window.location.href = "https://hmpg.io/settings"
+    } else {
+      // set status as error message
+      console.log(response.failed)
+    }
+  }
+}
+
+// submit setting change request
 function handleSubmit() {
   // create a FormData object for ajax requests
   let form = new FormData()
@@ -93,11 +218,10 @@ function handleSettingsResponse(message) {
   if (this.readyState == 4) {
     // store request response
     const response = JSON.parse(this.response)
-    console.log(response)
 
-    // check if login was successful
+    // check if change was successful
     if (response.success == true) {
-      // redirect to index
+      // redirect to settings
       window.location.href = "https://hmpg.io/settings"
     } else {
       // set status as error message

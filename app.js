@@ -49,7 +49,7 @@ app.all('*', httpsRedirect())
 app.use(favicon('./public/images/favicon.ico'))
 
 // route api pages, thank you kingsley solomon!
-const routes = ['deleteFiles', 'getFiles', 'moveFiles', 'renameFiles']
+const routes = ['changeDetails', 'deleteFiles', 'getFiles', 'moveFiles', 'renameFiles']
 for(let i = 0; i < routes.length; i++) {
   app.use('/' + routes[i], (req, res, next) => {
     // generate main payload

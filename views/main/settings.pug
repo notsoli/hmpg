@@ -13,15 +13,38 @@ block content
       #content
         .contentItem#accountContent(style="display: block;")
           h1 Account Settings
+          #username
+            h2 Username
+            p Change your account username.
+            .inputElement
+              p New username:
+              input#newUsername(type="text" name="newUsername" placeholder="new username")
+            .inputElement
+              p Password:
+              input#password(type="password" name="password" placeholder="password")
+            #submitUsername submit
+          #password
+            h2 Password
+            p Change your account password.
+            .inputElement
+              p Old password:
+              input#oldPassword(type="password" name="oldPassword" placeholder="old password")
+            .inputElement
+              p New password:
+              input#newPassword(type="password" name="newPassword" placeholder="new password"  autocomplete="new-password")
+            .inputElement
+              p Confirm password:
+              input#confirmPassword(type="password" name="confirmPassword" placeholder="confirm password")
+            #submitPassword submit
         .contentItem#securityContent
           h1 Security Settings
           #links
             h2 Link Settings
             p Change the default link length for files and directories.
-            #fileLink
+            .inputElement
               p Default file link length:
               input#defaultFileLinkLength(type="number" name="defaultFileLinkLength")
-            #directoryLink
+            .inputElement
               p Default directory link length:
               input#defaultDirectoryLinkLength(type="number" name="defaultDirectoryLinkLength")
         #actions

@@ -90,7 +90,7 @@ async function userid(username) {
 
 // use the sql database to check login information & create a jwt if valid
 async function login(username, password) {
-  // converts plaintext password into hashed password
+  // convert plaintext password into hashed password
   const hashedPassword = hash.password(password)
 
   // compare username and password to database
@@ -228,6 +228,49 @@ async function rename(id, directory, name) {
   }
 }
 
+async function changeDetails(id, body) {
+  // store query result
+  let queryResult
+
+  if (body.newUsername) {
+    // verify new username
+    validity(body.newUsername, body.password, body.password)
+
+    // search for new username
+    const checkUsername = "SELECT username FROM userinfo WHERE username = ?;"
+    const checkResult = await sql.query(checkUsername, [body.newUsername])
+    if (checkResult.length !== 0) {
+      throw new Error(e.validity.takenUsername)
+    }
+
+    // convert plaintext password into hashed password
+    const hashedPassword = hash.password(body.password)
+
+    // change username
+    const changeUsername = "UPDATE userinfo SET username = ? WHERE userid = ? AND password = ?"
+    queryResult = await sql.query(changeUsername, [body.newUsername, id, hashedPassword])
+  } else if (body.newPassword) {
+    // verify new password
+    validity("username", body.newPassword, body.newPassword)
+
+    // convert plaintext password into hashed password
+    const hashedOldPassword = hash.password(body.oldPassword)
+    const hashedNewPassword = hash.password(body.newPassword)
+
+    // change password
+    const changePassword = "UPDATE userinfo SET password = ? WHERE userid = ? AND password = ?"
+    queryResult = await sql.query(changePassword, [hashedNewPassword, id, hashedOldPassword])
+  } else {
+    throw new Error(e.request.badRequest)
+  }
+
+  // verify if query was successful
+  if (queryResult.affectedRows === 0) {
+    // failed link modification
+    throw new Error(e.validity.invalidPassword)
+  }
+}
+
 // allows other files to use database functions
 module.exports.validity = validity
 module.exports.login = login
@@ -237,3 +280,4 @@ module.exports.findDirectory = findDirectory
 module.exports.link = link
 module.exports.unlink = unlink
 module.exports.rename = rename
+module.exports.changeDetails = changeDetails

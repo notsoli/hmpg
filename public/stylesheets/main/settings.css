@@ -57,14 +57,22 @@ h2 {
   margin-bottom: 10px;
 }
 
-#links > p {
-  margin-bottom: 20px;
-}
-
-#links > div {
+.inputElement {
   height: 30px;
   display: flex;
   align-items: center;
+}
+
+#accountContent > div > p {
+  margin-bottom: 20px;
+}
+
+#accountContent > div > div > p{
+  width: 150px;
+}
+
+#links > p {
+  margin-bottom: 20px;
 }
 
 #links > div > p {
@@ -81,7 +89,7 @@ h2 {
   margin-top: 20px;
 }
 
-#actions > div {
+#actions > div, #submitUsername, #submitPassword {
   width: 80px;
   height: 30px;
   display: flex;
@@ -94,7 +102,7 @@ h2 {
   cursor: pointer;
 }
 
-#confirmButton {
+#confirmButton, #submitUsername, #submitPassword {
   background-color: #000000;
 }
 

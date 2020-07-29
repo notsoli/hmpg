@@ -389,7 +389,6 @@ function Edit() {
 
         if (response.success === true) {
           await renderFileList()
-          closePopup()
         }
       }
     })

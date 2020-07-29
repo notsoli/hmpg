@@ -8,7 +8,8 @@
     "longPassword": "password is longer than 32 characters",
     "shortPassword": "password is shorter than 8 characters",
     "differentPassword": "passwords do not match",
-    "invalidLogin": "username or password is incorrect"
+    "invalidLogin": "username or password is incorrect",
+    "invalidPassword": "password is incorrect"
   },
   "link": {
     "overlapLink": "failed to generate unique link",
