@@ -33,11 +33,11 @@ function File(name, size, filetype, link) {
 }
 
 // directory constuctor function
-function Directory(name, link) {
+function Directory(name, link, display) {
   this.type = "directory"
-  this.display = "default"
   this.name = name
   this.link = link
+  this.display = display
   this.children = []
 }
 
@@ -138,7 +138,7 @@ async function read(id) {
 
 // send hmpgInfo with target directory's children as base
 async function handleView(id, path) {
-  return = await modifyItem(id, {action: "search"}, path)
+  return await modifyItem(id, {action: "search"}, path)
 }
 
 // change hmpgInfo settings

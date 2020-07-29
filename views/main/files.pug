@@ -8,16 +8,34 @@ block links
   script(src="/javascripts/main/files.js")
 
 block content
+  #darken
+  #addWrapper
+    #addItem.popupWrapper
+      .popupHeader
+        p add item
+        .closePopup#add x
+      .popupContent
+        #createDirectory
+          .inputContainer
+            p path:
+            input#directoryInput(type='text' name='directory' placeholder="directory")
+          .inputContainer
+            p link length:
+            input#linkInput(type="number" name="linkLength" min="4" max="16")
+          .inputContainer
+            p display style:
+            select#displayInput(name='display')
+              option(value='default' selected) default
+              option(value='gallery') gallery
+          .inputContainer
+            button#directoryButton create
+            #addItemStatus
   #main
     #previewWrapper
     #fileActions
       #renameButton.inactiveButton rename
-    #directoryWrapper
-      #createDirectory
-        input#directoryLabel(type='text' name='directory' placeholder="directory")
-        input#linkInput(type="number" name="linkLength")
-        button#directoryButton create
     #fileWrapper
     #selectionActions
+      #addButton +
       #moveButton.inactiveButton move
       #deleteButton.inactiveButton delete

@@ -25,7 +25,7 @@ async function createRoot(id) {
 }
 
 // handle directory creation
-async function handleDirectory(id, directory, length) {
+async function handleDirectory(id, directory, length, display) {
   // replace backslashes with forwardslashes
   directory = directory.replace(/\\/g, "/")
 
@@ -56,7 +56,7 @@ async function handleDirectory(id, directory, length) {
   console.log("successfully created link")
 
   // add the directory to the user's hmpgInfo
-  const newDirectory = new info.Directory(name, link)
+  const newDirectory = new info.Directory(name, link, display)
   directorySplit.pop()
 
   // add item to hmpgInfo
