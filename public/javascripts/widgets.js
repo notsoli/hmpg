@@ -105,7 +105,7 @@ function Nav() {
   // assemble preview dom
   function assemblePreview() {
     // create preview element
-    const domString = '<div id="filePreview"><div id="imageWrapper"><img id="previewImage" src="https://via.placeholder.com/150/"/></div><div id="previewInfo"><div id="itemName">name: ...</div><div id="itemSize">size: ...</div><div id="itemType">type: ...</div><div id="itemLink"><div id="linkLabel">link: ...</div><a id="linkValue" href=""></a></div></div></div>'
+    const domString = '<div id="filePreview"><div id="imageWrapper"><img id="previewImage" src=""/></div><div id="previewInfo"><div id="itemName">name: ...</div><div id="itemSize">size: ...</div><div id="itemType">type: ...</div><div id="itemLink"><div id="linkLabel">link: ...</div><a id="linkValue" href=""></a></div></div></div>'
     const previewInfo = new DOMParser().parseFromString(domString, 'text/html')
 
     dom.itemName = previewInfo.querySelector("#itemName")
@@ -161,6 +161,17 @@ function Nav() {
 
     // append created list
     dom.fileTarget.appendChild(element)
+
+    // click first element
+    const firstItem = document.querySelector("#item-0")
+    if (firstItem) {
+      const fileName = firstItem.querySelector(".fileName")
+      if (fileName) {
+        fileName.click()
+      } else {
+        firstItem.querySelector(".dirName").click()
+      }
+    }
   }
 
   // handle checkbox clicks
@@ -221,7 +232,7 @@ function Nav() {
     if (item.type === "file") {
       // file name, size, and type
       dom.itemName.innerHTML = "name: " + item.name
-      dom.itemSize.innerHTML = "size: " + item.size
+      dom.itemSize.innerHTML = "size: " + item.displaySize
       dom.itemType.innerHTML = "type: " + item.filetype
 
       // file link
@@ -234,7 +245,7 @@ function Nav() {
       if (item.filetype.split("/")[0] === "image") {
         dom.previewImage.src = completeLink
       } else {
-        dom.previewImage.src = "https://via.placeholder.com/150/"
+        dom.previewImage.src = "/images/file.png"
       }
     } else {
       // directory name
@@ -259,7 +270,7 @@ function Nav() {
       dom.linkValue.href = completeLink
 
       // directory preview
-      dom.previewImage.src = "https://via.placeholder.com/150/"
+      dom.previewImage.src = "/images/directory.png"
     }
 
     this.focused = focused
@@ -320,19 +331,38 @@ function Edit() {
     // dom objects
     dom = domObjects
 
-
     // set value of link input to default
     dom.linkInput.value = settings.defaultDirectoryLinkLength
 
     // event listeners
+    dom.addButton.addEventListener("click", handleAdd)
     dom.directoryButton.addEventListener("click", handleDirectory)
     dom.renameButton.addEventListener("click", handleRename)
     dom.moveButton.addEventListener("click", handleMove)
     dom.deleteButton.addEventListener("click", handleDelete)
 
+    const closePopups = document.getElementsByClassName("closePopup")
+    for (let i = 0; i < closePopups.length; i++) {
+      closePopups[i].addEventListener("click", closePopup)
+    }
+
     info = await fs.sendFullRequest()
     info = fs.addPaths(info)
     await editNav.assembleFileList(info, domObjects, false)
+  }
+
+  // handle add button click
+  function handleAdd() {
+    // show popup and darken background
+    dom.addWrapper.style.display = "flex"
+    dom.darken.style.display = "block"
+  }
+
+  // close popup
+  function closePopup() {
+    // close popup and lighten background
+    document.querySelector("#" + this.id + "Wrapper").style.display = "none"
+    dom.darken.style.display = "none"
   }
 
   // send directory creation request
@@ -343,13 +373,11 @@ function Edit() {
     // append directory to form data
     directoryForm.append('directory', dom.directoryInput.value)
 
-    // make sure length isn't too long
-    if (dom.linkInput.value > 16) {
-      return
-    }
-
     // append length to form data
     directoryForm.append('length', dom.linkInput.value)
+
+    // append display style to form data
+    directoryForm.append('display', dom.displayInput.value)
 
     // create a new ajax request
     const request = new XMLHttpRequest()
@@ -361,6 +389,7 @@ function Edit() {
 
         if (response.success === true) {
           await renderFileList()
+          closePopup()
         }
       }
     })
