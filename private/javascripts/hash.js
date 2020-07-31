@@ -114,6 +114,9 @@ function validateJSON(string) {
 
 // generate a payload using cookies
 function payload(req, res) {
+  // fill req.info
+  req.info = {}
+
   // get a list of all cookies
   const cookies = req.cookies
 
@@ -131,9 +134,7 @@ function payload(req, res) {
 
     // valid jwt
     console.log("valid jwt")
-    req.info = jwt.payload
-    req.settings = jwt.payload.settings
-    res.cookie('settings', JSON.stringify(jwt.payload.settings), {maxAge: 900000, domain: 'hmpg.io'})
+    req.info.login = jwt.payload
   }
 }
 

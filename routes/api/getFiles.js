@@ -9,12 +9,12 @@ const e = require('../../config/errors.json')
 router.get('/', async function(req, res, next) {
   try {
     // make sure user is signed in
-    if (!req.info.user) {
+    if (!req.info.login) {
       throw new Error("not logged in")
     }
 
     // read user's hmpgInfo
-    const data = await info.read(req.info.userid)
+    const data = await info.read(req.info.login.userid)
     res.send({success: true, info: data})
   } catch (error) {
     console.log(error)

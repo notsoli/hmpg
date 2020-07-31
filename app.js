@@ -54,7 +54,6 @@ for(let i = 0; i < routes.length; i++) {
   app.use('/' + routes[i], (req, res, next) => {
     // generate main payload
     hash.payload(req, res)
-    if (!req.info) {req.info = {}}
 
     next()
   }, require('./routes/api/' + routes[i]))

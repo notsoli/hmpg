@@ -15,7 +15,7 @@ router.post('/files', async (req, res) => {
     }
 
     // check if user is signed in
-    if (!req.info.user) {
+    if (!req.info.login) {
       throw new Error(e.request.noSession)
     }
 
@@ -31,7 +31,7 @@ router.post('/files', async (req, res) => {
       throw new Error(e.request.badRequest)
     }
 
-    await file.handleDirectory(req.info.userid, req.body.directory, length, req.body.display)
+    await file.handleDirectory(req.info.login.userid, req.body.directory, length, req.body.display)
     res.send({success: true})
   } catch (error) {
     console.log(error)
@@ -64,7 +64,7 @@ function verifyBody(body) {
 // get & render page
 router.all('/files', function(req, res, next) {
   // check if user is signed in
-  if (req.info.user) {
+  if (req.info.login) {
     req.info.title = "hmpg:files"
     res.render('./main/files', req.info)
   } else {

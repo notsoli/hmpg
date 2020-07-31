@@ -16,7 +16,7 @@ router.post('/upload', async (req, res) => {
     }
 
     // check if user is signed in
-    if (!req.info.user) {
+    if (!req.info.login) {
       throw new Error(e.request.noSession)
     }
 
@@ -39,10 +39,10 @@ router.post('/upload', async (req, res) => {
     }
 
     // single file
-    const link = await file.handleFile(files, req.info.userid, req.body.length)
+    const link = await file.handleFile(files, req.info.login.userid, req.body.length)
 
     // respond with the new link
-    const completeLink = "https://" + req.info.user + ".hmpg.io/" + link
+    const completeLink = "https://" + req.info.login.user + ".hmpg.io/" + link
     res.send({success: true, link: completeLink, uploads: req.info.uploads})
   } catch (error) {
     console.log(error)
@@ -53,7 +53,7 @@ router.post('/upload', async (req, res) => {
 // get & render page
 router.all('/upload', function(req, res, next) {
   // check if user is signed in
-  if (req.info.user) {
+  if (req.info.login) {
     // render page
     req.info.title = "hmpg:upload"
     res.render('./main/upload', req.info)

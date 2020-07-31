@@ -3,6 +3,10 @@ extends ../layout
 block links
   link(rel='stylesheet', href='/stylesheets/widgets.css')
   link(rel='stylesheet', href='/stylesheets/sub/directory.css')
+  if targetid && targetPath
+    script.
+      const targetid = !{targetid}
+      const targetPath = !{JSON.stringify(targetPath)}
   script(src="/javascripts/fs.js")
   script(src="/javascripts/widgets.js")
   script(src="/javascripts/sub/directory.js")

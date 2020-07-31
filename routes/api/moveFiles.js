@@ -8,7 +8,7 @@ const e = require('../../config/errors.json')
 // get file info for user
 router.post('/', async function(req, res, next) {
   // make sure user is signed in
-  if (!req.info.user) {
+  if (!req.info.login) {
     res.send({success: false, error: e.request.noSession})
     return
   }
@@ -25,7 +25,7 @@ router.post('/', async function(req, res, next) {
   // iterate through each move request
   for (let i = 0; i < req.body.paths.length; i++) {
     try {
-      await file.handleMove(req.info.userid, req.body.paths[i], req.body.path)
+      await file.handleMove(req.info.login.userid, req.body.paths[i], req.body.path)
       completed.push(req.body[i])
     } catch (error) {
       failed.push(req.body[i])

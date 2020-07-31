@@ -9,7 +9,7 @@ const e = require('../../config/errors.json')
 router.post('/', async function(req, res, next) {
   try {
     // make sure user is signed in
-    if (!req.info.user) {
+    if (!req.info.login) {
       throw new Error(e.request.noSession)
     }
 
@@ -19,7 +19,7 @@ router.post('/', async function(req, res, next) {
     }
 
     // rename file
-    await file.handleRename(req.info.userid, req.body.path, req.body.name)
+    await file.handleRename(req.info.login.userid, req.body.path, req.body.name)
     res.send({success: true})
   } catch (error) {
     console.log(error)

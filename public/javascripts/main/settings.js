@@ -1,9 +1,6 @@
 // wait until window is loaded
 window.addEventListener('load', init)
 
-// cookie variables
-let settings
-
 // main dom objects
 let contentItems, menuItems
 
@@ -20,14 +17,6 @@ let defaultFileLinkLength, defaultDirectoryLinkLength
 let activePage = "account"
 
 function init() {
-  // populate cookie variables
-  const cookies = document.cookie.split("; ")
-  for (let i = 0; i < cookies.length; i++) {
-    const currentCookie = cookies[i].split("=")
-    if (currentCookie[0] === "settings") {
-      settings = JSON.parse(decodeURIComponent(currentCookie[1]))
-    }
-  }
 
   // populate main dom objects
   contentItems = document.getElementsByClassName("contentItem")
@@ -190,11 +179,11 @@ function handleSubmit() {
   if (activePage === "account") {
 
   } else if (activePage === "security") {
-    if (settings.defaultFileLinkLength != defaultFileLinkLength.value) {
+    if (userInfo.settings.defaultFileLinkLength != defaultFileLinkLength.value) {
       changed = true
       form.append("defaultFileLinkLength", defaultFileLinkLength.value)
     }
-    if (settings.defaultDirectoryLinkLength != defaultDirectoryLinkLength.value) {
+    if (userInfo.settings.defaultDirectoryLinkLength != defaultDirectoryLinkLength.value) {
       changed = true
       form.append("defaultDirectoryLinkLength", defaultDirectoryLinkLength.value)
     }
@@ -231,6 +220,6 @@ function handleSettingsResponse(message) {
 }
 
 function resetValues() {
-  defaultFileLinkLength.value = settings.defaultFileLinkLength
-  defaultDirectoryLinkLength.value = settings.defaultDirectoryLinkLength
+  defaultFileLinkLength.value = userInfo.settings.defaultFileLinkLength
+  defaultDirectoryLinkLength.value = userInfo.settings.defaultDirectoryLinkLength
 }

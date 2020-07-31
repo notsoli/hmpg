@@ -28,14 +28,30 @@ block content
               option(value='default' selected) default
               option(value='gallery') gallery
           .inputContainer
-            button#directoryButton create
+            button#directoryButton.popupButton create
+            #addItemStatus
+  #hmpgWrapper
+    #hmpgAdd.popupWrapper
+      .popupHeader
+        p add to hmpg
+        .closePopup#hmpg x
+      .popupContent
+        #createHmpg
+          .inputContainer
+            p display style:
+            select#displayInput(name='display')
+              option(value='default' selected) default
+              option(value='gallery') gallery
+          .inputContainer
+            button#hmpgButton.popupButton add
             #addItemStatus
   #main
     #previewWrapper
     #fileActions
+      #hmpgTriggerButton.inactiveButton hmpg
       #renameButton.inactiveButton rename
     #fileWrapper
     #selectionActions
-      #addButton +
+      #addTriggerButton +
       #moveButton.inactiveButton move
       #deleteButton.inactiveButton delete

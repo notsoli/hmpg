@@ -9,7 +9,6 @@ const hash = require('../private/javascripts/hash')
 router.all('/', (req, res, next) => {
   // generate main payload
   hash.payload(req, res)
-  if (!req.info) {req.info = {}}
 
   next()
 }, require('./main/indexRouter'))
@@ -22,7 +21,6 @@ for(let i = 0; i < routes.length; i++) {
   router.all('/' + routes[i], (req, res, next) => {
     // generate main payload
     hash.payload(req, res)
-    if (!req.info) {req.info = {}}
 
     next()
   }, require('./main/' + routes[i] + 'Router'))

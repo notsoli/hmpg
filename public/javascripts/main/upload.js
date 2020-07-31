@@ -4,9 +4,6 @@ window.addEventListener('load', init)
 // dom objects
 let main, fileInput, uploadButton, formStatus, fileList, linkInput
 
-// cookie variables
-let cookie
-
 // create an array of requests
 const requests = []
 
@@ -18,14 +15,6 @@ let desktop
 
 // init function
 function init() {
-  // populate cookie variables
-  const cookies = document.cookie.split("; ")
-  for (let i = 0; i < cookies.length; i++) {
-    const currentCookie = cookies[i].split("=")
-    if (currentCookie[0] === "settings") {
-      settings = JSON.parse(decodeURIComponent(currentCookie[1]))
-    }
-  }
 
   // dom objects
   dropZone = document.querySelector("#dropZone")
@@ -36,7 +25,7 @@ function init() {
   linkInput = document.querySelector("#linkInput")
 
   // set value of link input to default
-  linkInput.value = settings.defaultFileLinkLength
+  linkInput.value = userInfo.settings.defaultFileLinkLength
 
   // populate desktop
   if (window.innerWidth >= 1224) {

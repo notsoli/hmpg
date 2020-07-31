@@ -10,7 +10,7 @@ const e = require('../../config/errors.json')
 router.post('/settings', async (req, res) => {
   try {
     // make sure user is signed in
-    if (!req.info.user) {
+    if (!req.info.login) {
       throw new Error(e.request.noSession)
     }
 
@@ -20,17 +20,16 @@ router.post('/settings', async (req, res) => {
     }
 
     // change settings in hmpgInfo
-    const result = await info.changeSettings(req.info.userid, req.body)
+    const result = await info.changeSettings(req.info.login.userid, req.body)
 
     // create payload object
-    const payload = {user: req.info.user, userid: req.info.userid, settings: result.settings}
+    const payload = {user: req.info.login.user, userid: req.info.login.userid, settings: result.settings}
 
     // create a jwt
     const jwt = hash.sign(payload)
 
     // send new jwt and settings to user
     res.cookie('jwtToken', jwt, {maxAge: 900000, httpOnly: true, domain: 'hmpg.io'})
-    res.cookie('settings', JSON.stringify(result.settings), {maxAge: 900000, domain: 'hmpg.io'})
 
     res.send({success: true, completed: result.completed, failed: result.failed})
   } catch (error) {
@@ -42,7 +41,7 @@ router.post('/settings', async (req, res) => {
 // get & render page
 router.all('/settings', function(req, res, next) {
   // check if user is signed in
-  if (req.info.user) {
+  if (req.info.login) {
     req.info.title = "hmpg:settings"
     res.render('./main/settings', req.info)
   } else {

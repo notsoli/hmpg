@@ -15,7 +15,6 @@ const hmpgRouter = require('./sub/hmpgRouter')
 router.all('/s/:target/', function(req, res, next) {
   // generate main payload
   hash.payload(req, res)
-  if (!req.info) {req.info = {}}
 
   // store target
   req.info.target = req.params.target
@@ -43,11 +42,10 @@ router.all('/s/:target/:link', async function(req, res, next) {
 
       // generate main payload
       hash.payload(req, res)
-      if (!req.info) {req.info = {}}
 
       // set response cookies
-      res.cookie("targetid", result.userid, {maxAge: 900000, domain: 'hmpg.io'})
-      res.cookie("targetPath", JSON.stringify(result.directory.split("/")), {maxAge: 900000, domain: 'hmpg.io'})
+      req.info.targetid = result.userid
+      req.info.targetPath = result.directory.split("/")
 
       // set response title
       req.info.title = "hmpg:directory"

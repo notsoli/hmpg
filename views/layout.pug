@@ -6,14 +6,17 @@ html
     link(rel='stylesheet', href='/stylesheets/reset.css')
     link(rel='stylesheet', href='/stylesheets/layout.css')
     script(src='/javascripts/layout.js')
+    if login
+      script.
+        const userInfo = !{JSON.stringify(login)}
     block links
   body  
     ul#nav
       li#nav-logo
         a(href="https://hmpg.io") hmpg
       li#nav-wrapper
-        if user
-          #nav-profile #{user}
+        if login
+          #nav-profile #{login.user}
         else
           a.navButton(href="https://hmpg.io/login") login
           a.navButton(href="https://hmpg.io/register") register
@@ -30,7 +33,7 @@ html
             a(href="https://hmpg.io/settings") settings
           li
             a(href="https://hmpg.io/logout") logout
-        if user
+        if login
           li#nav-arrow
             div ▼
     block content

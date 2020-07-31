@@ -128,6 +128,7 @@ function Nav() {
 
     // reset buttons
     if (!simple) {
+      dom.hmpgTriggerButton.className = "inactiveButton"
       dom.renameButton.className = "inactiveButton"
       dom.moveButton.className = "inactiveButton"
       dom.deleteButton.className = "inactiveButton"
@@ -208,6 +209,7 @@ function Nav() {
   this.handleItemSelect = (target, simple) => {
     if (!simple) {
       // activate button
+      dom.hmpgTriggerButton.className = "activeButton"
       dom.renameButton.className = "activeButton"
     }
 
@@ -306,10 +308,6 @@ function Nav() {
 // filesystem explorer and editor
 function Edit() {
   // dom objects
-  let dom
-
-  // cookie variables
-  let settings
 
   // store info
   let info
@@ -319,23 +317,15 @@ function Edit() {
 
   // init function
   this.init = async (domObjects) => {
-    // populate cookie variables
-    const cookies = document.cookie.split("; ")
-    for (let i = 0; i < cookies.length; i++) {
-      const currentCookie = cookies[i].split("=")
-      if (currentCookie[0] === "settings") {
-        settings = JSON.parse(decodeURIComponent(currentCookie[1]))
-      }
-    }
-
     // dom objects
     dom = domObjects
 
     // set value of link input to default
-    dom.linkInput.value = settings.defaultDirectoryLinkLength
+    dom.linkInput.value = userInfo.settings.defaultDirectoryLinkLength
 
     // event listeners
-    dom.addButton.addEventListener("click", handleAdd)
+    dom.hmpgTriggerButton.addEventListener("click", handleHmpg)
+    dom.addTriggerButton.addEventListener("click", handleAdd)
     dom.directoryButton.addEventListener("click", handleDirectory)
     dom.renameButton.addEventListener("click", handleRename)
     dom.moveButton.addEventListener("click", handleMove)
@@ -349,6 +339,13 @@ function Edit() {
     info = await fs.sendFullRequest()
     info = fs.addPaths(info)
     await editNav.assembleFileList(info, domObjects, false)
+  }
+
+  // handle hmpg button clikc
+  function handleHmpg() {
+    // show popup and darken background
+    dom.hmpgWrapper.style.display = "flex"
+    dom.darken.style.display = "block"
   }
 
   // handle add button click

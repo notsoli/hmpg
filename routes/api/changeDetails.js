@@ -9,7 +9,7 @@ const e = require('../../config/errors.json')
 router.post('/', async function(req, res, next) {
   try {
     // make sure user is signed in
-    if (!req.info.user) {
+    if (!req.info.login) {
       throw new Error(e.request.noSession)
     }
 
@@ -18,7 +18,7 @@ router.post('/', async function(req, res, next) {
       throw new Error(e.request.badRequest)
     }
 
-    await db.changeDetails(req.info.userid, req.body)
+    await db.changeDetails(req.info.login.userid, req.body)
 
     res.send({success: true})
   } catch (error) {

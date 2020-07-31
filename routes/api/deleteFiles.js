@@ -9,7 +9,7 @@ const e = require('../../config/errors.json')
 router.post('/', async function(req, res, next) {
   try {
     // make sure user is signed in
-    if (!req.info.user) {
+    if (!req.info.login) {
       throw new Error(e.request.noSession)
     }
 
@@ -24,7 +24,7 @@ router.post('/', async function(req, res, next) {
     // iterate through each delete request
     for (let i = 0; i < req.body.length; i++) {
       try {
-        await file.handleDelete(req.info.userid, req.body[i])
+        await file.handleDelete(req.info.login.userid, req.body[i])
         completed.push(req.body[i])
       } catch (error) {
         console.log(error)

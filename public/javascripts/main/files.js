@@ -17,8 +17,10 @@
         deleteButton: document.querySelector("#deleteButton"),
         previewTarget: document.querySelector("#previewWrapper"),
         fileTarget: document.querySelector("#fileWrapper"),
-        addButton: document.querySelector("#addButton"),
+        hmpgTriggerButton: document.querySelector("#hmpgTriggerButton"),
+        addTriggerButton: document.querySelector("#addTriggerButton"),
         addWrapper: document.querySelector("#addWrapper"),
+        hmpgWrapper: document.querySelector("#hmpgWrapper"),
         darken: document.querySelector("#darken")
       }
 
