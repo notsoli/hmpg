@@ -3,7 +3,7 @@
   "version": "0.4.3",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www",
+    "start": "nodemon ./bin/www",
     "truncateUsers": "node ./utils/truncateUsers.js",
     "truncateFiles": "node ./utils/truncateFiles.js"
   },
@@ -25,5 +25,8 @@
   },
   "devDependencies": {
     "eslint": "^7.5.0"
+  },
+  "nodemonConfig": {
+    "ext": "js,json"
   }
 }
