@@ -220,16 +220,6 @@ function Nav() {
     // set item as focused
     focused = item
 
-    // get username
-    const subdomain = window.location.host.split(".")[0]
-    let username
-    if (subdomain == "hmpg" || subdomain == "www") {
-      // this is a stupid way to do it
-      username = document.querySelector("#nav-profile").innerHTML
-    } else {
-      username = subdomain
-    }
-
     // determine if item is a file or directory
     if (item.type === "file") {
       // file name, size, and type
@@ -239,7 +229,7 @@ function Nav() {
 
       // file link
       dom.linkLabel.innerHTML = "link:"
-      const completeLink = "https://" + username + ".hmpg.io/" + item.link
+      const completeLink = "https://" + userInfo.user + ".hmpg.io/" + item.link
       dom.linkValue.innerHTML = item.link
       dom.linkValue.href = completeLink
 
@@ -267,7 +257,7 @@ function Nav() {
 
       // directory link
       dom.linkLabel.innerHTML = "link:"
-      const completeLink = "https://" + username + ".hmpg.io/" + item.link
+      const completeLink = "https://" + userInfo.user + ".hmpg.io/" + item.link
       dom.linkValue.innerHTML = item.link
       dom.linkValue.href = completeLink
 
@@ -554,9 +544,6 @@ function Gallery() {
   // store selected image
   let selected
 
-  // store username
-  let username
-
   // store object
   let galleryObject
 
@@ -584,16 +571,13 @@ function Gallery() {
     let domString
 
     if (images.length > 0) {
-      // get username
-      username = window.location.host.split(".")[0]
-
       // set selected
       selected = 0
 
-      domString = '<div id="gallery"><div id="galleryWrapper"><img id="galleryContent" src="https://' + username + '.hmpg.io/' + images[0].link + '"/></div><div id="galleryPreviews"><img class="galleryPreview activePreview" id="galleryPreview-0" src="https://' + username + '.hmpg.io/' + images[0].link + '"/>'
+      domString = '<div id="gallery"><div id="galleryWrapper"><img id="galleryContent" src="https://' + userInfo.user + '.hmpg.io/' + images[0].link + '"/></div><div id="galleryPreviews"><img class="galleryPreview activePreview" id="galleryPreview-0" src="https://' + userInfo.user + '.hmpg.io/' + images[0].link + '"/>'
       for (let i = 1; i < images.length; i++) {
         const image = images[i]
-        domString += '<img class="galleryPreview" id="galleryPreview-' + i + '" src="https://' + username + '.hmpg.io/' + image.link + '"/>'
+        domString += '<img class="galleryPreview" id="galleryPreview-' + i + '" src="https://' + userInfo.user + '.hmpg.io/' + image.link + '"/>'
       }
       domString += '</div><div id="galleryButtons"><div id="leftButton">&lt;</div><div id="rightButton">&gt;</div></div></div>'
     } else {
@@ -628,7 +612,7 @@ function Gallery() {
     galleryObject.querySelector("#galleryPreview-" + selected).className = "galleryPreview"
 
     // set new link
-    galleryObject.querySelector("#galleryContent").src = "https://" + username + ".hmpg.io/" + images[id].link
+    galleryObject.querySelector("#galleryContent").src = "https://" + userInfo.user + ".hmpg.io/" + images[id].link
 
     // set new id as selected
     selected = id
