@@ -5,13 +5,14 @@ html
     title= title
     link(rel='stylesheet', href='/stylesheets/reset.css')
     link(rel='stylesheet', href='/stylesheets/layout.css')
+    script(src="https://kit.fontawesome.com/a8d4e15e24.js" crossorigin="anonymous")
     script(src='/javascripts/layout.js')
     if login
       script.
         const userInfo = !{JSON.stringify(login)}
     block links
   body  
-    ul#nav
+    ul#nav.nav-incorporated
       li#nav-logo
         a(href="https://hmpg.io") hmpg
       li#nav-wrapper

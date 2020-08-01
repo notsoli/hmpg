@@ -1,51 +1,250 @@
-#main {
-  margin: 30px;
+/* nav */
+.nav-incorporated {
+  transition: 0.3s;
+  background-color: #6a2c70 !important;
+  box-shadow: none !important;
+  height: 70px !important;
 }
 
-#info > h1 {
-  font-size: 30px;
-  margin-bottom: 20px;
+.nav-incorporated * {
+  color: #eeecda !important;
+  background-color: #6a2c70 !important;
 }
 
-#info > p {
-  margin-bottom: 20px;
-}
-
-#account {
+/* transition arrow */
+.transition-arrow {
+  width: 100%;
+  height: 0;
   display: flex;
-  flex-direction: row;
   align-items: center;
+  justify-content: center;
 }
 
-#account > * {
-  margin-right: 10px;
+.transition-arrow i {
+  margin-top: -75px;
 }
 
-#registerButton, #loginButton {
+.transition-arrow i:hover {
+  cursor: pointer;
+}
+
+/* intro */
+
+#intro {
+  height: 600px;
+  background-color: #6a2c70;
+  color: #fff;
+}
+
+#intro .ui-two-columns {
+  justify-content: space-between;
+}
+
+#intro .ui-left-column {
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  text-decoration: none;
-  width: 100px;
-  height: 30px;
-  color: #ffffff;
-  border-radius: 5px;
-  outline: none;
+}
+
+#intro .ui-left-column .column-content {
+  height: 70%;
+  width: 70%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+#intro .ui-left-column h1 {
+  display: flex;
+  align-items: center;
+  font-size: 30px;
+  color: #eeecda;
+}
+
+#intro .ui-left-column p {
+  display: flex;
+  align-items: center;
+  line-height: 1.5;
+  color: #eeecda;
+}
+
+#getStartedButton {
+  width: 120px;
+  height: 40px;
+  background-color: #f08a5d;
+  color: #6a2c70;
+}
+
+#intro .ui-right-column {
+  display: none;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+#intro .ui-right-column img {
+  width: 600px;
+  margin-right: 100px;
+}
+
+#introArrow {
+  color: #eeecda;
+}
+
+/* features */
+
+#features {
+  background-color: #f7f7f7;
+}
+
+#features .ui-columns {
+  justify-content: space-around;
+  padding-bottom: 75px;
+}
+
+#features .ui-column {
+  width: 300px;
+  height: 400px;
+  margin-top: 75px;
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+  background-color: #fff;
+}
+
+#features .column-content h1 {
+  text-align: center;
+  color: #f08a5d;
+  font-size: 22px;
+  padding: 20px 0;
+}
+
+#features .column-content p {
+  padding: 0 30px;
+  line-height: 1.2
+}
+
+#featuresArrow {
+  color: #f08a5d;
+}
+
+/* account */
+
+#account {
+  height: 600px;
+  background-color: #000;
+}
+
+#account .ui-columns {
+  justify-content: space-around;
+  align-items: center;
+}
+
+#account .ui-column {
+  width: 300px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#account h1 {
+  padding: 60px 0;
+  text-align: center;
+  font-size: 30px;
+  color: #eeecda;
+}
+
+#account p {
+  padding: 30px 0;
+  font-size: 20px;
+  color: #eeecda;
+}
+
+#account .ui-button {
+  width: 120px;
+  height: 50px;
+  color: #000;
 }
 
 #registerButton {
-  background-color: #6090db;
-  border: 2px solid #6090db;
+  background-color: #f08a5d;
 }
 
 #loginButton {
-  background-color: #4eba5e;
-  border: 2px solid #4eba5e;
+  background-color: #6a2c70;
 }
 
-#registerButton a, #loginButton a {
+/* footer */
+
+#footer {
+  height: 75px;
   display: flex;
-  text-decoration: none;
-  width: 100%;
-  height: 100%;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+}
+
+#footer p {
+  color: #919191;
+  font-size: 15px;
+}
+
+@media only screen  and (min-width : 1224px) {
+  .transition-arrow i {
+    transition: 0.3s;
+  }
+
+  .transition-arrow i:hover {
+    transform: scale(1.2);
+  }
+
+  /* intro */
+
+  #intro {
+    height: 800px;
+  }
+
+  #intro .ui-left-column {
+    width: 500px;
+  }
+
+  #intro .ui-left-column .column-content {
+    height: 50%;
+  }
+
+  #intro .ui-right-column {
+    display: flex;
+    width: calc(80% - 500px)
+  }
+
+  /* features */
+
+  #features .ui-columns {
+    padding: none;
+  }
+
+  #features .ui-column {
+    margin: 200px 0;
+    transition: 0.3s;
+  }
+
+  #features .ui-column:hover {
+    transition: 0.3s;
+    transform: scale(1.1);
+  }
+
+  /* account */
+
+  #account {
+    height: 400px;
+  }
+
+  #account .ui-button {
+    transition: 0.3s;
+  }
+
+  #account .ui-button:hover {
+   transition: 0.3s;
+   transform: scale(1.1);
+  }
 }

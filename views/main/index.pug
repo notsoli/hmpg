@@ -1,14 +1,46 @@
 extends ../layout
 
 block links
+  script(src="/javascripts/main/index.js")
   link(rel='stylesheet', href='/stylesheets/main/index.css')
 
 block content
   #main
-    #info
-      h1 A place for your hobbies.
-      p hmpg is a free, extremely customizable file organization and hosting site geared towards housing ever-changing personal projects.
+    #intro
+      .ui-two-columns
+        .ui-left-column
+          .column-content
+            h1 A place for your hobbies.
+            p hmpg is a free, extremely customizable file organization and hosting site geared towards housing ever-changing personal projects.<br><br>Share pictures, files, and directories through easy-to-use link sharing or your own personalized homepage.
+            div#getStartedButton.ui-button Get Started
+        .ui-right-column
+          img(src="https://picsum.photos/seed/hmpg5/500")
+    .transition-arrow#introArrow
+      i.fas.fa-angle-down.fa-4x
+    #features
+      .ui-columns
+        .ui-column
+          .column-content
+            h1 Upload
+            p Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.
+        .ui-column
+          .column-content
+            h1 Share
+            p Lobortis feugiat vivamus at augue. Luctus accumsan tortor posuere ac ut consequat. Id cursus metus aliquam eleifend mi in nulla posuere. A iaculis at erat pellentesque adipiscing commodo elit at. Convallis tellus id interdum velit laoreet id donec ultrices tincidunt. In ornare quam viverra orci sagittis eu volutpat odio facilisis. Ultrices dui sapien eget mi proin.
+        .ui-column
+          .column-content
+            h1 Display
+            p Dictum varius duis at consectetur lorem donec massa. Netus et malesuada fames ac turpis egestas maecenas pharetra convallis. Quis vel eros donec ac odio tempor orci. Mattis rhoncus urna neque viverra justo nec ultrices dui. Aliquam purus sit amet luctus venenatis lectus magna. Egestas quis ipsum suspendisse ultrices gravida dictum fusce ut placerat. Sagittis aliquam malesuada bibendum arcu vitae.
+    .transition-arrow#featuresArrow
+      i.fas.fa-angle-down.fa-4x
     #account
-      a#registerButton(href="/register") register
-      p or
-      a#loginButton(href="/login") login
+      h1 Ready?
+      .ui-columns
+        .ui-column
+          p Don't have an account?
+          a#registerButton.ui-button(href="/register") Register
+        .ui-column
+          p Already have an account?
+          a#loginButton.ui-button(href="/login") Login
+  #footer
+    p © Copyright Sam Randa 2020
