@@ -49,7 +49,7 @@ function Nav() {
     fileElement.className = "file"
 
     // create fileInfo element
-    const domString = '<div class="fileInfo" id="item-' + itemId + '"><input class="checkbox" type="checkbox" value="selected"><div class="fileType">i</div><div class="fileName">' + file.name + '</div></div>'
+    const domString = '<div class="fileInfo" id="item-' + itemId + '"><input class="checkbox" type="checkbox" value="selected"><div class="fileName">' + file.name + '</div></div>'
     const fileInfo = new DOMParser().parseFromString(domString, 'text/html')
     fileElement.appendChild(fileInfo.body.firstChild)
 
@@ -70,7 +70,7 @@ function Nav() {
     dirElement.className = "directory"
 
     // create dirInfo element
-    const domString = '<div class="dirInfo" id="item-' + itemId + '"><div class="hideIcon toggled">▲</div><input class="checkbox" type="checkbox" value="selected"><div class="dirType">d</div><div class="dirName">' + dir.name + '</div></div>'
+    const domString = '<div class="dirInfo" id="item-' + itemId + '"><div class="hideIcon toggled">▲</div><input class="checkbox" type="checkbox" value="selected"><div class="dirName">' + dir.name + '</div></div>'
     const dirInfo = new DOMParser().parseFromString(domString, 'text/html')
     dirElement.appendChild(dirInfo.body.firstChild)
 
