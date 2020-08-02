@@ -96,7 +96,8 @@
 }
 
 .itemIcon {
-  width: 50px;
+  width: 30px;
+  margin: 0 10px;
   text-align: center;
   font-size: 20px;
 }

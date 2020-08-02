@@ -53,8 +53,21 @@ function Nav() {
     items[itemId] = file
 
     // create item element
-    const domString = '<div class="item" id="item-' + itemId + '"><input class="itemCheckbox" type="checkbox"/><div class="itemIcon fas fa-file"></div><div class="itemName">' + file.name + '</div></div>'
+    const domString = '<div class="item" id="item-' + itemId + '"><input class="itemCheckbox" type="checkbox"/><img class="itemIcon" src=""><div class="itemName">' + file.name + '</div></div>'
     const fileInfo = new DOMParser().parseFromString(domString, 'text/html')
+
+    // set correct icon
+    const type = file.filetype.split("/")[0]
+    const itemIcon = fileInfo.querySelector(".itemIcon")
+    if (type === "image") {
+      itemIcon.src = "/images/icons/file-image.png"
+    } else if (type === "audio") {
+      itemIcon.src = "/images/icons/file-audio.png"
+    } else if (type === "video") {
+      itemIcon.src = "/images/icons/file-video.png"
+    } else {
+      itemIcon.src = "/images/icons/file-default.png"
+    }
 
     // add event listeners
     fileInfo.querySelector(".itemName").addEventListener("click", handleNameClick)
@@ -180,11 +193,16 @@ function Nav() {
       // item info
       dom.previewInfo.innerHTML = 'type: ' + item.filetype + ' • size: ' + item.displaySize + ' • link: <a href="' + completeLink + '">' + item.link + '</a>'
 
-      // file preview
-      if (item.filetype.split("/")[0] === "image") {
+      // set correct preview
+      const type = item.filetype.split("/")[0]
+      if (type === "image") {
         dom.previewImage.src = completeLink
+      } else if (type === "audio") {
+        dom.previewImage.src = "/images/icons/file-audio.png"
+      } else if (type === "video") {
+        dom.previewImage.src = "/images/icons/file-video.png"
       } else {
-        dom.previewImage.src = "/images/file.png"
+        dom.previewImage.src = "/images/icons/file-default.png"
       }
     } else {
       // size suffix
@@ -194,7 +212,11 @@ function Nav() {
       dom.previewInfo.innerHTML = 'type: directory • size: ' + item.children.length + suffix + ' • link: <a href="' + completeLink + '">' + item.link + '</a>'
 
       // directory preview
-      dom.previewImage.src = "/images/directory.png"
+      if (item.children.length === 0) {
+        dom.previewImage.src = "/images/icons/directory-empty.png"
+      } else {
+        dom.previewImage.src = "/images/icons/directory-full.png"
+      }
     }
 
     // set new item as focused
