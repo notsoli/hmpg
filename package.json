@@ -27,6 +27,7 @@
     "eslint": "^7.5.0"
   },
   "nodemonConfig": {
-    "ext": "js,json"
+    "ext": "js,json",
+    "ignore": ["./public"]
   }
 }
