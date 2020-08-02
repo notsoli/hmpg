@@ -126,21 +126,6 @@
   height: 0;
 }
 
-/* desktop formatting */
-
-@media only screen  and (min-width : 1224px) {
-  /* file preview */
-
-  #preview {
-    width: 350px;
-    box-shadow: none;
-  }
-
-  #selectedDisplay {
-    width: 350px;
-  }
-}
-
 /* gallery */
 
 #galleryButtons {
@@ -206,4 +191,25 @@
 .galleryPreview:hover, .activePreview {
   outline: 3px solid white;
   cursor: pointer;
+}
+
+/* desktop formatting */
+
+@media only screen  and (min-width : 1224px) {
+  /* main */
+
+  #files {
+    flex-direction: row;
+  }
+
+  /* file preview */
+
+  #preview {
+    width: 350px;
+    box-shadow: none;
+  }
+
+  #selectedDisplay {
+    width: 350px;
+  }
 }

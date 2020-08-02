@@ -13,8 +13,11 @@ function Nav() {
   // simple
   let simple
 
+  // store target username
+  let targetName
+
   // assemble fileList dom using info
-  this.assembleFileList = (info, target, clientSimple) => {
+  this.assembleFileList = (info, target, clientSimple, name) => {
     // reset information-storing variables
     items = [], itemId = 0, focused = undefined
 
@@ -41,7 +44,7 @@ function Nav() {
     // set simple
     simple = clientSimple
 
-    this.init(list, target)
+    this.init(list, target, name)
   }
 
   // create file object
@@ -121,10 +124,16 @@ function Nav() {
   }
 
   // add event listeners for objects
-  this.init = (element, target) => {
-
+  this.init = (element, target, name) => {
     // create and append file preview
     target.appendChild(assemblePreview())
+
+    // set name
+    if (name) {
+      targetName = name
+    } else {
+      targetName = userInfo.user
+    }
 
     // reset buttons
     if (!simple) {
@@ -164,7 +173,7 @@ function Nav() {
     dom.previewTitle.innerHTML = item.name
 
     // item link
-    const completeLink = "https://" + userInfo.user + ".hmpg.io/" + item.link
+    const completeLink = "https://" + targetName + ".hmpg.io/" + item.link
 
     // determine if item is a file or directory
     if (item.type === "file") {
@@ -220,8 +229,8 @@ function Explore() {
   // store nav
   const exploreNav = new Nav()
 
-  this.init = async (target, info) => {
-    await exploreNav.assembleFileList(info, target, false)
+  this.init = async (target, info, name) => {
+    await exploreNav.assembleFileList(info, target, false, name)
   }
 }
 
@@ -239,7 +248,10 @@ function Gallery() {
   // store object
   let galleryObject
 
-  this.init = async (domObjects, info) => {
+  // store target username
+  let targetName
+
+  this.init = async (domObjects, info, name) => {
     // store dom objects
     dom = domObjects
 
@@ -252,6 +264,9 @@ function Gallery() {
         images.push(child)
       }
     }
+
+    // set name
+    targetName = name
 
     // assemble gallery
     assembleGallery()
@@ -266,10 +281,10 @@ function Gallery() {
       // set selected
       selected = 0
 
-      domString = '<div id="gallery"><div id="galleryWrapper"><img id="galleryContent" src="https://' + userInfo.user + '.hmpg.io/' + images[0].link + '"/></div><div id="galleryPreviews"><img class="galleryPreview activePreview" id="galleryPreview-0" src="https://' + userInfo.user + '.hmpg.io/' + images[0].link + '"/>'
+      domString = '<div id="gallery"><div id="galleryWrapper"><img id="galleryContent" src="https://' + targetName + '.hmpg.io/' + images[0].link + '"/></div><div id="galleryPreviews"><img class="galleryPreview activePreview" id="galleryPreview-0" src="https://' + targetName + '.hmpg.io/' + images[0].link + '"/>'
       for (let i = 1; i < images.length; i++) {
         const image = images[i]
-        domString += '<img class="galleryPreview" id="galleryPreview-' + i + '" src="https://' + userInfo.user + '.hmpg.io/' + image.link + '"/>'
+        domString += '<img class="galleryPreview" id="galleryPreview-' + i + '" src="https://' + targetName + '.hmpg.io/' + image.link + '"/>'
       }
       domString += '</div><div id="galleryButtons"><div id="leftButton">&lt;</div><div id="rightButton">&gt;</div></div></div>'
     } else {
@@ -304,7 +319,7 @@ function Gallery() {
     galleryObject.querySelector("#galleryPreview-" + selected).className = "galleryPreview"
 
     // set new link
-    galleryObject.querySelector("#galleryContent").src = "https://" + userInfo.user + ".hmpg.io/" + images[id].link
+    galleryObject.querySelector("#galleryContent").src = "https://" + targetName + ".hmpg.io/" + images[id].link
 
     // set new id as selected
     selected = id

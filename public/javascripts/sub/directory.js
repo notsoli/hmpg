@@ -13,6 +13,8 @@
       if (targetid && targetPath) {
         info = await fs.sendPartialRequest(targetid, [targetPath])
 
+        const username = window.location.hostname.split(".")[0]
+
         main = document.querySelector('#main')
 
         // iterate through each returned directory
@@ -22,14 +24,14 @@
           if (info[i].display === "default") {
             // setup explore
             const directoryExplore = new Explore()
-            await directoryExplore.init(main, info[i])
+            await directoryExplore.init(main, info[i], username)
           } else if (info[i].display === "gallery") {
             // gallery wrapper
             dom.galleryTarget = main
 
             // setup explore
             const directoryGallery = new Gallery()
-            await directoryGallery.init(dom, info[i])
+            await directoryGallery.init(dom, info[i], username)
           }
         }
       }

@@ -180,12 +180,6 @@
     position: static;
   }
 
-  /* main */
-
-  #files {
-    flex-direction: row-reverse;
-  }
-
   /* file preview */
 
   #selectedDisplay {
