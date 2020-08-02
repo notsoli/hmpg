@@ -20,15 +20,9 @@
           // dom object
           const dom = {}
           if (info[i].display === "default") {
-            // preview wrapper
-            dom.previewTarget = main
-
-            // file wrapper
-            dom.fileTarget = main
-
             // setup explore
             const directoryExplore = new Explore()
-            await directoryExplore.init(dom, info[i])
+            await directoryExplore.init(main, info[i])
           } else if (info[i].display === "gallery") {
             // gallery wrapper
             dom.galleryTarget = main

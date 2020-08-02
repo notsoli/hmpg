@@ -131,7 +131,7 @@
 
 #account {
   height: 600px;
-  background-color: #000;
+  background-color: #6a2c70;
 }
 
 #account .ui-columns {
@@ -163,15 +163,8 @@
 #account .ui-button {
   width: 120px;
   height: 50px;
-  color: #000;
-}
-
-#registerButton {
+  color: #6a2c70;
   background-color: #f08a5d;
-}
-
-#loginButton {
-  background-color: #6a2c70;
 }
 
 /* footer */
@@ -220,7 +213,7 @@
   /* features */
 
   #features .ui-columns {
-    padding: none;
+    padding: 0;
   }
 
   #features .ui-column {

@@ -1,14 +1,29 @@
+/* main */
+
+#main {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+.itemCheckbox {
+  display: none;
+}
+
+/* gallery */
+
 #gallery {
   width: 100%;
   height: 100%;
 }
 
-#main {
-  width: 100%;
-  height: calc(100% - 50px);
-  position: fixed;
-}
+/* desktop formatting */
 
-.checkbox {
-  display: none;
+@media only screen  and (min-width : 1224px) {
+  /* main */
+
+  #main {
+    flex-direction: row-reverse;
+  }
 }

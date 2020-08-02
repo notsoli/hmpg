@@ -1,94 +1,147 @@
-#filePreview {
-  width: calc(100% - 30px);
+/* files */
+
+#files {
+  height: calc(100% - 50px);
   display: flex;
-  flex-direction: row;
-  margin: 30px 0 10px 30px;
+  flex-direction: column;
+}
+
+/* file preview */
+
+#preview {
+  width: 100%;
+  box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.5);
+}
+
+#previewWrapper {
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: #e3e3e3;
+}
+
+#previewContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#previewContent * {
+  margin-bottom: 10px;
+  text-align: center;
 }
 
 #imageWrapper {
-  width: 150px;
-  height: 150px;
+  width: 300px;
+  height: 75px;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-right: 10px;
-  background-color: #cccccc;
 }
 
 #previewImage {
-  max-width:150px;
-  max-height:150px;
+  max-width: 300px;
+  max-height: 75px;
+}
+
+#previewTitle {
+  width: 80%;
+  font-weight: bold;
+  color: #f08a5d;
+  overflow-wrap: anywhere;
 }
 
 #previewInfo {
-  flex-grow: 1;
+  width: 80%;
+  font-size: 13px;
+}
+
+#previewInfo a {
+  color: #000;
+}
+
+/* file content */
+
+#content {
+  flex: 1;
+  padding: 30px;
+  overflow: auto;
+}
+
+/* items */
+
+.item {
   display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  overflow-wrap: break-word;
-  overflow: hidden;
+  align-items: center;
+  height: 50px;
+  flew-wrap: wrap;
 }
 
-#itemLink {
-  display: flex;
-  flex-direction: row;
-}
-
-#linkLabel {
-  margin-right: 5px;
-}
-
-#linkValue {
-  color: #000000;
-}
-
-#fileList {
-  margin-left: 30px;
-}
-
-.file, .directory {
-  margin: 10px 0;
-}
-
-.file {
-  margin-left: 20px;
-}
-
-.container {
-  display: none;
-  margin-left: 30px;
-  border-left: 2px dotted #000000;
-}
-
-.container > div {
-  padding-left: 5px;
-}
-
-.hideIcon {
-  width: 20px;
+.itemArrow {
+  width: 50px;
+  color: #6a2c70;
   text-align: center;
+  font-size: 30px;
+  /* transition: 0.2s; */
 }
 
-.dirType, .fileType {
-  padding: 0 5px;
+.itemArrow:hover {
+  cursor: pointer;
+}
+
+.activeArrow {
+  /* transition: 0.2s; */
+  transform: rotate(90deg);
+}
+
+.itemIcon {
+  width: 50px;
   text-align: center;
+  font-size: 20px;
 }
 
-.dirName, .fileName {
-  flex-grow: 1;
+.itemName {
+  display: block;
+  font-size: 16px;
+  padding: 17px 10px;
+  max-width: calc(100% - 120px);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.dirInfo, .fileInfo {
-  display: flex;
-  flex-direction: row;
-}
-
-.hideIcon:hover, .dirName:hover, .fileName:hover {
+.itemName:hover {
   cursor: pointer;
 }
+
+.itemChildren {
+  padding-left: 25px;
+  border-left: 2px solid #bababa;
+  margin-left: 25px;
+  overflow: hidden;
+}
+
+.inactiveChildren {
+  height: 0;
+}
+
+/* desktop formatting */
+
+@media only screen  and (min-width : 1224px) {
+  /* file preview */
+
+  #preview {
+    width: 350px;
+    box-shadow: none;
+  }
+
+  #selectedDisplay {
+    width: 350px;
+  }
+}
+
+/* gallery */
 
 #galleryButtons {
   display: flex;
