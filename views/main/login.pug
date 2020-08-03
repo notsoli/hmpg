@@ -1,17 +1,13 @@
-extends ../layout
+extends action
 
 block links
-  link(rel='stylesheet', href='/stylesheets/main/login.css')
   script(src="/javascripts/main/login.js")
 
 block content
-  #main
-    #loginWrapper
-      #loginStatus
-      #login
-        input#username(type='text' name='username' placeholder="username")
-        input#password(type='password' name='password' placeholder="password")
-        button#loginButton submit
-      #register
-        #registerLabel don't have an account?
-        a#registerButton(href="/register") register
+  h1 Log In
+  #status <br>
+  input#usernameInput(type="text" placeholder="username" maxlength="16")
+  input#passwordInput(type="password" placeholder="password" maxlength="32")
+  #submit.ui-button submit
+  p Don't have an account?
+  a(href="/register").ui-button register

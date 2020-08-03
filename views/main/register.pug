@@ -1,19 +1,14 @@
-extends ../layout
+extends action
 
 block links
-  link(rel='stylesheet', href='/stylesheets/main/register.css')
   script(src="/javascripts/main/register.js")
-    
-block content
-  #main
-    #registerWrapper
-      #registerStatus
-      #register
-        input#username(type='text' name='username' placeholder="username")
-        input#password(type='password' name='password' placeholder="password")
-        input#confirmpassword(type='password' name='confirmpassword' placeholder="confirm password")
-        button#registerButton(type="submit") submit
-      #disclaimer disclaimer: although your login information is encrypted, this is simply a personal project not to be taken too seriously. i cannot guarantee that the login database is completely secure. for your safety, please use a username and password that you do NOT use on any other site.
-      #login
-        #loginLabel already have an account?
-        a#loginButton(href="/login") login  
+
+block content 
+  h1 Register
+  #status <br>
+  input#usernameInput(type="text" placeholder="username" maxlength="16")
+  input#passwordInput(type="password" placeholder="password" maxlength="32")
+  input#confirmInput(type="password" placeholder="confirm password" maxlength="32")
+  #submit.ui-button submit
+  p Already have an account?
+  a(href="/login").ui-button login

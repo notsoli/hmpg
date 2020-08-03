@@ -1,0 +1,98 @@
+/* main */
+
+body {
+  height: 100%;
+  display: flex;
+  flex-direction: row-reverse;
+  overflow: hidden;
+}
+
+#background {
+  width: 50%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+}
+
+/* content */
+
+#content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#title {
+  height: 75px;
+  display: flex;
+  align-items: center;
+  font-size: 30px;
+  font-family: lexendzetta;
+  color: #f08a5d;
+  text-decoration: none;
+}
+
+/* form */
+
+#form {
+  max-width: 300px;
+  width: calc(100% - 60px);
+  margin: auto;
+}
+
+#form *:not(:last-child) {
+  margin-bottom: 20px;
+}
+
+#status {
+  font-size: 14px;
+  text-align: center;
+}
+
+#form input {
+  width: calc(100% - 8px);
+  height: 30px;
+  border: 1px solid #919191;
+  border-radius: 4px;
+  text-indent: 10px;
+  outline: none;
+}
+
+#form .ui-button {
+  width: 100%;
+  border-radius: 4px;
+  height: 36px;
+}
+
+#submit {
+  background-color: #6a2c70;
+}
+
+#form p {
+  text-align: center;
+}
+
+#form a {
+  background-color: #f08a5d;
+}
+
+/* footer */
+
+#footer {
+  height: 75px;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #919191;
+}
+
+/* desktop formatting */
+
+@media only screen  and (min-width : 1224px) {
+  /* main */
+
+  #background {
+    display: block;
+  }
+}

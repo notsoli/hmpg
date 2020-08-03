@@ -1,0 +1,17 @@
+doctype html
+html
+  head
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    title= title
+    link(rel='stylesheet', href='/stylesheets/reset.css')
+    link(rel='stylesheet', href='/stylesheets/layout.css')
+    link(rel='stylesheet', href='/stylesheets/main/action.css')  
+    script(src="https://kit.fontawesome.com/a8d4e15e24.js" crossorigin="anonymous")
+    block links
+  body
+    img#background(src="images/main/login-bg.jpg")
+    #content
+      a#title(href="/") hmpg
+      #form
+        block content
+      #footer © Copyright Sam Randa 2020

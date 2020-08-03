@@ -2,19 +2,19 @@
 window.addEventListener('load', init)
 
 // dom objects
-let usernameInput, passwordInput, confirmInput, registerButton, registerStatus
+let usernameInput, passwordInput, confirmInput, submit, status
 
 // init function
 function init() {
   // dom objects
-  usernameInput = document.querySelector("#username")
-  passwordInput = document.querySelector("#password")
-  confirmInput = document.querySelector("#confirmpassword")
-  registerButton = document.querySelector("#registerButton")
-  registerStatus = document.querySelector("#registerStatus")
+  usernameInput = document.querySelector("#usernameInput")
+  passwordInput = document.querySelector("#passwordInput")
+  confirmInput = document.querySelector("#confirmInput")
+  submit = document.querySelector("#submit")
+  status = document.querySelector("#status")
 
   // event listeners
-  registerButton.addEventListener("click", sendRegisterData)
+  submit.addEventListener("click", sendRegisterData)
 }
 
 // send form data to server
@@ -57,7 +57,7 @@ function handleResponse(message) {
       }
     } else {
       // set status as error message
-      registerStatus.innerHTML = response.error
+      status.innerHTML = response.error
     }
   }
 }

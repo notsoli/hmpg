@@ -2,18 +2,18 @@
 window.addEventListener('load', init)
 
 // dom objects
-let usernameInput, passwordInput, loginButton, loginStatus
+let usernameInput, passwordInput, submit, status
 
 // init function
 function init() {
   // dom objects
-  usernameInput = document.querySelector("#username")
-  passwordInput = document.querySelector("#password")
-  loginButton = document.querySelector("#loginButton")
-  loginStatus = document.querySelector("#loginStatus")
+  usernameInput = document.querySelector("#usernameInput")
+  passwordInput = document.querySelector("#passwordInput")
+  submit = document.querySelector("#submit")
+  status = document.querySelector("#status")
 
   // event listeners
-  loginButton.addEventListener("click", sendLoginData)
+  submit.addEventListener("click", sendLoginData)
 }
 
 // send form data to server
@@ -49,7 +49,7 @@ function handleResponse(message) {
       window.location.href = "https://hmpg.io/files"
     } else {
       // set status as error message
-      loginStatus.innerHTML = response.error
+      status.innerHTML = response.error
     }
   }
 }
