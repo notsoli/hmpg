@@ -10,9 +10,18 @@ block links
 block content
   #main
     #interfaces
+      #renameInterface.interface
+        .interfaceHeader
+          .interfaceTitle rename item
+          .closeInterface.fas.fa-times
+        .interfaceContent
+          input#renameInput(type="text" placeholder="new name")
+          .ui-button-collection
+            #renameCancel.ui-button.confirmButton Cancel
+            #renameConfirm.ui-button.cancelButton Rename
       #addInterface.interface
         .interfaceHeader
-          .interfaceTitle add items
+          .interfaceTitle add item
           .closeInterface.fas.fa-times
         .interfaceContent
           .ui-input-container

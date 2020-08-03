@@ -5,7 +5,7 @@ function Nav() {
   let items = [], itemId = 0
 
   // store currently focused item
-  let focused
+  let focused = null
 
   // dom objects
   let dom = {}
@@ -19,7 +19,7 @@ function Nav() {
   // assemble fileList dom using info
   this.assembleFileList = (info, target, clientSimple, name) => {
     // reset information-storing variables
-    items = [], itemId = 0, focused = undefined
+    items = [], itemId = 0, focused = null
 
     // create fileList div
     const list = document.createElement("div")
@@ -30,9 +30,9 @@ function Nav() {
       const child = info.children[i]
       // check if child is a file or directory
       if (child.type === "file") {
-        list.appendChild(assembleFile(child))
+        list.appendChild(this.assembleFile(child))
       } else if (child.type === "directory") {
-        const dirNodes = assembleDirectory(child)
+        const dirNodes = this.assembleDirectory(child)
         list.appendChild(dirNodes[0])
         list.appendChild(dirNodes[0])
       }
@@ -48,7 +48,7 @@ function Nav() {
   }
 
   // create file object
-  function assembleFile(file) {
+  this.assembleFile = (file) => {
     // add to items
     items[itemId] = file
 
@@ -70,7 +70,7 @@ function Nav() {
     }
 
     // add event listeners
-    fileInfo.querySelector(".itemName").addEventListener("click", handleNameClick)
+    fileInfo.querySelector(".itemName").addEventListener("click", (event) => {this.handleNameClick(event.target)})
 
     // increment itemId
     itemId++
@@ -80,7 +80,7 @@ function Nav() {
   }
 
   // create directory object
-  function assembleDirectory(dir) {
+  this.assembleDirectory = (dir) => {
     // add to items
     items[itemId] = dir
 
@@ -90,7 +90,7 @@ function Nav() {
 
     // add event listeners
     dirInfo.querySelector(".itemArrow").addEventListener("click", handleArrowClick)
-    dirInfo.querySelector(".itemName").addEventListener("click", handleNameClick)
+    dirInfo.querySelector(".itemName").addEventListener("click", (event) => {this.handleNameClick(event.target)})
 
     // create child container
     const containerElement = document.createElement("div")
@@ -107,10 +107,10 @@ function Nav() {
       // check if child is a file or directory
       if (child.type === "file") {
         // append file object
-        containerElement.appendChild(assembleFile(child))
+        containerElement.appendChild(this.assembleFile(child))
       } else if (child.type === "directory") {
         // recursively append directory object
-        const dirNodes = assembleDirectory(child)
+        const dirNodes = this.assembleDirectory(child)
         containerElement.appendChild(dirNodes[0])
         containerElement.appendChild(dirNodes[0])
       }
@@ -126,7 +126,7 @@ function Nav() {
   // assemble preview dom
   function assemblePreview() {
     // create preview element
-    const domString = '<div id="preview"><div id="previewWrapper"><div id="previewContent"><div id="imageWrapper"><img id="previewImage" src="https://picsum.photos/seed/hmpg/75"/></div><div id="previewTitle">...</div><div id="previewInfo">...</div></div></div><div class="hiddenDisplay" id="selectedDisplay"></div></div>'
+    const domString = '<div id="preview"><div id="previewWrapper"><div id="previewContent"><div id="imageWrapper"><img id="previewImage" src=""/></div><div id="previewTitle">...</div><div id="previewInfo">...</div></div></div><div class="hiddenDisplay" id="selectedDisplay"></div></div>'
     const previewInfo = new DOMParser().parseFromString(domString, 'text/html')
 
     dom.previewImage = previewInfo.querySelector("#previewImage")
@@ -148,14 +148,6 @@ function Nav() {
       targetName = userInfo.user
     }
 
-    // reset buttons
-    if (!simple) {
-      // dom.hmpgTriggerButton.className = "inactiveButton"
-      // dom.renameButton.className = "inactiveButton"
-      // dom.moveButton.className = "inactiveButton"
-      // dom.deleteButton.className = "inactiveButton"
-    }
-
     // display/collapse icons
     const hideIcons = element.getElementsByClassName('hideIcon')
     for (let i = 0; i < hideIcons.length; i++) {
@@ -173,13 +165,9 @@ function Nav() {
   }
 
   // handle item selection
-  function handleNameClick() {
-    if (!simple) {
-      // activate buttons
-    }
-
+  this.handleNameClick = (target) => {
     // get the object's item id
-    const id = this.parentNode.id.split("-")[1]
+    const id = target.parentNode.id.split("-")[1]
     const item = items[id]
 
     // item name
@@ -221,6 +209,9 @@ function Nav() {
 
     // set new item as focused
     focused = item
+
+    // set focused
+    this.focused = focused
   }
 
   // display and collapse directories
