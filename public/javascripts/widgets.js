@@ -129,9 +129,9 @@ function Nav() {
     const domString = '<div id="preview"><div id="previewWrapper"><div id="previewContent"><div id="imageWrapper"><img id="previewImage" src=""/></div><div id="previewTitle">...</div><div id="previewInfo">...</div></div></div><div class="hiddenDisplay" id="selectedDisplay"></div></div>'
     const previewInfo = new DOMParser().parseFromString(domString, 'text/html')
 
-    dom.previewImage = previewInfo.querySelector("#previewImage")
-    dom.previewTitle = previewInfo.querySelector("#previewTitle")
-    dom.previewInfo = previewInfo.querySelector("#previewInfo")
+    // previewImage = previewInfo.querySelector("#previewImage")
+    // previewTitle = previewInfo.querySelector("#previewTitle")
+    // previewInfo = previewInfo.querySelector("#previewInfo")
 
     return previewInfo.body.firstChild
   }
@@ -171,7 +171,7 @@ function Nav() {
     const item = items[id]
 
     // item name
-    dom.previewTitle.innerHTML = item.name
+    previewTitle.innerHTML = item.name
 
     // item link
     const completeLink = "https://" + targetName + ".hmpg.io/" + item.link
@@ -179,31 +179,31 @@ function Nav() {
     // determine if item is a file or directory
     if (item.type === "file") {
       // item info
-      dom.previewInfo.innerHTML = 'type: ' + item.filetype + ' • size: ' + item.displaySize + ' • link: <a href="' + completeLink + '">' + item.link + '</a>'
+      previewInfo.innerHTML = 'type: ' + item.filetype + ' • size: ' + item.displaySize + ' • link: <a href="' + completeLink + '">' + item.link + '</a>'
 
       // set correct preview
       const type = item.filetype.split("/")[0]
       if (type === "image") {
-        dom.previewImage.src = completeLink
+        previewImage.src = completeLink
       } else if (type === "audio") {
-        dom.previewImage.src = "/images/icons/file-audio.png"
+        previewImage.src = "/images/icons/file-audio.png"
       } else if (type === "video") {
-        dom.previewImage.src = "/images/icons/file-video.png"
+        previewImage.src = "/images/icons/file-video.png"
       } else {
-        dom.previewImage.src = "/images/icons/file-default.png"
+        previewImage.src = "/images/icons/file-default.png"
       }
     } else {
       // size suffix
       let suffix = ((item.children.length === 1) ? ' item' : ' items')
 
       // item info
-      dom.previewInfo.innerHTML = 'type: directory • size: ' + item.children.length + suffix + ' • link: <a href="' + completeLink + '">' + item.link + '</a>'
+      previewInfo.innerHTML = 'type: directory • size: ' + item.children.length + suffix + ' • link: <a href="' + completeLink + '">' + item.link + '</a>'
 
       // directory preview
       if (item.children.length === 0) {
-        dom.previewImage.src = "/images/icons/directory-empty.png"
+        previewImage.src = "/images/icons/directory-empty.png"
       } else {
-        dom.previewImage.src = "/images/icons/directory-full.png"
+        previewImage.src = "/images/icons/directory-full.png"
       }
     }
 
