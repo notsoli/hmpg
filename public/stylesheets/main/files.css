@@ -8,11 +8,12 @@
 
 #interfaces {
   width: 100%;
-  height: 200px;
+  height: 250px;
   position: absolute;
   top: 50px;
   right: 0px;
   user-select: none;
+  display: none;
 }
 
 .interface {
@@ -62,12 +63,13 @@
   background-color: #6a2c70;
 }
 
-/* rename interface */
-
-#renameInput {
+#renameInput, #moveInput {
   width: 80%;
   height: 25px;
+  margin-top: 12%;
 }
+
+/* rename interface */
 
 /* add interface */
 
@@ -77,11 +79,6 @@
 
 /* move interface */
 
-#moveInput {
-  width: 80%;
-  height: 25px;
-}
-
 /* delete interface */
 
 #deleteInterface p {
@@ -89,6 +86,7 @@
   text-align: center;
   font-size: 15px;
   line-height: 1.3;
+  margin-top: 10%;
 }
 
 /* file preview */

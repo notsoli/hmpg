@@ -77,21 +77,25 @@
 
     d.renameCancel.addEventListener("click", () => {
       document.querySelector("#renameInterface").style.display = "none"
+      interfaces.style.display = "none"
     })
     d.renameConfirm.addEventListener("click", handleRename)
 
     d.addCancel.addEventListener("click", () => {
       document.querySelector("#addInterface").style.display = "none"
+      interfaces.style.display = "none"
     })
     d.addConfirm.addEventListener("click", handleDirectory)
 
     d.deleteCancel.addEventListener("click", () => {
       document.querySelector("#deleteInterface").style.display = "none"
+      interfaces.style.display = "none"
     })
     d.deleteConfirm.addEventListener("click", handleDelete)
 
     d.moveCancel.addEventListener("click", () => {
       document.querySelector("#moveInterface").style.display = "none"
+      interfaces.style.display = "none"
     })
     d.moveConfirm.addEventListener("click", handleMove)
 
@@ -137,6 +141,9 @@
 
   // handle interface opening
   function handleInterfaceOpen(newInterface) {
+    // show interfaces
+    interfaces.style.display = "block"
+
     // make sure there are items selected
     if ((newInterface === "moveInterface" || newInterface === "deleteInterface") && selected.length === 0) return
 
@@ -147,6 +154,10 @@
 
   // handle interface x button clicks
   function handleInterfaceClose() {
+    // hide interfaces
+    interfaces.style.display = "none"
+
+    // hide selected interface
     this.parentNode.parentNode.style.display = "none"
   }
 
