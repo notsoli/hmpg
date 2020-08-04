@@ -7,10 +7,10 @@
   let info
 
   // dom objects
-  let dom, target
+  let d, target
 
   // store nav
-  const editNav = new Nav()
+  let editNav
 
   // store selected elements
   let selected = []
@@ -20,17 +20,20 @@
 
   // init function
   async function init() {
-    // pre init dom objects
-    target = document.querySelector("#files")
-
     // assemble dom
     info = await fs.sendFullRequest()
     info = fs.addPaths(info)
-    await editNav.assembleFileList(info, target, false)
+    editNav = new Nav({target: document.querySelector("#files")}, false, userInfo.user)
+    await editNav.init(info)
+
+    // append preview buttons to preview
+    const buttonString = '<div id="previewActions" class="ui-button-collection"><div id="hmpgButton" class="ui-button">hmpg</div><div id="renameButton" class="ui-button">Rename</div></div>'
+    const buttonInfo = new DOMParser().parseFromString(buttonString, 'text/html')
+    document.querySelector("#previewContent").appendChild(buttonInfo.body.firstChild)
 
     // post init dom objects
     // why can i completely comment this thing out?
-    dom = {
+    d = {
       interfaces: document.querySelector("#interfaces"),
       selectedDisplay: document.querySelector("#selectedDisplay"),
       hmpgButton: document.querySelector("#hmpgButton"),
@@ -54,10 +57,7 @@
     }
 
     // append interfaces to preview
-    document.querySelector("#preview").appendChild(interfaces)
-
-    // append preview buttons to preview
-    document.querySelector("#previewContent").innerHTML += '<div id="previewActions" class="ui-button-collection"><div id="hmpgButton" class="ui-button">hmpg</div><div id="renameButton" class="ui-button">Rename</div></div>'
+    document.querySelector("#preview").appendChild(d.interfaces)
 
     // event listeners
     const checkboxes = document.getElementsByClassName('itemCheckbox')
@@ -65,37 +65,37 @@
       checkboxes[i].addEventListener('change', handleCheckboxClick)
     }
 
-    renameButton.addEventListener("click", () => {handleInterfaceOpen("renameInterface")})
-    addButton.addEventListener("click", () => {handleInterfaceOpen("addInterface")})
-    moveButton.addEventListener("click", () => {handleInterfaceOpen("moveInterface")})
-    deleteButton.addEventListener("click", () => {handleInterfaceOpen("deleteInterface")})
+    d.renameButton.addEventListener("click", () => {handleInterfaceOpen("renameInterface")})
+    d.addButton.addEventListener("click", () => {handleInterfaceOpen("addInterface")})
+    d.moveButton.addEventListener("click", () => {handleInterfaceOpen("moveInterface")})
+    d.deleteButton.addEventListener("click", () => {handleInterfaceOpen("deleteInterface")})
 
     const closeInterfaces = document.getElementsByClassName('closeInterface')
     for (let i = 0; i < closeInterfaces.length; i++) {
       closeInterfaces[i].addEventListener('click', handleInterfaceClose)
     }
 
-    renameCancel.addEventListener("click", () => {
+    d.renameCancel.addEventListener("click", () => {
       document.querySelector("#renameInterface").style.display = "none"
     })
-    renameConfirm.addEventListener("click", handleRename)
+    d.renameConfirm.addEventListener("click", handleRename)
 
-    addCancel.addEventListener("click", () => {
+    d.addCancel.addEventListener("click", () => {
       document.querySelector("#addInterface").style.display = "none"
     })
-    addConfirm.addEventListener("click", handleDirectory)
+    d.addConfirm.addEventListener("click", handleDirectory)
 
-    deleteCancel.addEventListener("click", () => {
+    d.deleteCancel.addEventListener("click", () => {
       document.querySelector("#deleteInterface").style.display = "none"
     })
-    deleteConfirm.addEventListener("click", handleDelete)
+    d.deleteConfirm.addEventListener("click", handleDelete)
 
-    moveCancel.addEventListener("click", () => {
+    d.moveCancel.addEventListener("click", () => {
       document.querySelector("#moveInterface").style.display = "none"
     })
-    moveConfirm.addEventListener("click", handleMove)
+    d.moveConfirm.addEventListener("click", handleMove)
 
-    addLink.value = userInfo.settings.defaultDirectoryLinkLength
+    d.addLink.value = userInfo.settings.defaultDirectoryLinkLength
   }
 
   // handle checkbox clicks
@@ -119,19 +119,19 @@
     // activate/deactivate elements
     if (selected.length > 0) {
       // show selected display
-      selectedDisplay.innerHTML = "selected: " + selected.length + ((selected.length > 1) ? " items" : " item")
-      selectedDisplay.style.display = "block"
+      d.selectedDisplay.innerHTML = "selected: " + selected.length + ((selected.length > 1) ? " items" : " item")
+      d.selectedDisplay.style.display = "block"
 
       // activate buttons
-      moveButton.className = "ui-button"
-      deleteButton.className = "ui-button"
+      d.moveButton.className = "ui-button"
+      d.deleteButton.className = "ui-button"
     } else {
       // hide selected display
-      selectedDisplay.style.display = "none"
+      d.selectedDisplay.style.display = "none"
 
       // deactivate buttons
-      moveButton.className = "ui-button ui-button-inactive"
-      deleteButton.className = "ui-button ui-button-inactive"
+      d.moveButton.className = "ui-button ui-button-inactive"
+      d.deleteButton.className = "ui-button ui-button-inactive"
     }
   }
 
@@ -253,7 +253,7 @@
       if (editNav.focused.fileType) {
         // concatename and verify filetype
         const type = "." + editNav.focused.filetype.split("/")[1]
-        if (!renameInput.value.endsWith(type)) return
+        if (!d.renameInput.value.endsWith(type)) return
       }
 
       // create a new ajax request
@@ -269,7 +269,7 @@
       // send request
       request.open("POST", "https://hmpg.io/renameFiles")
       request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8')
-      request.send(JSON.stringify({path: path, name: renameInput.value}))
+      request.send(JSON.stringify({path: path, name: d.renameInput.value}))
     }
   }
 
@@ -280,7 +280,7 @@
 
     // move back current interfaces
     document.querySelector("#" + openInterface).style.display = "none"
-    document.querySelector("#main").appendChild(interfaces)
+    document.querySelector("#main").appendChild(d.interfaces)
 
     // remove current list if it exists
     const fileList = document.querySelector("#content")
@@ -297,10 +297,10 @@
     // setup new list
     info = await fs.sendFullRequest()
     info = fs.addPaths(info)
-    editNav.assembleFileList(info, target, false)
+    await editNav.init(info)
 
     // append interfaces to preview
-    document.querySelector("#preview").appendChild(interfaces)
+    document.querySelector("#preview").appendChild(d.interfaces)
 
     // reset checkbox event listeners
     const checkboxes = document.getElementsByClassName('itemCheckbox')
@@ -309,8 +309,8 @@
     }
 
     // reset buttons
-    moveButton.className = "ui-button ui-button-inactive"
-    deleteButton.className = "ui-button ui-button-inactive"
+    d.moveButton.className = "ui-button ui-button-inactive"
+    d.deleteButton.className = "ui-button ui-button-inactive"
 
     // append preview buttons to preview
     document.querySelector("#previewContent").innerHTML += '<div id="previewActions" class="ui-button-collection"><div id="hmpgButton" class="ui-button">hmpg</div><div id="renameButton" class="ui-button">Rename</div></div>'
