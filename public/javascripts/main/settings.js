@@ -5,7 +5,7 @@ window.addEventListener('load', init)
 let contentItems, menuItems
 
 // account dom objects
-let newUsername, password, submitUsername, oldPassword, newPassword, confirmPassword, submitPassword
+let newUsername, password, submitUsername, oldPassword, newPassword, confirmPassword, submitPassword, menu, menuButton
 
 // store username and password for later login
 let loginUsername, loginPassword
@@ -30,12 +30,15 @@ function init() {
   newPassword = document.querySelector("#newPassword")
   confirmPassword = document.querySelector("#confirmPassword")
   submitPassword = document.querySelector("#submitPassword")
+  menu = document.querySelector("#menu")
+  menuButton = document.querySelector("#menuButton")
 
   // populate security dom objects
   defaultFileLinkLength = document.querySelector("#defaultFileLinkLength")
   defaultDirectoryLinkLength = document.querySelector("#defaultDirectoryLinkLength")
 
   // main event listeners
+  menuButton.addEventListener("click", toggleMenu)
   for (let i = 0; i < menuItems.length; i++) {
     menuItems[i].addEventListener('click', handleMenuClick)
   }
@@ -47,6 +50,15 @@ function init() {
   submitPassword.addEventListener("click", handlePassword)
 
   resetValues()
+}
+
+// handle menu button click
+function toggleMenu() {
+  if (menu.style.marginLeft === "0px" ) {
+    menu.style.marginLeft = "-170px"
+  } else {
+    menu.style.marginLeft = "0px"
+  }
 }
 
 // handle menu item selection
@@ -61,6 +73,11 @@ function handleMenuClick() {
 
   // set the current active page
   activePage = this.id
+
+  // hide menu
+  if (window.innerWidth <= 1224) {
+    toggleMenu()
+  }
 }
 
 // submit username change request

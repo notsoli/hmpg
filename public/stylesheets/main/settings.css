@@ -1,138 +1,183 @@
+/* main */
+
 #main {
-  margin: 30px;
-  width: calc(100% - 60px);
-  height: calc(100% - 110px);
+  height: 100%;
 }
 
-#settingsWrapper {
-  width: 100%;
+/* menu */
+
+#menu {
+  padding: 30px;
+  user-select: none;
+  width: 110px;
+  position: fixed;
   height: 100%;
+  background-color: #fff;
+  margin-top: -40px;
+  margin-left: -170px;
+  transition: margin-left 0.3s;
+}
+
+#menuButton {
+  width: 40px;
+  height: 40px;
+  position: relative;
+  font-size: 30px;
+  background-color: #fff;
+  color: #f08a5d;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  left: 140px;
+  top: 10px;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  width: 100px;
+  height: 30px;
+  margin-bottom: 10px;
+}
+
+.menuItem:hover, .activeItem {
+  color: #f08a5d;
+  border-bottom: 2px solid #f08a5d;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.menuIcon {
+  font-size: 20px;
+  margin-right: 10px;
+}
+
+/* content */
+
+#content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* body */
+
+#contentBody {
+  background-color: #e3e3e3;
+  flex-grow: 1;
+  height: calc(100% - 50px);
+  overflow: auto;
+}
+
+.contentItem {
+  flex-grow: 1;
+  display: none;
+}
+
+.contentItem > * {
+  margin: 30px 30px 0 30px;
+  background-color: #fff;
+}
+
+.contentItem > *:last-child {
+  margin-bottom: 30px;
+}
+
+.contentItem h1 {
+  background-color: #6a2c70;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  text-indent: 10px;
+  color: #fff;
+  font-size: 22px;
+}
+
+.contentItem h2 {
+  background-color: #f08a5d;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  text-indent: 10px;
+  color: #fff;
+}
+
+.contentBody {
   display: flex;
   flex-direction: column;
 }
 
-#menu {
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: row;
-  border-bottom: 2px solid #000000;
-  padding-bottom: 10px;
-  margin-bottom: 20px;
+.contentBody > * {
+  margin: 15px 15px 0 15px;
 }
 
-.menuItem {
-  padding: 10px;
+.contentBody > *:last-child {
+  margin-bottom: 15px;
 }
 
-.activeItem {
-  font-weight: bold;
+.inputElement p {
+  margin-bottom: 5px;
 }
 
-.menuItem:hover {
-  cursor: pointer;
+.contentBody .ui-button {
+  background-color: #6a2c70;
 }
 
-#content {
-  width: 100%;
-  height: calc(100% - 120px);
-}
-
-.contentItem {
-  width: 100%;
-  height: 100%;
-  display: none;
-  overflow: auto;
-}
-
-.contentItem > * {
-  margin-bottom: 30px;
-}
-
-h1 {
-  font-size: 30px;
-}
-
-h2 {
-  font-size: 22px;
-  margin-bottom: 10px;
-}
-
-.inputElement {
-  height: 30px;
-  display: flex;
-  align-items: center;
-}
-
-#accountContent > div > p {
-  margin-bottom: 20px;
-}
-
-#accountContent > div > div > p{
-  width: 150px;
-}
-
-#links > p {
-  margin-bottom: 20px;
-}
-
-#links > div > p {
-  width: 200px;
-}
-
-#links > div > input {
+.contentBody input[type=number] {
   width: 50px;
 }
 
-#actions {
-  height: 30px;
-  display: flex;
-  margin-top: 20px;
-}
+/* footer */
 
-#actions > div, #submitUsername, #submitPassword {
-  width: 80px;
-  height: 30px;
+#contentFooter {
+  height: 50px;
   display: flex;
-  justify-content: space-around;
   align-items: center;
-  color: #ffffff;
-  border-radius: 5px;
-  margin-right: 10px;
-  user-select: none;
-  cursor: pointer;
 }
 
-#confirmButton, #submitUsername, #submitPassword {
-  background-color: #000000;
+#contentFooter .ui-button-collection {
+  margin-left: 10px;
 }
 
 #cancelButton {
-  background-color: #db6b58;
+  background-color: #6a2c70;
 }
 
+#confirmButton {
+  background-color: #f08a5d;
+}
+
+/* desktop formatting */
+
 @media only screen  and (min-width : 1224px) {
-  #settingsWrapper {
-    flex-direction: row;
-  }
+  /* menu */
 
   #menu {
-    flex-wrap: nowrap;
-    overflow: auto;
-    width: 100px;
-    flex-direction: column;
-    border-bottom: none;
-    border-right: 2px solid #000000;
-    padding: 0;
-    margin-bottom: 0;
-    margin-right: 20px;
+    margin: 0 !important;
   }
 
-  .menuItem {
-    width: 70px;
-    padding: 10px;
+  #menuButton {
+    display: none;
   }
+
+  /* content */
 
   #content {
-    height: calc(100% - 50px);
+    margin-left: 170px;
+  }
+
+  /* body */
+
+  .inputElement {
+    display: flex;
+    align-items: center;
+  }
+
+  .inputElement p {
+    width: 175px;
+  }
+
+  #links .inputElement p {
+    width: 250px;
   }
 }

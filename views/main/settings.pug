@@ -6,49 +6,57 @@ block links
 
 block content
   #main
-    #settingsWrapper
-      #menu
-        .menuItem.activeItem#account Account
-        .menuItem#security Security
-      #content
+    #menu
+      #menuButton.fas.fa-bars
+      #account.menuItem.activeItem
+        .menuIcon.fas.fa-user
+        .menuTitle Account
+      #security.menuItem
+        .menuIcon.fas.fa-lock
+        .menuTitle Security
+    #content
+      #contentBody
         .contentItem#accountContent(style="display: block;")
           h1 Account Settings
           #username
             h2 Username
-            p Change your account username.
-            .inputElement
-              p New username:
-              input#newUsername(type="text" name="newUsername" placeholder="new username")
-            .inputElement
-              p Password:
-              input#password(type="password" name="password" placeholder="password")
-            #submitUsername submit
+            .contentBody
+              p Change your account username.
+              .inputElement
+                p New username:
+                input#newUsername(type="text" name="newUsername" placeholder="new username")
+              .inputElement
+                p Password:
+                input#password(type="password" name="password" placeholder="password")
+              #submitUsername.ui-button Submit
           #password
             h2 Password
-            p Change your account password.
-            .inputElement
-              p Old password:
-              input#oldPassword(type="password" name="oldPassword" placeholder="old password")
-            .inputElement
-              p New password:
-              input#newPassword(type="password" name="newPassword" placeholder="new password"  autocomplete="new-password")
-            .inputElement
-              p Confirm password:
-              input#confirmPassword(type="password" name="confirmPassword" placeholder="confirm password")
-            #submitPassword submit
+            .contentBody
+              p Change your account password.
+              .inputElement
+                p Old password:
+                input#oldPassword(type="password" name="oldPassword" placeholder="old password")
+              .inputElement
+                p New password:
+                input#newPassword(type="password" name="newPassword" placeholder="new password"  autocomplete="new-password")
+              .inputElement
+                p Confirm password:
+                input#confirmPassword(type="password" name="confirmPassword" placeholder="confirm password")
+              #submitPassword.ui-button Submit
         .contentItem#securityContent
           h1 Security Settings
           #links
             h2 Link Settings
-            p Change the default link length for files and directories.
-            .inputElement
-              p Default file link length:
-              input#defaultFileLinkLength(type="number" name="defaultFileLinkLength")
-            .inputElement
-              p Default directory link length:
-              input#defaultDirectoryLinkLength(type="number" name="defaultDirectoryLinkLength")
-        #actions
-          #confirmButton confirm
-          #cancelButton cancel
-            
+            .contentBody
+              p Change the default link length for files and directories.
+              .inputElement
+                p Default file link length:
+                input#defaultFileLinkLength(type="number" name="defaultFileLinkLength")
+              .inputElement
+                p Default directory link length:
+                input#defaultDirectoryLinkLength(type="number" name="defaultDirectoryLinkLength")
+      #contentFooter
+        .ui-button-collection
+          #cancelButton.ui-button Cancel
+          #confirmButton.ui-button Confirm
     
