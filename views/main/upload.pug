@@ -1,29 +1,21 @@
 extends ../layout
 
 block links
+  link(rel='stylesheet', href='/stylesheets/main/up.css')
   link(rel='stylesheet', href='/stylesheets/main/upload.css')
+  script(src="/javascripts/up.js")
   script(src="/javascripts/main/upload.js")
 
 block content
   #dropZone
   #main
-    #fileWrapper
-      #fileDropper
-        div drag and drop files
-        p or
-        //- send me a memo when this breaks lol
-        button(onclick='document.getElementById("fileInput").click()')#fileButton choose files
-    #requestStatus
-    #linkLength
-      p Link length:
-      input#linkInput(type="number" name="linkLength")
-    #fileList
-      p Files
-      #fileDivide
-      #fileExample
-        #exampleIcon ▼
-        #exampleName name
-        #exampleSize size
-        #exampleLink link
-        #exampleStatus status
+    #uploadWrapper
+      #dropperWrapper
+        #fileDropper
+          #uploadIcon.fas.fa-upload
+          p Drag and drop items or
+          button#uploadButton.ui-button(onclick='document.querySelector("#fileInput").click()') Upload
+      #fileWrapper
+        h1 Files
+        #uploadContent
   input#fileInput(type='file' name='sampleFile' style="display: none" multiple)

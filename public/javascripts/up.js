@@ -38,7 +38,7 @@ const up = (() => {
     e.preventDefault()
 
     // show upload interface
-    if (d.uploadInterface.style.display === "none") {
+    if (d.uploadInterface && d.uploadInterface.style.display === "none") {
       d.interfaces.style.display = "block"
       d.uploadInterface.style.display = "block"
     }
@@ -86,14 +86,8 @@ const up = (() => {
       // append file to form data
       fileForm.append("file", files[i])
 
-      // verify link length
-      // if (linkInput.value > 16) {
-      //   requestStatus.innerHTML = "link can't be longer than 16 characters"
-      //   return
-      // }
-
       // append length to form data
-      fileForm.append("length", 4)
+      fileForm.append("length", userInfo.settings.defaultFileLinkLength)
 
       // create a new ajax request
       requests[fileId] = new XMLHttpRequest()
@@ -139,28 +133,12 @@ const up = (() => {
           const newItem = nav.assembleFile(response.item)
           document.querySelector("#content").appendChild(newItem)
         }
-      } else {
-
       }
     }
   }
 
   // build file html
   function buildFile(targetFileName, id) {
-    // // create human-readable filesize, from Hristo on StackOverflow
-    // let tempSize = targetFileSize
-    //
-    // let i = -1
-    // const byteUnits = [' KB', ' MB', ' GB']
-    //
-    // // determine what suffix should be used
-    // do {
-    //     tempSize = tempSize / 1024
-    //     i++;
-    // } while (tempSize > 1024)
-    //
-    // const fileSize = Math.max(tempSize, 0.1).toFixed(1) + byteUnits[i]
-
     // build dom
     const domString = '<div class="uploadFile" id="upload-' + id + '"><div class="uploadProgress"></div><img class="uploadIcon" src="images/icons/file-default.png"/><div class="uploadName">' + targetFileName + '</div><div class="uploadPercent">0%</div></div>'
     const file = new DOMParser().parseFromString(domString, 'text/html')
