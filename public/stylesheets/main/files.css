@@ -155,8 +155,8 @@
   height: 50px;
   display: flex;
   flex-direction: row;
-  background-color: #6a2c70;
   align-items: center;
+  background-color: #6a2c70;
   outline: none;
   border: none;
   font-size: 16px;
@@ -166,19 +166,28 @@
   cursor: pointer;
 }
 
-#uploadFooter > * {
+#uploadFooter * {
   color: #fff;
 }
 
 #uploadIcon {
   font-size: 30px;
+  width: 50px;
+}
+
+#uploadText {
+  display: flex;
   flex-grow: 1;
+  justify-content: center;
+}
+
+#uploadText p {
+  display: none;
+  margin-right: 5px;
 }
 
 #uploadLabel {
-  flex-grow: 1;
   text-decoration: underline;
-  margin-right: 10px;
 }
 
 /* directory interface */
@@ -324,6 +333,10 @@
 
   #interfaces {
     position: static;
+  }
+
+  #uploadText p {
+    display: block;
   }
 
   /* file preview */
