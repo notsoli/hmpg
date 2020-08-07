@@ -3,7 +3,7 @@ A simple, extremely customizable file organization and hosting platform.
 
 Uses Node.js and Express
 
-Latest version: 0.4.4
+Latest version: 0.4.5
 
 Production version: 0.3.4
 
