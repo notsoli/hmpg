@@ -4,10 +4,12 @@ block links
   link(rel='stylesheet', href='/stylesheets/widgets.css')
   link(rel='stylesheet', href='/stylesheets/main/files.css')
   script(src="/javascripts/fs.js")
+  script(src="/javascripts/up.js")
   script(src="/javascripts/widgets.js")
   script(src="/javascripts/main/files.js")
 
 block content
+  #dropZone
   #main
     #interfaces
       #renameInterface.interface
@@ -17,27 +19,46 @@ block content
         .interfaceContent
           input#renameInput(type="text" placeholder="new name")
           .ui-button-collection
-            #renameCancel.ui-button.confirmButton Cancel
-            #renameConfirm.ui-button.cancelButton Rename
+            #renameCancel.ui-button.cancelButton Cancel
+            #renameConfirm.ui-button.confirmButton Rename
       #addInterface.interface
         .interfaceHeader
           .interfaceTitle add item
           .closeInterface.fas.fa-times
         .interfaceContent
+          p What type of item would you like to add?
+          .ui-button-collection
+            #addFile.ui-button.cancelButton File
+            #addDirectory.ui-button.cancelButton Folder
+      #uploadInterface.interface(style="display: none;")
+        .interfaceHeader
+          .interfaceTitle upload files
+          .closeInterface.fas.fa-times
+        .interfaceContent
+          #uploadContent
+          button#uploadFooter(onclick='document.querySelector("#fileInput").click()')
+            #uploadIcon.fas.fa-upload
+            p Drag and drop files or
+            #uploadLabel upload
+      #directoryInterface.interface
+        .interfaceHeader
+          .interfaceTitle add folder
+          .closeInterface.fas.fa-times
+        .interfaceContent
           .ui-input-container
-            p path:
-            input#addDirectory(type='text' name='directory' placeholder="directory")
+            p name/path:
+            input#directoryPath(type='text' name='directory' placeholder="directory")
           .ui-input-container
             p link length:
-            input#addLink(type="number" name="linkLength" min="4" max="16")
+            input#directoryLink(type="number" name="linkLength" min="4" max="16")
           .ui-input-container
             p display style:
-            select#addDisplay(name='display')
+            select#directoryDisplay(name='display')
               option(value='default' selected) default
               option(value='gallery') gallery
           .ui-button-collection
-            #addCancel.ui-button.confirmButton Cancel
-            #addConfirm.ui-button.cancelButton Add
+            #directoryCancel.ui-button.cancelButton Cancel
+            #directoryConfirm.ui-button.confirmButton Add
       #moveInterface.interface
         .interfaceHeader
           .interfaceTitle move items
@@ -45,8 +66,8 @@ block content
         .interfaceContent
           input#moveInput(type="text" placeholder="new path")
           .ui-button-collection
-            #moveCancel.ui-button.confirmButton Cancel
-            #moveConfirm.ui-button.cancelButton Move
+            #moveCancel.ui-button.cancelButton Cancel
+            #moveConfirm.ui-button.confirmButton Move
       #deleteInterface.interface
         .interfaceHeader
           .interfaceTitle delete items
@@ -54,13 +75,16 @@ block content
         .interfaceContent
           p Are you sure you want to delete these items? This action cannot be undone.
           .ui-button-collection
-            #deleteCancel.ui-button.confirmButton Cancel
-            #deleteConfirm.ui-button.cancelButton Delete
+            #deleteCancel.ui-button.cancelButton Cancel
+            #deleteConfirm.ui-button.confirmButton Delete
     #files
     #actions
       .ui-button-collection
         #addButton.ui-button.fas.fa-plus
+        #addFileIcon.ui-button.fas.fa-upload
+        #addDirectoryIcon.ui-button.fas.fa-folder
         #moveButton.ui-button.ui-button-inactive Move
         #deleteButton.ui-button.ui-button-inactive Delete
       #otherActions.fas.fa-ellipsis-h
+  input#fileInput(type='file' name='sampleFile' style="display: none" multiple)
       

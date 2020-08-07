@@ -1,5 +1,5 @@
 // filesystem explorer and editor
-(() => {
+const files = (() => {
   // wait for page to load
   window.addEventListener("load", init)
 
@@ -7,7 +7,7 @@
   let info
 
   // dom objects
-  let d, target
+  let d
 
   // store nav
   let editNav
@@ -34,6 +34,7 @@
     // post init dom objects
     // why can i completely comment this thing out?
     d = {
+      dropZone: document.querySelector("#dropZone"),
       interfaces: document.querySelector("#interfaces"),
       selectedDisplay: document.querySelector("#selectedDisplay"),
       hmpgButton: document.querySelector("#hmpgButton"),
@@ -42,11 +43,15 @@
       renameCancel: document.querySelector("#renameCancel"),
       renameConfirm: document.querySelector("#renameConfirm"),
       addButton: document.querySelector("#addButton"),
+      addFileIcon: document.querySelector("#addFileIcon"),
+      addDirectoryIcon: document.querySelector("#addDirectoryIcon"),
+      addFile: document.querySelector("#addFile"),
       addDirectory: document.querySelector("#addDirectory"),
-      addLink: document.querySelector("#addLink"),
-      addDisplay: document.querySelector("#addDisplay"),
-      addCancel: document.querySelector("#addCancel"),
-      addConfirm: document.querySelector("#addConfirm"),
+      directoryPath: document.querySelector("#directoryPath"),
+      directoryLink: document.querySelector("#directoryLink"),
+      directoryDisplay: document.querySelector("#directoryDisplay"),
+      directoryCancel: document.querySelector("#directoryCancel"),
+      directoryConfirm: document.querySelector("#directoryConfirm"),
       moveButton: document.querySelector("#moveButton"),
       moveInput: document.querySelector("#moveInput"),
       moveCancel: document.querySelector("#moveCancel"),
@@ -59,48 +64,59 @@
     // append interfaces to preview
     document.querySelector("#preview").appendChild(d.interfaces)
 
-    // event listeners
-    const checkboxes = document.getElementsByClassName('itemCheckbox')
-    for (let i = 0; i < checkboxes.length; i++) {
-      checkboxes[i].addEventListener('change', handleCheckboxClick)
-    }
-
+    // open interfaces
     d.renameButton.addEventListener("click", () => {handleInterfaceOpen("renameInterface")})
     d.addButton.addEventListener("click", () => {handleInterfaceOpen("addInterface")})
+    d.addFileIcon.addEventListener("click", () => {handleInterfaceOpen("uploadInterface")})
+    d.addDirectoryIcon.addEventListener("click", () => {handleInterfaceOpen("directoryInterface")})
+    d.addFile.addEventListener("click", () => {handleInterfaceOpen("uploadInterface")})
+    d.addDirectory.addEventListener("click", () => {handleInterfaceOpen("directoryInterface")})
     d.moveButton.addEventListener("click", () => {handleInterfaceOpen("moveInterface")})
     d.deleteButton.addEventListener("click", () => {handleInterfaceOpen("deleteInterface")})
 
+    // close interfaces
     const closeInterfaces = document.getElementsByClassName('closeInterface')
     for (let i = 0; i < closeInterfaces.length; i++) {
       closeInterfaces[i].addEventListener('click', handleInterfaceClose)
     }
 
+    // confirm/cancel interfaces
     d.renameCancel.addEventListener("click", () => {
       document.querySelector("#renameInterface").style.display = "none"
-      interfaces.style.display = "none"
+      d.interfaces.style.display = "none"
     })
     d.renameConfirm.addEventListener("click", handleRename)
 
-    d.addCancel.addEventListener("click", () => {
-      document.querySelector("#addInterface").style.display = "none"
-      interfaces.style.display = "none"
+    d.directoryCancel.addEventListener("click", () => {
+      document.querySelector("#directoryInterface").style.display = "none"
+      d.interfaces.style.display = "none"
     })
-    d.addConfirm.addEventListener("click", handleDirectory)
+    d.directoryConfirm.addEventListener("click", handleDirectory)
 
     d.deleteCancel.addEventListener("click", () => {
       document.querySelector("#deleteInterface").style.display = "none"
-      interfaces.style.display = "none"
+      d.interfaces.style.display = "none"
     })
     d.deleteConfirm.addEventListener("click", handleDelete)
 
     d.moveCancel.addEventListener("click", () => {
       document.querySelector("#moveInterface").style.display = "none"
-      interfaces.style.display = "none"
+      d.interfaces.style.display = "none"
     })
     d.moveConfirm.addEventListener("click", handleMove)
 
-    d.addLink.value = userInfo.settings.defaultDirectoryLinkLength
+    // set default link length
+    d.directoryLink.value = userInfo.settings.defaultDirectoryLinkLength
+
+    // file uploads
+    up.init({dropZone: d.dropZone, interfaces: d.interfaces,
+      uploadInterface: document.querySelector("#uploadInterface"),
+      uploadTarget: document.querySelector("#uploadContent")}, editNav)
   }
+
+  window.addEventListener("linkCheckbox", (e) => {
+    e.detail.addEventListener('change', handleCheckboxClick)
+  })
 
   // handle checkbox clicks
   function handleCheckboxClick() {
@@ -142,7 +158,7 @@
   // handle interface opening
   function handleInterfaceOpen(newInterface) {
     // show interfaces
-    interfaces.style.display = "block"
+    d.interfaces.style.display = "block"
 
     // make sure there are items selected
     if ((newInterface === "moveInterface" || newInterface === "deleteInterface") && selected.length === 0) return
@@ -155,7 +171,7 @@
   // handle interface x button clicks
   function handleInterfaceClose() {
     // hide interfaces
-    interfaces.style.display = "none"
+    d.interfaces.style.display = "none"
 
     // hide selected interface
     this.parentNode.parentNode.style.display = "none"
@@ -167,13 +183,13 @@
     const directoryForm = new FormData()
 
     // append directory to form data
-    directoryForm.append('directory', addDirectory.value)
+    directoryForm.append('directory', d.directoryPath.value)
 
     // append length to form data
-    directoryForm.append('length', addLink.value)
+    directoryForm.append('length', d.directoryLink.value)
 
     // append display style to form data
-    directoryForm.append('display', addDisplay.value)
+    directoryForm.append('display', d.directoryDisplay.value)
 
     // create a new ajax request
     const request = new XMLHttpRequest()
@@ -184,7 +200,35 @@
         const response = JSON.parse(request.response)
 
         if (response.success === true) {
-          await renderFileList()
+          // get target item
+          const targetPath = d.directoryPath.value.split("/")
+          targetPath.pop()
+          const completePath = [...targetPath]
+          let targetItem
+
+          if (targetPath.length > 0) {
+            const targetName = targetPath.pop()
+            let targetId
+            for (let i = 0; i < editNav.items.length; i++) {
+              const item = editNav.items[i]
+              if (JSON.stringify(item.path) === JSON.stringify(targetPath) && item.name === targetName) {
+                targetId = i
+              }
+            }
+            targetItem = document.querySelector("#item-" + targetId + "-children")
+          } else {
+            targetItem = document.querySelector("#content")
+          }
+
+          // push new item to view
+          response.item.path = completePath
+          editNav.items.push(response.item)
+          const newItem = editNav.assembleDirectory(response.item)
+          targetItem.appendChild(newItem[0])
+          targetItem.appendChild(newItem[0])
+
+          // close directory interface
+          document.querySelector("#directoryInterface").style.display = "none"
         }
       }
     })
@@ -196,8 +240,11 @@
 
   // send move request
   function handleMove() {
+    // store value of moveInput
+    const path = d.moveInput.value
+
     // determine if any files are selected
-    if (selected.length > 0 && moveInput.value !== "") {
+    if (selected.length > 0 && path !== "") {
       // create array of links used to identify items later
       const paths = []
       for (let i = 0; i < selected.length; i++) {
@@ -212,14 +259,44 @@
       // prepare to receive response
       request.addEventListener("readystatechange", async () => {
         if (request.readyState == 4) {
-          await renderFileList()
+          const response = JSON.parse(request.response)
+          if (response.success) {
+            // get target item
+            const newPath = path.split("/")
+            const targetPath = [...newPath]
+            const targetName = targetPath.pop()
+            let targetId
+            for (let i = 0; i < editNav.items.length; i++) {
+              const item = editNav.items[i]
+              if (JSON.stringify(item.path) === JSON.stringify(targetPath) && item.name === targetName) {
+                targetId = i
+              }
+            }
+            const targetItem = document.querySelector("#item-" + targetId + "-children")
+            
+            // iterate through each successful move
+            for (let c = 0; c < response.completed.length; c++) {
+              // get file id and item
+              const id = selected[response.completed[c]]
+              const item = document.querySelector("#item-" + id)
+              
+              // change item path
+              editNav.items[id].path = newPath
+
+              // append item to targetItem
+              targetItem.appendChild(item)
+            }
+
+            // close move interface
+            document.querySelector("#moveInterface").style.display = "none"
+          }
         }
       })
 
       // send request
       request.open("POST", "https://hmpg.io/moveFiles")
       request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8')
-      request.send(JSON.stringify({paths: paths, path: moveInput.value}))
+      request.send(JSON.stringify({paths: paths, path: path}))
     }
   }
 
@@ -241,7 +318,16 @@
       // prepare to receive response
       request.addEventListener("readystatechange", async () => {
         if (request.readyState == 4) {
-          await renderFileList()
+          const response = JSON.parse(request.response)
+          if (response.success) {
+            for (let c = 0; c < response.completed.length; c++) {
+              const id = selected[response.completed[c]]
+              document.querySelector("#item-" + id).remove()
+            }
+
+            // close delete interface
+            document.querySelector("#deleteInterface").style.display = "none"
+          }
         }
       })
 
@@ -272,8 +358,30 @@
 
       // prepare to receive response
       request.addEventListener("readystatechange", async () => {
-        if (request.readyState == 4) {
-          await renderFileList()
+        if (request.readyState === 4) {
+          const response = JSON.parse(request.response)
+          if (response.success) {
+            // rename item in items
+            let id
+            for (let i = 0; i < editNav.items.length; i++) {
+              const item = editNav.items[i]
+              if (item.link === editNav.focused.link) {
+                item.name = d.renameInput.value
+                id = i
+              }
+            }
+
+            // find item element
+            const itemElement = document.querySelector("#item-" + id)
+            const itemName = itemElement.querySelector(".itemName")
+
+            // rename item dom and reset preview
+            itemName.innerHTML = d.renameInput.value
+            itemName.click()
+
+            // close rename interface
+            document.querySelector("#renameInterface").style.display = "none"
+          }
         }
       })
 
@@ -284,46 +392,6 @@
     }
   }
 
-  // re-render file list dom
-  async function renderFileList() {
-    // reset selected
-    selected = []
-
-    // move back current interfaces
-    document.querySelector("#" + openInterface).style.display = "none"
-    document.querySelector("#main").appendChild(d.interfaces)
-
-    // remove current list if it exists
-    const fileList = document.querySelector("#content")
-    if (fileList) {
-      fileList.remove()
-    }
-
-    // remove current preview if it exists
-    const preview = document.querySelector("#preview")
-    if (preview) {
-      preview.remove()
-    }
-
-    // setup new list
-    info = await fs.sendFullRequest()
-    info = fs.addPaths(info)
-    await editNav.init(info)
-
-    // append interfaces to preview
-    document.querySelector("#preview").appendChild(d.interfaces)
-
-    // reset checkbox event listeners
-    const checkboxes = document.getElementsByClassName('itemCheckbox')
-    for (let i = 0; i < checkboxes.length; i++) {
-      checkboxes[i].addEventListener('change', handleCheckboxClick)
-    }
-
-    // reset buttons
-    d.moveButton.className = "ui-button ui-button-inactive"
-    d.deleteButton.className = "ui-button ui-button-inactive"
-
-    // append preview buttons to preview
-    document.querySelector("#previewContent").innerHTML += '<div id="previewActions" class="ui-button-collection"><div id="hmpgButton" class="ui-button">hmpg</div><div id="renameButton" class="ui-button">Rename</div></div>'
-  }
+  // return values and functions so other files can use them
+  return {}
 })()

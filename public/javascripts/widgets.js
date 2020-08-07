@@ -9,7 +9,7 @@ function Nav(domObjects, simple, targetName) {
   this.focused = null
 
   // dom objects
-  d = domObjects
+  const d = domObjects
 
   // simple
   this.simple = simple
@@ -82,6 +82,11 @@ function Nav(domObjects, simple, targetName) {
 
     // add event listeners
     fileInfo.querySelector(".itemName").addEventListener("click", (event) => {this.handleNameClick(event.target)})
+    
+    if (!this.simple) {
+      const linkCheckbox = new CustomEvent('linkCheckbox', {detail: fileInfo.querySelector(".itemCheckbox")})
+      window.dispatchEvent(linkCheckbox)
+    }
 
     // increment itemId
     this.itemId++
@@ -102,6 +107,11 @@ function Nav(domObjects, simple, targetName) {
     // add event listeners
     dirInfo.querySelector(".itemArrow").addEventListener("click", (event) => {this.handleArrowClick(event.target)})
     dirInfo.querySelector(".itemName").addEventListener("click", (event) => {this.handleNameClick(event.target)})
+    
+    if (!this.simple) {
+      const linkCheckbox = new CustomEvent('linkCheckbox', {detail: dirInfo.querySelector(".itemCheckbox")})
+      window.dispatchEvent(linkCheckbox)
+    }
 
     // create child container
     const containerElement = document.createElement("div")
@@ -234,7 +244,7 @@ function Gallery(domObjects, targetName) {
   this.images = []
 
   // store dom
-  d = domObjects
+  const d = domObjects
 
   // store target username
   this.targetName = targetName

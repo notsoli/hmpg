@@ -1,5 +1,14 @@
 /* main */
 
+#dropZone {
+  display: none;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+}
+
 #main {
   height: 100%;
 }
@@ -73,7 +82,108 @@
 
 /* add interface */
 
-#addInterface .ui-input-container {
+#addInterface p {
+  width: 80%;
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.3;
+  margin-top: 10%;
+}
+
+#addInterface .ui-button {
+  width: 80px;
+}
+
+/* upload interface */
+
+#uploadInterface .interfaceContent {
+  margin: 0;
+  height: calc(100% - 30px);
+}
+
+/* upload content */
+
+#uploadContent {
+  width: 100%;
+  height: calc(100% - 50px);
+  overflow: auto;
+}
+
+.uploadFile {
+  height: 50px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  position: relative;
+}
+
+.uploadProgress {
+  position: absolute;
+  height: 46px;
+  width: 0;
+  background-color: #e3d3cc;
+  border-bottom: 4px solid #f08a5d;
+  transition: width 0.3s;
+}
+
+.uploadIcon {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  margin: 0 10px;
+}
+
+.uploadName {
+  position: relative;
+  max-width: calc(100% - 130px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.uploadPercent {
+  text-align: right;
+  position: relative;
+  margin-right: 10px;
+  flex-grow: 1;
+}
+
+/* upload footer */
+
+#uploadFooter {
+  width: 100%;
+  height: 50px;
+  display: flex;
+  flex-direction: row;
+  background-color: #6a2c70;
+  align-items: center;
+  outline: none;
+  border: none;
+  font-size: 16px;
+}
+
+#uploadFooter:hover {
+  cursor: pointer;
+}
+
+#uploadFooter > * {
+  color: #fff;
+}
+
+#uploadIcon {
+  font-size: 30px;
+  flex-grow: 1;
+}
+
+#uploadLabel {
+  flex-grow: 1;
+  text-decoration: underline;
+  margin-right: 10px;
+}
+
+/* directory interface */
+
+#directoryInterface .ui-input-container {
   width: 80%;
 }
 
@@ -147,7 +257,7 @@
 #actions .ui-button-collection {
   display: flex;
   justify-content: space-around;
-  width: 280px;
+  width: 260px;
   flex-shrink: 1;
 }
 
@@ -155,13 +265,17 @@
   margin: 0;
 }
 
-#uploadButton, #addButton {
+#addButton, #addFileIcon, #addDirectoryIcon {
   width: 30px;
   background-color: #6a2c70;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 17px;
+}
+
+#addFileIcon, #addDirectoryIcon {
+  display: none;
 }
 
 #moveButton, #deleteButton {
@@ -222,5 +336,19 @@
 
   #content {
     height: auto;
+  }
+
+  /* file actions */
+
+  #actions .ui-button-collection {
+    width: 330px;
+  }
+
+  #addButton {
+    display: none;
+  }
+
+  #addFileIcon, #addDirectoryIcon {
+    display: flex;
   }
 }

@@ -60,9 +60,9 @@ async function handleDirectory(id, directory, length, display) {
   directorySplit.pop()
 
   // add item to hmpgInfo
-  await info.modifyItem(id, {action: "add", item: newDirectory}, directorySplit)
+  const item = await info.modifyItem(id, {action: "add", item: newDirectory}, directorySplit)
   console.log("successfully created directory")
-  return link
+  return item.children[item.children.length - 1]
 }
 
 // handle file upload
@@ -89,7 +89,7 @@ async function handleFile(file, id, length) {
   const newFile = new info.File(file.name, file.size, file.mimetype, link)
 
   await info.modifyItem(id, {action: "add", item: newFile}, [])
-  return link
+  return newFile
 }
 
 // move file into user filesystem
@@ -138,7 +138,7 @@ async function handleMove(id, path, newPath) {
   await info.modifyItem(id, {action: "delete", name: name}, path)
 
   // add item to hmpgInfo
-  await info.modifyItem(id, {action: "add", item: item}, splitPath)
+  const newItem = await info.modifyItem(id, {action: "add", item: item}, splitPath)
 
   // change link directory
   await db.rename(id, basePath + name, newPath + name)
@@ -150,6 +150,8 @@ async function handleMove(id, path, newPath) {
       await moveChild(id, basePath + name + "/" + child.name, newPath + name + "/" + child.name, child)
     }
   }
+
+  return newItem.children[newItem.children.length - 1]
 }
 
 // handles file moving for children

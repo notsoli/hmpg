@@ -25,10 +25,10 @@ router.post('/', async function(req, res, next) {
     for (let i = 0; i < req.body.length; i++) {
       try {
         await file.handleDelete(req.info.login.userid, req.body[i])
-        completed.push(req.body[i])
+        completed.push(i)
       } catch (error) {
         console.log(error)
-        failed.push(req.body[i])
+        failed.push(i)
       }
     }
 

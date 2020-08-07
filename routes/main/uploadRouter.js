@@ -39,11 +39,8 @@ router.post('/upload', async (req, res) => {
     }
 
     // single file
-    const link = await file.handleFile(files, req.info.login.userid, req.body.length)
-
-    // respond with the new link
-    const completeLink = "https://" + req.info.login.user + ".hmpg.io/" + link
-    res.send({success: true, link: completeLink, uploads: req.info.uploads})
+    const item = await file.handleFile(files, req.info.login.userid, req.body.length)
+    res.send({success: true, item: item})
   } catch (error) {
     console.log(error)
     res.send({success: false, error: error.message})

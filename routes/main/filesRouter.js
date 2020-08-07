@@ -31,8 +31,8 @@ router.post('/files', async (req, res) => {
       throw new Error(e.request.badRequest)
     }
 
-    await file.handleDirectory(req.info.login.userid, req.body.directory, length, req.body.display)
-    res.send({success: true})
+    const item = await file.handleDirectory(req.info.login.userid, req.body.directory, length, req.body.display)
+    res.send({success: true, item: item})
   } catch (error) {
     console.log(error)
     res.send({success: false, error: error.message})
