@@ -342,6 +342,12 @@
                 itemArrow.click()
               }
             }
+
+            // click first element
+            const firstItem = document.querySelector("#item-0")
+            if (firstItem) {
+              firstItem.querySelector(".itemName").click()
+            }
           }
         }
       })
@@ -381,6 +387,12 @@
             // close delete interface
             document.querySelector("#deleteInterface").style.display = "none"
             resetSelected()
+          
+            // click first element
+            const firstItem = document.querySelector("#item-0")
+            if (firstItem) {
+              firstItem.querySelector(".itemName").click()
+            }
           }
         }
       })
