@@ -1,5 +1,5 @@
 // filesystem explorer and editor
-const files = (() => {
+(() => {
   // wait for page to load
   window.addEventListener("load", init)
 
@@ -155,6 +155,24 @@ const files = (() => {
     }
   }
 
+  function resetSelected() {
+    // clear selected
+    selected = []
+    
+    // hide selected display
+    d.selectedDisplay.style.display = "none"
+
+    // deactivate buttons
+    d.moveButton.className = "ui-button ui-button-inactive"
+    d.deleteButton.className = "ui-button ui-button-inactive"
+
+    // uncheck all checkboxes
+    const checkboxes = document.querySelectorAll(".itemCheckbox")
+    for (let checkbox of checkboxes) {
+      checkbox.checked = false
+    }
+  }
+
   // handle interface opening
   function handleInterfaceOpen(newInterface) {
     // show interfaces
@@ -221,7 +239,7 @@ const files = (() => {
           }
 
           // push new item to view
-          response.item.path = completePath
+          response.item.path = [...completePath]
           editNav.items.push(response.item)
           const newItem = editNav.assembleDirectory(response.item)
           targetItem.appendChild(newItem[0])
@@ -229,6 +247,23 @@ const files = (() => {
 
           // close directory interface
           document.querySelector("#directoryInterface").style.display = "none"
+        
+          // open directories
+          for (let p = 0; p < completePath.length; p++) {
+            const dirName = completePath.pop()
+            let dirId
+            for (let i = 0; i < editNav.items.length; i++) {
+              const item = editNav.items[i]
+              if (item.name === dirName && JSON.stringify(item.path) === JSON.stringify(completePath)) {
+                dirId = i
+              }
+            }
+
+            const itemArrow = document.querySelector("#item-" + dirId + " .itemArrow")
+            if (!itemArrow.classList.contains("activeArrow")) {
+              itemArrow.click()
+            }
+          }
         }
       }
     })
@@ -281,7 +316,7 @@ const files = (() => {
               const item = document.querySelector("#item-" + id)
               
               // change item path
-              editNav.items[id].path = newPath
+              editNav.items[id].path = [...newPath]
 
               // append item to targetItem
               targetItem.appendChild(item)
@@ -289,6 +324,24 @@ const files = (() => {
 
             // close move interface
             document.querySelector("#moveInterface").style.display = "none"
+            resetSelected()
+
+            // open directories
+            for (let p = 0; p < newPath.length; p++) {
+              const dirName = newPath.pop()
+              let dirId
+              for (let i = 0; i < editNav.items.length; i++) {
+                const item = editNav.items[i]
+                if (item.name === dirName && JSON.stringify(item.path) === JSON.stringify(newPath)) {
+                  dirId = i
+                }
+              }
+
+              const itemArrow = document.querySelector("#item-" + dirId + " .itemArrow")
+              if (!itemArrow.classList.contains("activeArrow")) {
+                itemArrow.click()
+              }
+            }
           }
         }
       })
@@ -327,6 +380,7 @@ const files = (() => {
 
             // close delete interface
             document.querySelector("#deleteInterface").style.display = "none"
+            resetSelected()
           }
         }
       })
@@ -391,7 +445,4 @@ const files = (() => {
       request.send(JSON.stringify({path: path, name: d.renameInput.value}))
     }
   }
-
-  // return values and functions so other files can use them
-  return {}
 })()
