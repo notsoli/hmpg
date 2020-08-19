@@ -12,7 +12,7 @@
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "express": "~4.16.1",
-    "express-fileupload": "^1.1.7-alpha.4",
+    "express-fileupload": "^1.1.9",
     "express-https-redirect": "^1.0.0",
     "http-errors": "~1.6.3",
     "lodash": "^4.17.19",
