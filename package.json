@@ -15,7 +15,7 @@
     "express-fileupload": "^1.1.9",
     "express-https-redirect": "^1.0.0",
     "http-errors": "~1.6.3",
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.21",
     "morgan": "~1.9.1",
     "mysql": "^2.18.1",
     "pug": "^3.0.0",
